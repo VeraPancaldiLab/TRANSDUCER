@@ -15,6 +15,9 @@
 *.bam
 *.sam
 *.gtf
+*.RDS
+*.rds
+*.RData
 
 # specific dirs
 02_Raw_data/Fix-OneDrive-Zip
