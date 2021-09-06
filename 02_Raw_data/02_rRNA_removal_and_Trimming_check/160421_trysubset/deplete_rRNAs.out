@@ -1,0 +1,542 @@
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --ref
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_F8-9_R1.fastq of previous flag: --reads
+Found flag: --reads
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_F8-9_R2.fastq of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_F8-9_R1.fastq
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_F8-9_R2.fastq
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/kvdb"
+[validate_kvdbdir:1259] Creating KVDB directory: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/idx"
+[validate_idxdir:1197] Created index directory - OK
+[validate_readb_dir:1281] Using split reads directory : "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb"
+[validate_readb_dir:1289] Created split reads directory - OK
+[validate_aligned_pfx:1310] Checking output directory: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out"
+[validate_other_pfx:1333] Checking output directory: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree"
+[main:62] Running command:
+sortmerna --ref /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta --reads /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_F8-9_R1.fastq --reads /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_F8-9_R2.fastq --workdir /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/ --fastx rRNA_aligned --other /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9 --paired_in --out2 
+[build_index:1127] ==== Index building started ====
+[build_index:1190] Begin indexing file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta of size: 129519 under index name /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/idx/6793334293745532880
+  done.
+
+[build_index:2108] ==== Done index building in 0.338993 sec ====
+
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_F8-9_R1.fastq" is FASTQ flat ASCII
+[define_format:885] file: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_F8-9_R2.fastq" is FASTQ flat ASCII
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 47398615
+[next:311] EOF REV reached. Total reads: 47398615
+[count_reads:949] done count. Elapsed time: 806.962 sec. Total reads: 94797230
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_0.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_0.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_1.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_1.fq
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[next:311] EOF FWD reached. Total reads: 47398615
+[next:311] EOF REV reached. Total reads: 47398615
+[split:694] Done splitting. Reads count: 94797230 Runtime sec: 436.756
+
+[init:135] Readfeed init done in sec [1243.76]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 94797230 all_reads_len= 2814824954 min_read_len= 75 max_read_len= 75 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 4
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.555924 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 7 ... 
+[align:190] done in [0.247327] sec Memory KB: 21
+[align:193] Loading references ...
+[align:197] done in [0.0120569] sec. Memory KB: 22
+[align2:70] Processor 0 thread 140654776628992 started
+[align2:70] Processor 1 thread 140654785021696 started
+[next:433] EOF FWD reached. Total reads: 23699307
+[next:433] EOF REV reached. Total reads: 23699307
+[align2:133] Processor 1 thread 140654785021696 done. Processed 47398614 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 1191775 Runtime sec: 624.254
+[next:433] EOF FWD reached. Total reads: 23699308
+[next:433] EOF REV reached. Total reads: 23699308
+[align2:133] Processor 0 thread 140654776628992 done. Processed 47398616 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 1187159 Runtime sec: 633.159
+[align:220] done index: 0 part: 1 in 633.159 sec Memory KB: 178
+[align:227] Index and References unloaded in 0.00321535 sec. Memory KB: 178
+[align:237] ==== Done alignment in 633.423 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 94797230 all_reads_len= 2814824954 min_read_len= 75 max_read_len= 75 total_aligned= 2378934 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.502189 sec
+[write:62] Using summary file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.532645] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.51074 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.000792814 sec
+[report:93] Report Processor: 0 thread: 140654785021696 started. Memory KB: 177
+[report:93] Report Processor: 1 thread: 140654776628992 started. Memory KB: 177
+[next:433] EOF FWD reached. Total reads: 23699308
+[next:433] EOF REV reached. Total reads: 23699308
+[report:152] Report processor: 0 thread: 140654785021696 done. Processed reads: 47398616 Invalid reads: 0 Memory KB: 174
+[next:433] EOF FWD reached. Total reads: 23699307
+[next:433] EOF REV reached. Total reads: 23699307
+[report:152] Report processor: 1 thread: 140654776628992 done. Processed reads: 47398614 Invalid reads: 0 Memory KB: 174
+[writeReports:211] done reference 0 part: 1 in 519.88 sec
+[writeReports:217] references unloaded in 8.9609e-05 sec Memory KB: 174
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq for reading.
+[merge:155] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_0.fq
+[merge:158] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq for reading.
+[merge:155] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_0.fq
+[merge:158] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_fwd_1.fq for reading.
+[merge:130] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_fwd_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_fwd_0.fq
+[merge:133] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_fwd_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_fwd_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_fwd.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_rev_1.fq for reading.
+[merge:130] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_rev_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_rev_0.fq
+[merge:133] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_rev_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_rev_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_F8-9_rev.fq"
+[writeReports:259] === done Reports in 615.233 sec ===
+
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --ref
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_R1.fastq of previous flag: --reads
+Found flag: --reads
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_R2.fastq of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_R1.fastq
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_R2.fastq
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --ref /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta --reads /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_R1.fastq --reads /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_R2.fastq --workdir /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/ --fastx rRNA_aligned --other /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T --paired_in --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_R1.fastq" is FASTQ flat ASCII
+[define_format:885] file: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC202T_R2.fastq" is FASTQ flat ASCII
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 110213236
+[next:311] EOF REV reached. Total reads: 110213236
+[count_reads:949] done count. Elapsed time: 2077.84 sec. Total reads: 220426472
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_0.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_0.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_1.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_1.fq
+[is_split_ready:723] found existing readfeed descriptor /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_0.fq
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_0.fq
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_1.fq
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_1.fq
+[next:311] EOF FWD reached. Total reads: 110213236
+[next:311] EOF REV reached. Total reads: 110213236
+[split:694] Done splitting. Reads count: 220426472 Runtime sec: 2075.64
+
+[init:135] Readfeed init done in sec [4153.58]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 220426472 all_reads_len= 3647083512 min_read_len= 75 max_read_len= 75 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 4
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.557403 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 6 ... 
+[align:190] done in [0.0985668] sec Memory KB: 21
+[align:193] Loading references ...
+[align:197] done in [0.0137016] sec. Memory KB: 21
+[align2:70] Processor 0 thread 140218191570688 started
+[align2:70] Processor 1 thread 140218199963392 started
+[next:433] EOF FWD reached. Total reads: 55106618
+[next:433] EOF REV reached. Total reads: 55106618
+[align2:133] Processor 1 thread 140218199963392 done. Processed 110213236 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 13090387 Runtime sec: 1895.78
+[next:433] EOF FWD reached. Total reads: 55106618
+[next:433] EOF REV reached. Total reads: 55106618
+[align2:133] Processor 0 thread 140218191570688 done. Processed 110213236 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 13095897 Runtime sec: 2087.63
+[align:220] done index: 0 part: 1 in 2087.63 sec Memory KB: 1243
+[align:227] Index and References unloaded in 0.00343784 sec. Memory KB: 1243
+[align:237] ==== Done alignment in 2087.75 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 220426472 all_reads_len= 3647083512 min_read_len= 75 max_read_len= 75 total_aligned= 26186284 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.503326 sec
+[write:62] Using summary file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.503481] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.51667 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.0235412 sec
+[report:93] Report Processor: 0 thread: 140218199963392 started. Memory KB: 1241
+[report:93] Report Processor: 1 thread: 140218191570688 started. Memory KB: 1241
+[next:433] EOF FWD reached. Total reads: 55106618
+[next:433] EOF REV reached. Total reads: 55106618
+[report:152] Report processor: 1 thread: 140218191570688 done. Processed reads: 110213236 Invalid reads: 0 Memory KB: 1241
+[next:433] EOF FWD reached. Total reads: 55106618
+[next:433] EOF REV reached. Total reads: 55106618
+[report:152] Report processor: 0 thread: 140218199963392 done. Processed reads: 110213236 Invalid reads: 0 Memory KB: 1241
+[writeReports:211] done reference 0 part: 1 in 1818.13 sec
+[writeReports:217] references unloaded in 4.9185e-05 sec Memory KB: 1241
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq for reading.
+[merge:155] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_0.fq
+[merge:158] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq for reading.
+[merge:155] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_0.fq
+[merge:158] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_fwd_1.fq for reading.
+[merge:130] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_fwd_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_fwd_0.fq
+[merge:133] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_fwd_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_fwd_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_fwd.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_rev_1.fq for reading.
+[merge:130] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_rev_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_rev_0.fq
+[merge:133] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_rev_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_rev_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC202T_rev.fq"
+[writeReports:259] === done Reports in 2206.94 sec ===
+
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --ref
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_F8-9_R1.fastq of previous flag: --reads
+Found flag: --reads
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_F8-9_R2.fastq of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_F8-9_R1.fastq
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_F8-9_R2.fastq
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --ref /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta --reads /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_F8-9_R1.fastq --reads /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_F8-9_R2.fastq --workdir /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/ --fastx rRNA_aligned --other /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9 --paired_in --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_F8-9_R1.fastq" is FASTQ flat ASCII
+[define_format:885] file: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_F8-9_R2.fastq" is FASTQ flat ASCII
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 58290655
+[next:311] EOF REV reached. Total reads: 58290655
+[count_reads:949] done count. Elapsed time: 1231.16 sec. Total reads: 116581310
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_0.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_0.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_1.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_1.fq
+[is_split_ready:723] found existing readfeed descriptor /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_0.fq
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_0.fq
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_1.fq
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_1.fq
+[next:311] EOF FWD reached. Total reads: 58290655
+[next:311] EOF REV reached. Total reads: 58290655
+[split:694] Done splitting. Reads count: 116581310 Runtime sec: 959.304
+
+[init:135] Readfeed init done in sec [2190.54]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 116581310 all_reads_len= 153663658 min_read_len= 75 max_read_len= 75 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 4
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.660971 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 6 ... 
+[align:190] done in [0.0982901] sec Memory KB: 21
+[align:193] Loading references ...
+[align:197] done in [0.0219136] sec. Memory KB: 21
+[align2:70] Processor 0 thread 139634663212800 started
+[align2:70] Processor 1 thread 139634671605504 started
+[next:433] EOF FWD reached. Total reads: 29145327
+[next:433] EOF REV reached. Total reads: 29145327
+[align2:133] Processor 1 thread 139634671605504 done. Processed 58290654 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 25485672 Runtime sec: 1673.81
+[next:433] EOF FWD reached. Total reads: 29145328
+[next:433] EOF REV reached. Total reads: 29145328
+[align2:133] Processor 0 thread 139634663212800 done. Processed 58290656 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 25562527 Runtime sec: 1857.68
+[align:220] done index: 0 part: 1 in 1857.68 sec Memory KB: 2542
+[align:227] Index and References unloaded in 0.00337234 sec. Memory KB: 2542
+[align:237] ==== Done alignment in 1857.8 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 116581310 all_reads_len= 153663658 min_read_len= 75 max_read_len= 75 total_aligned= 51048199 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.53953 sec
+[write:62] Using summary file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.588518] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.515502 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.0156702 sec
+[report:93] Report Processor: 0 thread: 139634671605504 started. Memory KB: 2543
+[report:93] Report Processor: 1 thread: 139634663212800 started. Memory KB: 2543
+[next:433] EOF FWD reached. Total reads: 29145327
+[next:433] EOF REV reached. Total reads: 29145327
+[report:152] Report processor: 1 thread: 139634663212800 done. Processed reads: 58290654 Invalid reads: 0 Memory KB: 2549
+[next:433] EOF FWD reached. Total reads: 29145328
+[next:433] EOF REV reached. Total reads: 29145328
+[report:152] Report processor: 0 thread: 139634671605504 done. Processed reads: 58290656 Invalid reads: 0 Memory KB: 2549
+[writeReports:211] done reference 0 part: 1 in 837.39 sec
+[writeReports:217] references unloaded in 4.879e-05 sec Memory KB: 2549
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq for reading.
+[merge:155] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_0.fq
+[merge:158] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq for reading.
+[merge:155] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_0.fq
+[merge:158] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_fwd_1.fq for reading.
+[merge:130] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_fwd_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_fwd_0.fq
+[merge:133] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_fwd_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_fwd_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_fwd.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_rev_1.fq for reading.
+[merge:130] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_rev_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_rev_0.fq
+[merge:133] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_rev_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_rev_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_F8-9_rev.fq"
+[writeReports:259] === done Reports in 1116.99 sec ===
+
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --ref
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_R1.fastq of previous flag: --reads
+Found flag: --reads
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_R2.fastq of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_R1.fastq
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_R2.fastq
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --ref /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDXrRNAs_ensembl75.fasta --reads /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_R1.fastq --reads /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_R2.fastq --workdir /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/ --fastx rRNA_aligned --other /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T --paired_in --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_R1.fastq" is FASTQ flat ASCII
+[define_format:885] file: "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_R2.fastq" is FASTQ flat ASCII
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 91793911
+[next:311] EOF REV reached. Total reads: 91793911
+[count_reads:949] done count. Elapsed time: 867.349 sec. Total reads: 183587822
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_0.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_0.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_1.fq
+[init_split_files:971] added file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_1.fq
+[is_split_ready:723] found existing readfeed descriptor /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_0.fq
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_0.fq
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_1.fq
+[clean:1146] removing split file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_1.fq
+[next:311] EOF FWD reached. Total reads: 91793911
+[next:311] EOF REV reached. Total reads: 91793911
+[split:694] Done splitting. Reads count: 183587822 Runtime sec: 1071.44
+
+[init:135] Readfeed init done in sec [1938.9]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 183587822 all_reads_len= 884184762 min_read_len= 75 max_read_len= 75 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 4
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.583335 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 6 ... 
+[align:190] done in [0.152041] sec Memory KB: 21
+[align:193] Loading references ...
+[align:197] done in [0.0194423] sec. Memory KB: 21
+[align2:70] Processor 0 thread 140090433046272 started
+[align2:70] Processor 1 thread 140090441438976 started
+[next:433] EOF FWD reached. Total reads: 45896955
+[next:433] EOF REV reached. Total reads: 45896955
+[align2:133] Processor 1 thread 140090441438976 done. Processed 91793910 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 22226241 Runtime sec: 1955.96
+[next:433] EOF FWD reached. Total reads: 45896956
+[next:433] EOF REV reached. Total reads: 45896956
+[align2:133] Processor 0 thread 140090433046272 done. Processed 91793912 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 22298313 Runtime sec: 2190.54
+[align:220] done index: 0 part: 1 in 2190.54 sec Memory KB: 1949
+[align:227] Index and References unloaded in 0.00343017 sec. Memory KB: 1949
+[align:237] ==== Done alignment in 2190.73 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 183587822 all_reads_len= 884184762 min_read_len= 75 max_read_len= 75 total_aligned= 44524554 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.53488 sec
+[write:62] Using summary file: /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.535034] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.515764 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.0157401 sec
+[report:93] Report Processor: 0 thread: 140090441438976 started. Memory KB: 1947
+[report:93] Report Processor: 1 thread: 140090433046272 started. Memory KB: 1947
+[next:433] EOF FWD reached. Total reads: 45896955
+[next:433] EOF REV reached. Total reads: 45896955
+[report:152] Report processor: 1 thread: 140090433046272 done. Processed reads: 91793910 Invalid reads: 0 Memory KB: 1949
+[next:433] EOF FWD reached. Total reads: 45896956
+[next:433] EOF REV reached. Total reads: 45896956
+[report:152] Report processor: 0 thread: 140090441438976 done. Processed reads: 91793912 Invalid reads: 0 Memory KB: 1950
+[writeReports:211] done reference 0 part: 1 in 1568.29 sec
+[writeReports:217] references unloaded in 4.7812e-05 sec Memory KB: 1950
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq for reading.
+[merge:155] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_0.fq
+[merge:158] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_fwd.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq for reading.
+[merge:155] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_0.fq
+[merge:158] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/aligned_rev.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_fwd_1.fq for reading.
+[merge:130] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_fwd_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_fwd_0.fq
+[merge:133] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_fwd_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_fwd_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_fwd.fq"
+[openfr:114] Opened output file /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_rev_1.fq for reading.
+[merge:130] merged /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_rev_1.fq -> /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_rev_0.fq
+[merge:133] deleted /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_rev_1.fq
+[strip_path_sfx:154] moving /home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_rev_0.fq -> "/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/out/rRNAfree/PDAC217T_rev.fq"
+[writeReports:259] === done Reports in 1890.34 sec ===
+

@@ -1,0 +1,50 @@
+# format of this file:
+#   time
+#   num_orig_files
+#   num_sense
+#   num_splits
+#   num_reads_tot
+#   [
+#     file
+#     size
+#     reads
+#     zip
+#     fastq/a
+#   ] for each file both original and split
+
+Fri Apr 16 00:56:38 2021
+
+2
+2
+2
+183587822
+/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_R1.fastq
+19234765611
+91793911
+0
+fastq
+/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/01_Input/PDAC217T_R2.fastq
+19234765611
+91793911
+0
+fastq
+/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_0.fq
+9617115301
+45896956
+0
+fastq
+/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_0.fq
+9617115301
+45896956
+0
+fastq
+/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/fwd_1.fq
+9617650310
+45896955
+0
+fastq
+/home/jacobo/Documents/02_TRANSDUCER/02_Raw_data/02_rRNA_removal_and_Trimming_check/02_Output/sortmerna/readb/rev_1.fq
+9617650310
+45896955
+0
+fastq

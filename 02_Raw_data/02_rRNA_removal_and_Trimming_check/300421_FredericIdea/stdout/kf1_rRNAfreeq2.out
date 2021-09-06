@@ -1,0 +1,2448 @@
+/home/jsolorzano/work/kf_fastqs
+/home/jsolorzano/work/kf_fastqs
+/home/jsolorzano/work/kf_fastqs/PDAC220T_F8-9kf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC220T_F8-9kf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC220T_F8-9kf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC220T_F8-9kf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC220T_F8-9kf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC220T_F8-9kf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_kvdbdir:1259] Creating KVDB directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC220T_F8-9kf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC220T_F8-9kf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC220T_F8-9kf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC220T_F8-9kf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 63332963
+[next:311] EOF REV reached. Total reads: 63332963
+[count_reads:949] done count. Elapsed time: 484.477 sec. Total reads: 126665926
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_2.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_2.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_3.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_3.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_4.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_4.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_5.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_5.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_6.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_6.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_7.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_7.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_8.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_8.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_9.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_9.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_10.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_10.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_11.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_11.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_12.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_12.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_13.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_13.fq.gz
+[next:311] EOF FWD reached. Total reads: 63332963
+[next:311] EOF REV reached. Total reads: 63332963
+[split:694] Done splitting. Reads count: 126665926 Runtime sec: 3661.18
+
+[init:135] Readfeed init done in sec [4145.69]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 126665926 all_reads_len= 907404370 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.452809 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 10 ... 
+[align:190] done in [0.154285] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.0100974] sec. Memory KB: 25
+[align2:70] Processor 0 thread 140581594429184 started
+[align2:70] Processor 1 thread 140581602821888 started
+[next:433] EOF FWD reached. Total reads: 31666481
+[next:433] EOF REV reached. Total reads: 31666481
+[align2:133] Processor 1 thread 140581602821888 done. Processed 63332962 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 30562553 Runtime sec: 2695.08
+[next:433] EOF FWD reached. Total reads: 31666482
+[next:433] EOF REV reached. Total reads: 31666482
+[align2:133] Processor 0 thread 140581594429184 done. Processed 63332964 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 30645741 Runtime sec: 2983.18
+[align:220] done index: 0 part: 1 in 2983.18 sec Memory KB: 2890
+[align:227] Index and References unloaded in 0.00916157 sec. Memory KB: 2890
+[align:237] ==== Done alignment in 2983.36 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 126665926 all_reads_len= 907404370 min_read_len= 75 max_read_len= 40 total_aligned= 61208294 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.481367 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.48487] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.449828 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.000922828 sec
+[report:93] Report Processor: 1 thread: 140581594429184 started. Memory KB: 2890
+[report:93] Report Processor: 0 thread: 140581602821888 started. Memory KB: 2890
+[next:433] EOF FWD reached. Total reads: 31666481
+[next:433] EOF REV reached. Total reads: 31666481
+[report:152] Report processor: 1 thread: 140581594429184 done. Processed reads: 63332962 Invalid reads: 0 Memory KB: 2890
+[next:433] EOF FWD reached. Total reads: 31666482
+[next:433] EOF REV reached. Total reads: 31666482
+[report:152] Report processor: 0 thread: 140581602821888 done. Processed reads: 63332964 Invalid reads: 0 Memory KB: 2890
+[writeReports:211] done reference 0 part: 1 in 2384.3 sec
+[writeReports:217] references unloaded in 0.000252579 sec Memory KB: 2890
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_rev.fq.gz"
+[writeReports:259] === done Reports in 2388.1 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC220Tkf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC220Tkf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC220Tkf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC220Tkf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC220Tkf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC220Tkf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC220Tkf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC220Tkf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC220Tkf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC220Tkf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 99978059
+[next:311] EOF REV reached. Total reads: 99978059
+[count_reads:949] done count. Elapsed time: 788.598 sec. Total reads: 199956118
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 99978059
+[next:311] EOF REV reached. Total reads: 99978059
+[split:694] Done splitting. Reads count: 199956118 Runtime sec: 8523.5
+
+[init:135] Readfeed init done in sec [9312.12]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 199956118 all_reads_len= 2110013472 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.435379 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 8 ... 
+[align:190] done in [0.154262] sec Memory KB: 23
+[align:193] Loading references ...
+[align:197] done in [0.00101114] sec. Memory KB: 23
+[align2:70] Processor 0 thread 139708541646592 started
+[align2:70] Processor 1 thread 139708550039296 started
+[next:433] EOF FWD reached. Total reads: 49989029
+[next:433] EOF REV reached. Total reads: 49989029
+[align2:133] Processor 1 thread 139708550039296 done. Processed 99978058 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 6015269 Runtime sec: 2111.35
+[next:433] EOF FWD reached. Total reads: 49989030
+[next:433] EOF REV reached. Total reads: 49989030
+[align2:133] Processor 0 thread 139708541646592 done. Processed 99978060 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 6079346 Runtime sec: 2233.29
+[align:220] done index: 0 part: 1 in 2233.29 sec Memory KB: 651
+[align:227] Index and References unloaded in 0.00904349 sec. Memory KB: 651
+[align:237] ==== Done alignment in 2233.46 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 199956118 all_reads_len= 2110013472 min_read_len= 75 max_read_len= 40 total_aligned= 12094615 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.488077 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.495859] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.445322 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.0142902 sec
+[report:93] Report Processor: 0 thread: 139708550039296 started. Memory KB: 649
+[report:93] Report Processor: 1 thread: 139708541646592 started. Memory KB: 649
+[next:433] EOF FWD reached. Total reads: 49989030
+[next:433] EOF REV reached. Total reads: 49989030
+[report:152] Report processor: 0 thread: 139708550039296 done. Processed reads: 99978060 Invalid reads: 0 Memory KB: 654
+[next:433] EOF FWD reached. Total reads: 49989029
+[next:433] EOF REV reached. Total reads: 49989029
+[report:152] Report processor: 1 thread: 139708541646592 done. Processed reads: 99978058 Invalid reads: 0 Memory KB: 654
+[writeReports:211] done reference 0 part: 1 in 5155.26 sec
+[writeReports:217] references unloaded in 0.000140676 sec Memory KB: 654
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_rev.fq.gz"
+[writeReports:259] === done Reports in 5162.43 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC221T_F8-9kf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC221T_F8-9kf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC221T_F8-9kf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC221T_F8-9kf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC221T_F8-9kf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC221T_F8-9kf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC221T_F8-9kf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC221T_F8-9kf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC221T_F8-9kf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC221T_F8-9kf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 43705620
+[next:311] EOF REV reached. Total reads: 43705620
+[count_reads:949] done count. Elapsed time: 344.616 sec. Total reads: 87411240
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 43705620
+[next:311] EOF REV reached. Total reads: 43705620
+[split:694] Done splitting. Reads count: 87411240 Runtime sec: 3165.49
+
+[init:135] Readfeed init done in sec [3510.15]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 87411240 all_reads_len= 2259566880 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.442165 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 14 ... 
+[align:190] done in [0.214343] sec Memory KB: 29
+[align:193] Loading references ...
+[align:197] done in [0.0024728] sec. Memory KB: 29
+[align2:70] Processor 0 thread 140551059928832 started
+[align2:70] Processor 1 thread 140551143790336 started
+[next:433] EOF FWD reached. Total reads: 21852810
+[next:433] EOF REV reached. Total reads: 21852810
+[align2:133] Processor 1 thread 140551143790336 done. Processed 43705620 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 17682246 Runtime sec: 1651.2
+[next:433] EOF FWD reached. Total reads: 21852810
+[next:433] EOF REV reached. Total reads: 21852810
+[align2:133] Processor 0 thread 140551059928832 done. Processed 43705620 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 17711274 Runtime sec: 1824.4
+[align:220] done index: 0 part: 1 in 1824.4 sec Memory KB: 1775
+[align:227] Index and References unloaded in 0.00604368 sec. Memory KB: 1775
+[align:237] ==== Done alignment in 1824.62 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 87411240 all_reads_len= 2259566880 min_read_len= 75 max_read_len= 40 total_aligned= 35393520 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.493345 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.493801] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.435313 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.000883384 sec
+[report:93] Report Processor: 0 thread: 140551143790336 started. Memory KB: 1773
+[report:93] Report Processor: 1 thread: 140551059928832 started. Memory KB: 1773
+[next:433] EOF FWD reached. Total reads: 21852810
+[next:433] EOF REV reached. Total reads: 21852810
+[report:152] Report processor: 1 thread: 140551059928832 done. Processed reads: 43705620 Invalid reads: 0 Memory KB: 1773
+[next:433] EOF FWD reached. Total reads: 21852810
+[next:433] EOF REV reached. Total reads: 21852810
+[report:152] Report processor: 0 thread: 140551143790336 done. Processed reads: 43705620 Invalid reads: 0 Memory KB: 1773
+[writeReports:211] done reference 0 part: 1 in 1866.87 sec
+[writeReports:217] references unloaded in 0.000247555 sec Memory KB: 1773
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_rev.fq.gz"
+[writeReports:259] === done Reports in 1870.08 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC221Tkf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC221Tkf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC221Tkf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC221Tkf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC221Tkf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC221Tkf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC221Tkf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC221Tkf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC221Tkf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC221Tkf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 90865537
+[next:311] EOF REV reached. Total reads: 90865537
+[count_reads:949] done count. Elapsed time: 726.158 sec. Total reads: 181731074
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 90865537
+[next:311] EOF REV reached. Total reads: 90865537
+[split:694] Done splitting. Reads count: 181731074 Runtime sec: 7315.32
+
+[init:135] Readfeed init done in sec [8041.51]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 181731074 all_reads_len= 743144704 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.484459 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 11 ... 
+[align:190] done in [0.103306] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.00101014] sec. Memory KB: 25
+[align2:70] Processor 1 thread 140330414343936 started
+[align2:70] Processor 0 thread 140330405951232 started
+[next:433] EOF FWD reached. Total reads: 45432768
+[next:433] EOF REV reached. Total reads: 45432768
+[align2:133] Processor 1 thread 140330414343936 done. Processed 90865536 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 8061823 Runtime sec: 1981.67
+[next:433] EOF FWD reached. Total reads: 45432769
+[next:433] EOF REV reached. Total reads: 45432769
+[align2:133] Processor 0 thread 140330405951232 done. Processed 90865538 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 8110113 Runtime sec: 2163.07
+[align:220] done index: 0 part: 1 in 2163.07 sec Memory KB: 894
+[align:227] Index and References unloaded in 0.00842587 sec. Memory KB: 894
+[align:237] ==== Done alignment in 2163.19 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 181731074 all_reads_len= 743144704 min_read_len= 75 max_read_len= 40 total_aligned= 16171936 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.472792 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.473247] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.443586 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.00087973 sec
+[report:93] Report Processor: 0 thread: 140330414343936 started. Memory KB: 892
+[report:93] Report Processor: 1 thread: 140330405951232 started. Memory KB: 892
+[next:433] EOF FWD reached. Total reads: 45432768
+[next:433] EOF REV reached. Total reads: 45432768
+[report:152] Report processor: 1 thread: 140330405951232 done. Processed reads: 90865536 Invalid reads: 0 Memory KB: 896
+[next:433] EOF FWD reached. Total reads: 45432769
+[next:433] EOF REV reached. Total reads: 45432769
+[report:152] Report processor: 0 thread: 140330414343936 done. Processed reads: 90865538 Invalid reads: 0 Memory KB: 896
+[writeReports:211] done reference 0 part: 1 in 4127.68 sec
+[writeReports:217] references unloaded in 0.000153302 sec Memory KB: 896
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_rev.fq.gz"
+[writeReports:259] === done Reports in 4137.34 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC222T_F8-9kf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC222T_F8-9kf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC222T_F8-9kf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC222T_F8-9kf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC222T_F8-9kf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC222T_F8-9kf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC222T_F8-9kf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC222T_F8-9kf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC222T_F8-9kf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC222T_F8-9kf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 47213026
+[next:311] EOF REV reached. Total reads: 47213026
+[count_reads:949] done count. Elapsed time: 373.673 sec. Total reads: 94426052
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 47213026
+[next:311] EOF REV reached. Total reads: 47213026
+[split:694] Done splitting. Reads count: 94426052 Runtime sec: 3654.08
+
+[init:135] Readfeed init done in sec [4027.79]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 94426052 all_reads_len= 2785193838 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.448393 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 11 ... 
+[align:190] done in [0.142355] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.0157728] sec. Memory KB: 26
+[align2:70] Processor 1 thread 140706878318336 started
+[align2:70] Processor 0 thread 140706869925632 started
+[next:433] EOF FWD reached. Total reads: 23606513
+[next:433] EOF REV reached. Total reads: 23606513
+[align2:133] Processor 1 thread 140706878318336 done. Processed 47213026 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 10912735 Runtime sec: 1385.86
+[next:433] EOF FWD reached. Total reads: 23606513
+[next:433] EOF REV reached. Total reads: 23606513
+[align2:133] Processor 0 thread 140706869925632 done. Processed 47213026 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 10869111 Runtime sec: 1498.81
+[align:220] done index: 0 part: 1 in 1498.81 sec Memory KB: 1095
+[align:227] Index and References unloaded in 0.00964963 sec. Memory KB: 1095
+[align:237] ==== Done alignment in 1498.98 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 94426052 all_reads_len= 2785193838 min_read_len= 75 max_read_len= 40 total_aligned= 21781846 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.480174 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.48062] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.454482 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.00144009 sec
+[report:93] Report Processor: 0 thread: 140706878318336 started. Memory KB: 1085
+[report:93] Report Processor: 1 thread: 140706869925632 started. Memory KB: 1085
+[next:433] EOF FWD reached. Total reads: 23606513
+[next:433] EOF REV reached. Total reads: 23606513
+[report:152] Report processor: 1 thread: 140706869925632 done. Processed reads: 47213026 Invalid reads: 0 Memory KB: 1093
+[next:433] EOF FWD reached. Total reads: 23606513
+[next:433] EOF REV reached. Total reads: 23606513
+[report:152] Report processor: 0 thread: 140706878318336 done. Processed reads: 47213026 Invalid reads: 0 Memory KB: 1093
+[writeReports:211] done reference 0 part: 1 in 2181.26 sec
+[writeReports:217] references unloaded in 0.000261406 sec Memory KB: 1093
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_rev.fq.gz"
+[writeReports:259] === done Reports in 2185 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC222Tkf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC222Tkf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC222Tkf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC222Tkf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC222Tkf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC222Tkf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC222Tkf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC222Tkf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC222Tkf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC222Tkf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 97710366
+[next:311] EOF REV reached. Total reads: 97710366
+[count_reads:949] done count. Elapsed time: 783.145 sec. Total reads: 195420732
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 97710366
+[next:311] EOF REV reached. Total reads: 97710366
+[split:694] Done splitting. Reads count: 195420732 Runtime sec: 8529.93
+
+[init:135] Readfeed init done in sec [9313.12]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 195420732 all_reads_len= 1769348270 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.543337 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 10 ... 
+[align:190] done in [0.146214] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.00241329] sec. Memory KB: 25
+[align2:70] Processor 1 thread 140065703446272 started
+[align2:70] Processor 0 thread 140065695053568 started
+[next:433] EOF FWD reached. Total reads: 48855183
+[next:433] EOF REV reached. Total reads: 48855183
+[align2:133] Processor 1 thread 140065703446272 done. Processed 97710366 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 6066110 Runtime sec: 2293.01
+[next:433] EOF FWD reached. Total reads: 48855183
+[next:433] EOF REV reached. Total reads: 48855183
+[align2:133] Processor 0 thread 140065695053568 done. Processed 97710366 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 6076953 Runtime sec: 2406.27
+[align:220] done index: 0 part: 1 in 2406.27 sec Memory KB: 633
+[align:227] Index and References unloaded in 0.0080154 sec. Memory KB: 633
+[align:237] ==== Done alignment in 2406.43 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 195420732 all_reads_len= 1769348270 min_read_len= 75 max_read_len= 40 total_aligned= 12143063 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.470664 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.472189] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.454699 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.000927594 sec
+[report:93] Report Processor: 0 thread: 140065703446272 started. Memory KB: 631
+[report:93] Report Processor: 1 thread: 140065695053568 started. Memory KB: 631
+[next:433] EOF FWD reached. Total reads: 48855183
+[next:433] EOF REV reached. Total reads: 48855183
+[report:152] Report processor: 1 thread: 140065695053568 done. Processed reads: 97710366 Invalid reads: 0 Memory KB: 633
+[next:433] EOF FWD reached. Total reads: 48855183
+[next:433] EOF REV reached. Total reads: 48855183
+[report:152] Report processor: 0 thread: 140065703446272 done. Processed reads: 97710366 Invalid reads: 0 Memory KB: 633
+[writeReports:211] done reference 0 part: 1 in 4696.38 sec
+[writeReports:217] references unloaded in 0.000254597 sec Memory KB: 633
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_rev.fq.gz"
+[writeReports:259] === done Reports in 4703.19 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC223T_F8-9kf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC223T_F8-9kf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC223T_F8-9kf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC223T_F8-9kf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC223T_F8-9kf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC223T_F8-9kf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC223T_F8-9kf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC223T_F8-9kf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC223T_F8-9kf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC223T_F8-9kf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 54548203
+[next:311] EOF REV reached. Total reads: 54548203
+[count_reads:949] done count. Elapsed time: 434.6 sec. Total reads: 109096406
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 54548203
+[next:311] EOF REV reached. Total reads: 54548203
+[split:694] Done splitting. Reads count: 109096406 Runtime sec: 4089.19
+
+[init:135] Readfeed init done in sec [4523.82]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 109096406 all_reads_len= 3885608398 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.471419 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 10 ... 
+[align:190] done in [0.318765] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.00126769] sec. Memory KB: 25
+[align2:70] Processor 0 thread 140218535474944 started
+[align2:70] Processor 1 thread 140218543867648 started
+[next:433] EOF FWD reached. Total reads: 27274101
+[next:433] EOF REV reached. Total reads: 27274101
+[align2:133] Processor 1 thread 140218543867648 done. Processed 54548202 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 31032262 Runtime sec: 2442.84
+[next:433] EOF FWD reached. Total reads: 27274102
+[next:433] EOF REV reached. Total reads: 27274102
+[align2:133] Processor 0 thread 140218535474944 done. Processed 54548204 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 31043564 Runtime sec: 2702.76
+[align:220] done index: 0 part: 1 in 2702.76 sec Memory KB: 2828
+[align:227] Index and References unloaded in 0.00947562 sec. Memory KB: 2828
+[align:237] ==== Done alignment in 2703.1 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 109096406 all_reads_len= 3885608398 min_read_len= 75 max_read_len= 40 total_aligned= 62075826 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.521026 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.521522] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.478055 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.00088342 sec
+[report:93] Report Processor: 0 thread: 140218543867648 started. Memory KB: 2826
+[report:93] Report Processor: 1 thread: 140218535474944 started. Memory KB: 2826
+[next:433] EOF FWD reached. Total reads: 27274101
+[next:433] EOF REV reached. Total reads: 27274101
+[report:152] Report processor: 1 thread: 140218535474944 done. Processed reads: 54548202 Invalid reads: 0 Memory KB: 2835
+[next:433] EOF FWD reached. Total reads: 27274102
+[next:433] EOF REV reached. Total reads: 27274102
+[report:152] Report processor: 0 thread: 140218543867648 done. Processed reads: 54548204 Invalid reads: 0 Memory KB: 2835
+[writeReports:211] done reference 0 part: 1 in 2423.53 sec
+[writeReports:217] references unloaded in 0.000158901 sec Memory KB: 2835
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_rev.fq.gz"
+[writeReports:259] === done Reports in 2427.68 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC223Tkf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC223Tkf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC223Tkf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC223Tkf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC223Tkf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC223Tkf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC223Tkf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC223Tkf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC223Tkf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC223Tkf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 104002087
+[next:311] EOF REV reached. Total reads: 104002087
+[count_reads:949] done count. Elapsed time: 833.518 sec. Total reads: 208004174
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 104002087
+[next:311] EOF REV reached. Total reads: 104002087
+[split:694] Done splitting. Reads count: 208004174 Runtime sec: 9212.05
+
+[init:135] Readfeed init done in sec [10045.6]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 208004174 all_reads_len= 2713228640 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.480459 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 10 ... 
+[align:190] done in [0.202345] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.0172664] sec. Memory KB: 25
+[align2:70] Processor 0 thread 140375838652160 started
+[align2:70] Processor 1 thread 140375847044864 started
+[next:433] EOF FWD reached. Total reads: 52001043
+[next:433] EOF REV reached. Total reads: 52001043
+[align2:133] Processor 1 thread 140375847044864 done. Processed 104002086 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 23404761 Runtime sec: 3319.01
+[next:433] EOF FWD reached. Total reads: 52001044
+[next:433] EOF REV reached. Total reads: 52001044
+[align2:133] Processor 0 thread 140375838652160 done. Processed 104002088 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 23438885 Runtime sec: 3716.22
+[align:220] done index: 0 part: 1 in 3716.22 sec Memory KB: 2099
+[align:227] Index and References unloaded in 0.00939684 sec. Memory KB: 2100
+[align:237] ==== Done alignment in 3716.45 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 208004174 all_reads_len= 2713228640 min_read_len= 75 max_read_len= 40 total_aligned= 46843646 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.510146 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.512717] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.458466 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.0214517 sec
+[report:93] Report Processor: 0 thread: 140375847044864 started. Memory KB: 2097
+[report:93] Report Processor: 1 thread: 140375838652160 started. Memory KB: 2097
+[next:433] EOF FWD reached. Total reads: 52001043
+[next:433] EOF REV reached. Total reads: 52001043
+[report:152] Report processor: 1 thread: 140375838652160 done. Processed reads: 104002086 Invalid reads: 0 Memory KB: 2098
+[next:433] EOF FWD reached. Total reads: 52001044
+[next:433] EOF REV reached. Total reads: 52001044
+[report:152] Report processor: 0 thread: 140375847044864 done. Processed reads: 104002088 Invalid reads: 0 Memory KB: 2098
+[writeReports:211] done reference 0 part: 1 in 5406.88 sec
+[writeReports:217] references unloaded in 0.000177287 sec Memory KB: 2098
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_rev.fq.gz"
+[writeReports:259] === done Reports in 5417.05 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC224T_F8-9kf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC224T_F8-9kf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC224T_F8-9kf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC224T_F8-9kf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC224T_F8-9kf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC224T_F8-9kf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC224T_F8-9kf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC224T_F8-9kf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC224T_F8-9kf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC224T_F8-9kf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 57492748
+[next:311] EOF REV reached. Total reads: 57492748
+[count_reads:949] done count. Elapsed time: 483.376 sec. Total reads: 114985496
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 57492748
+[next:311] EOF REV reached. Total reads: 57492748
+[split:694] Done splitting. Reads count: 114985496 Runtime sec: 5280.12
+
+[init:135] Readfeed init done in sec [5763.6]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 114985496 all_reads_len= 32694796 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.49158 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 10 ... 
+[align:190] done in [0.149158] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.0146533] sec. Memory KB: 25
+[align2:70] Processor 1 thread 140508034754304 started
+[align2:70] Processor 0 thread 140508026361600 started
+[next:433] EOF FWD reached. Total reads: 28746374
+[next:433] EOF REV reached. Total reads: 28746374
+[align2:133] Processor 1 thread 140508034754304 done. Processed 57492748 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 2851638 Runtime sec: 1454.93
+[next:433] EOF FWD reached. Total reads: 28746374
+[next:433] EOF REV reached. Total reads: 28746374
+[align2:133] Processor 0 thread 140508026361600 done. Processed 57492748 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 2868159 Runtime sec: 1578.34
+[align:220] done index: 0 part: 1 in 1578.34 sec Memory KB: 422
+[align:227] Index and References unloaded in 0.0098202 sec. Memory KB: 423
+[align:237] ==== Done alignment in 1578.52 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 114985496 all_reads_len= 32694796 min_read_len= 75 max_read_len= 40 total_aligned= 5719797 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.525443 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.534878] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.489009 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.000979994 sec
+[report:93] Report Processor: 0 thread: 140508034754304 started. Memory KB: 420
+[report:93] Report Processor: 1 thread: 140508026361600 started. Memory KB: 420
+[next:433] EOF FWD reached. Total reads: 28746374
+[next:433] EOF REV reached. Total reads: 28746374
+[report:152] Report processor: 1 thread: 140508026361600 done. Processed reads: 57492748 Invalid reads: 0 Memory KB: 420
+[next:433] EOF FWD reached. Total reads: 28746374
+[next:433] EOF REV reached. Total reads: 28746374
+[report:152] Report processor: 0 thread: 140508034754304 done. Processed reads: 57492748 Invalid reads: 0 Memory KB: 420
+[writeReports:211] done reference 0 part: 1 in 3215.73 sec
+[writeReports:217] references unloaded in 0.000162425 sec Memory KB: 420
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_rev.fq.gz"
+[writeReports:259] === done Reports in 3221.84 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC224Tkf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC224Tkf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC224Tkf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC224Tkf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC224Tkf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC224Tkf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC224Tkf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC224Tkf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC224Tkf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC224Tkf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 93827109
+[next:311] EOF REV reached. Total reads: 93827109
+[count_reads:949] done count. Elapsed time: 784.601 sec. Total reads: 187654218
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 93827109
+[next:311] EOF REV reached. Total reads: 93827109
+[split:694] Done splitting. Reads count: 187654218 Runtime sec: 8119.56
+
+[init:135] Readfeed init done in sec [8904.2]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 187654218 all_reads_len= 1187624354 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.489818 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 10 ... 
+[align:190] done in [0.224308] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.0109433] sec. Memory KB: 25
+[align2:70] Processor 1 thread 140253759268608 started
+[align2:70] Processor 0 thread 140253750875904 started
+[next:433] EOF FWD reached. Total reads: 46913554
+[next:433] EOF REV reached. Total reads: 46913554
+[align2:133] Processor 1 thread 140253759268608 done. Processed 93827108 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 14988380 Runtime sec: 2723.79
+[next:433] EOF FWD reached. Total reads: 46913555
+[next:433] EOF REV reached. Total reads: 46913555
+[align2:133] Processor 0 thread 140253750875904 done. Processed 93827110 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 15013697 Runtime sec: 3002.37
+[align:220] done index: 0 part: 1 in 3002.37 sec Memory KB: 1464
+[align:227] Index and References unloaded in 0.00877661 sec. Memory KB: 1464
+[align:237] ==== Done alignment in 3002.62 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 187654218 all_reads_len= 1187624354 min_read_len= 75 max_read_len= 40 total_aligned= 30002077 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.495597 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.498302] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.470557 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.0033887 sec
+[report:93] Report Processor: 0 thread: 140253759268608 started. Memory KB: 1462
+[report:93] Report Processor: 1 thread: 140253750875904 started. Memory KB: 1462
+[next:433] EOF FWD reached. Total reads: 46913554
+[next:433] EOF REV reached. Total reads: 46913554
+[report:152] Report processor: 1 thread: 140253750875904 done. Processed reads: 93827108 Invalid reads: 0 Memory KB: 1462
+[next:433] EOF FWD reached. Total reads: 46913555
+[next:433] EOF REV reached. Total reads: 46913555
+[report:152] Report processor: 0 thread: 140253759268608 done. Processed reads: 93827110 Invalid reads: 0 Memory KB: 1462
+[writeReports:211] done reference 0 part: 1 in 4688.79 sec
+[writeReports:217] references unloaded in 0.000268975 sec Memory KB: 1462
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_rev.fq.gz"
+[writeReports:259] === done Reports in 4698.5 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC225T_F8-9kf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC225T_F8-9kf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC225T_F8-9kf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC225T_F8-9kf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC225T_F8-9kf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC225T_F8-9kf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC225T_F8-9kf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC225T_F8-9kf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC225T_F8-9kf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC225T_F8-9kf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 50459241
+[next:311] EOF REV reached. Total reads: 50459241
+[count_reads:949] done count. Elapsed time: 417.184 sec. Total reads: 100918482
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 50459241
+[next:311] EOF REV reached. Total reads: 50459241
+[split:694] Done splitting. Reads count: 100918482 Runtime sec: 4607.82
+
+[init:135] Readfeed init done in sec [5025.05]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 100918482 all_reads_len= 3272267844 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.567215 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 10 ... 
+[align:190] done in [0.190419] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.00194784] sec. Memory KB: 25
+[align2:70] Processor 0 thread 139673452136192 started
+[align2:70] Processor 1 thread 139673460528896 started
+[next:433] EOF FWD reached. Total reads: 25229620
+[next:433] EOF REV reached. Total reads: 25229620
+[align2:133] Processor 1 thread 139673460528896 done. Processed 50459240 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 6663948 Runtime sec: 1499.4
+[next:433] EOF FWD reached. Total reads: 25229621
+[next:433] EOF REV reached. Total reads: 25229621
+[align2:133] Processor 0 thread 139673452136192 done. Processed 50459242 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 6712243 Runtime sec: 1589.05
+[align:220] done index: 0 part: 1 in 1589.05 sec Memory KB: 808
+[align:227] Index and References unloaded in 0.00948767 sec. Memory KB: 808
+[align:237] ==== Done alignment in 1589.26 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 100918482 all_reads_len= 3272267844 min_read_len= 75 max_read_len= 40 total_aligned= 13376191 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.553505 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.554671] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.543014 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.000913923 sec
+[report:93] Report Processor: 0 thread: 139673460528896 started. Memory KB: 806
+[report:93] Report Processor: 1 thread: 139673452136192 started. Memory KB: 806
+[next:433] EOF FWD reached. Total reads: 25229621
+[next:433] EOF REV reached. Total reads: 25229621
+[report:152] Report processor: 0 thread: 139673460528896 done. Processed reads: 50459242 Invalid reads: 0 Memory KB: 806
+[next:433] EOF FWD reached. Total reads: 25229620
+[next:433] EOF REV reached. Total reads: 25229620
+[report:152] Report processor: 1 thread: 139673452136192 done. Processed reads: 50459240 Invalid reads: 0 Memory KB: 806
+[writeReports:211] done reference 0 part: 1 in 2798.79 sec
+[writeReports:217] references unloaded in 0.000317413 sec Memory KB: 806
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_rev.fq.gz"
+[writeReports:259] === done Reports in 2803.39 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC225Tkf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC225Tkf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC225Tkf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC225Tkf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC225Tkf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC225Tkf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC225Tkf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC225Tkf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC225Tkf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC225Tkf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 94525152
+[next:311] EOF REV reached. Total reads: 94525152
+[count_reads:949] done count. Elapsed time: 786.608 sec. Total reads: 189050304
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 94525152
+[next:311] EOF REV reached. Total reads: 94525152
+[split:694] Done splitting. Reads count: 189050304 Runtime sec: 8375.26
+
+[init:135] Readfeed init done in sec [9161.89]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 189050304 all_reads_len= 1292136848 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.533424 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 10 ... 
+[align:190] done in [0.263466] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.0213275] sec. Memory KB: 25
+[align2:70] Processor 0 thread 140629862487808 started
+[align2:70] Processor 1 thread 140629870880512 started
+[next:433] EOF FWD reached. Total reads: 47262576
+[next:433] EOF REV reached. Total reads: 47262576
+[align2:133] Processor 1 thread 140629870880512 done. Processed 94525152 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 4252932 Runtime sec: 2247.6
+[next:433] EOF FWD reached. Total reads: 47262576
+[next:433] EOF REV reached. Total reads: 47262576
+[align2:133] Processor 0 thread 140629862487808 done. Processed 94525152 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 4295656 Runtime sec: 2355.99
+[align:220] done index: 0 part: 1 in 2355.99 sec Memory KB: 474
+[align:227] Index and References unloaded in 0.00974628 sec. Memory KB: 475
+[align:237] ==== Done alignment in 2356.28 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 189050304 all_reads_len= 1292136848 min_read_len= 75 max_read_len= 40 total_aligned= 8548588 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.539328 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.542344] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.515419 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.000924637 sec
+[report:93] Report Processor: 1 thread: 140629862487808 started. Memory KB: 472
+[report:93] Report Processor: 0 thread: 140629870880512 started. Memory KB: 472
+[next:433] EOF FWD reached. Total reads: 47262576
+[next:433] EOF REV reached. Total reads: 47262576
+[report:152] Report processor: 0 thread: 140629870880512 done. Processed reads: 94525152 Invalid reads: 0 Memory KB: 475
+[next:433] EOF FWD reached. Total reads: 47262576
+[next:433] EOF REV reached. Total reads: 47262576
+[report:152] Report processor: 1 thread: 140629862487808 done. Processed reads: 94525152 Invalid reads: 0 Memory KB: 475
+[writeReports:211] done reference 0 part: 1 in 5221.14 sec
+[writeReports:217] references unloaded in 0.000280096 sec Memory KB: 475
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_rev.fq.gz"
+[writeReports:259] === done Reports in 5228.71 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC226T_F8-9kf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC226T_F8-9kf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC226T_F8-9kf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC226T_F8-9kf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC226T_F8-9kf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC226T_F8-9kf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC226T_F8-9kf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC226T_F8-9kf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC226T_F8-9kf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC226T_F8-9kf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 85767322
+[next:311] EOF REV reached. Total reads: 85767322
+[count_reads:949] done count. Elapsed time: 685.309 sec. Total reads: 171534644
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 85767322
+[next:311] EOF REV reached. Total reads: 85767322
+[split:694] Done splitting. Reads count: 171534644 Runtime sec: 5280.75
+
+[init:135] Readfeed init done in sec [5966.18]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 171534644 all_reads_len= 4271658720 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.479115 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 8 ... 
+[align:190] done in [0.178693] sec Memory KB: 23
+[align:193] Loading references ...
+[align:197] done in [0.0120426] sec. Memory KB: 23
+[align2:70] Processor 0 thread 140203469518592 started
+[align2:70] Processor 1 thread 140203477911296 started
+[next:433] EOF FWD reached. Total reads: 42883661
+[next:433] EOF REV reached. Total reads: 42883661
+[align2:133] Processor 1 thread 140203477911296 done. Processed 85767322 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 51653197 Runtime sec: 4233.85
+[next:433] EOF FWD reached. Total reads: 42883661
+[next:433] EOF REV reached. Total reads: 42883661
+[align2:133] Processor 0 thread 140203469518592 done. Processed 85767322 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 51550608 Runtime sec: 4679.54
+[align:220] done index: 0 part: 1 in 4679.54 sec Memory KB: 4690
+[align:227] Index and References unloaded in 0.00978954 sec. Memory KB: 4690
+[align:237] ==== Done alignment in 4679.75 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 171534644 all_reads_len= 4271658720 min_read_len= 75 max_read_len= 40 total_aligned= 103203805 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.513283 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.514753] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.480163 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.00184752 sec
+[report:93] Report Processor: 1 thread: 140203469518592 started. Memory KB: 4688
+[report:93] Report Processor: 0 thread: 140203477911296 started. Memory KB: 4688
+[next:433] EOF FWD reached. Total reads: 42883661
+[next:433] EOF REV reached. Total reads: 42883661
+[report:152] Report processor: 1 thread: 140203469518592 done. Processed reads: 85767322 Invalid reads: 0 Memory KB: 4701
+[next:433] EOF FWD reached. Total reads: 42883661
+[next:433] EOF REV reached. Total reads: 42883661
+[report:152] Report processor: 0 thread: 140203477911296 done. Processed reads: 85767322 Invalid reads: 0 Memory KB: 4701
+[writeReports:211] done reference 0 part: 1 in 3360.25 sec
+[writeReports:217] references unloaded in 0.000212131 sec Memory KB: 4701
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_rev.fq.gz"
+[writeReports:259] === done Reports in 3366.31 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC226Tkf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC226Tkf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC226Tkf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC226Tkf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC226Tkf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC226Tkf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC226Tkf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC226Tkf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC226Tkf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC226Tkf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 112451597
+[next:311] EOF REV reached. Total reads: 112451597
+[count_reads:949] done count. Elapsed time: 923.702 sec. Total reads: 224903194
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 112451597
+[next:311] EOF REV reached. Total reads: 112451597
+[split:694] Done splitting. Reads count: 224903194 Runtime sec: 9905.27
+
+[init:135] Readfeed init done in sec [10829]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 224903194 all_reads_len= 3980117038 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.538192 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 10 ... 
+[align:190] done in [0.214712] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.00237601] sec. Memory KB: 25
+[align2:70] Processor 0 thread 140649089193728 started
+[align2:70] Processor 1 thread 140649097586432 started
+[next:433] EOF FWD reached. Total reads: 56225798
+[next:433] EOF REV reached. Total reads: 56225798
+[align2:133] Processor 1 thread 140649097586432 done. Processed 112451596 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 7401741 Runtime sec: 2733.27
+[next:433] EOF FWD reached. Total reads: 56225799
+[next:433] EOF REV reached. Total reads: 56225799
+[align2:133] Processor 0 thread 140649089193728 done. Processed 112451598 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 7448452 Runtime sec: 2874.79
+[align:220] done index: 0 part: 1 in 2874.8 sec Memory KB: 783
+[align:227] Index and References unloaded in 0.00841147 sec. Memory KB: 784
+[align:237] ==== Done alignment in 2875.02 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 224903194 all_reads_len= 3980117038 min_read_len= 75 max_read_len= 40 total_aligned= 14850193 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.517926 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.520475] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.462007 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.00942639 sec
+[report:93] Report Processor: 0 thread: 140649097586432 started. Memory KB: 781
+[report:93] Report Processor: 1 thread: 140649089193728 started. Memory KB: 781
+[next:433] EOF FWD reached. Total reads: 56225799
+[next:433] EOF REV reached. Total reads: 56225799
+[report:152] Report processor: 0 thread: 140649097586432 done. Processed reads: 112451598 Invalid reads: 0 Memory KB: 782
+[next:433] EOF FWD reached. Total reads: 56225798
+[next:433] EOF REV reached. Total reads: 56225798
+[report:152] Report processor: 1 thread: 140649089193728 done. Processed reads: 112451596 Invalid reads: 0 Memory KB: 782
+[writeReports:211] done reference 0 part: 1 in 6013.46 sec
+[writeReports:217] references unloaded in 0.000244733 sec Memory KB: 782
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_rev.fq.gz"
+[writeReports:259] === done Reports in 6022.93 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC227T_F8-9kf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC227T_F8-9kf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC227T_F8-9kf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC227T_F8-9kf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC227T_F8-9kf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC227T_F8-9kf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC227T_F8-9kf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC227T_F8-9kf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC227T_F8-9kf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC227T_F8-9kf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 49892687
+[next:311] EOF REV reached. Total reads: 49892687
+[count_reads:949] done count. Elapsed time: 432.128 sec. Total reads: 99785374
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 49892687
+[next:311] EOF REV reached. Total reads: 49892687
+[split:694] Done splitting. Reads count: 99785374 Runtime sec: 4607.28
+
+[init:135] Readfeed init done in sec [5039.47]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 99785374 all_reads_len= 3187603430 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.543714 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 6 ... 
+[align:190] done in [0.184397] sec Memory KB: 21
+[align:193] Loading references ...
+[align:197] done in [0.0136831] sec. Memory KB: 21
+[align2:70] Processor 0 thread 140124415309568 started
+[align2:70] Processor 1 thread 140124423702272 started
+[next:433] EOF FWD reached. Total reads: 24946343
+[next:433] EOF REV reached. Total reads: 24946343
+[align2:133] Processor 1 thread 140124423702272 done. Processed 49892686 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 7563359 Runtime sec: 1520.92
+[next:433] EOF FWD reached. Total reads: 24946344
+[next:433] EOF REV reached. Total reads: 24946344
+[align2:133] Processor 0 thread 140124415309568 done. Processed 49892688 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 7534642 Runtime sec: 1619.46
+[align:220] done index: 0 part: 1 in 1619.46 sec Memory KB: 924
+[align:227] Index and References unloaded in 0.00978052 sec. Memory KB: 924
+[align:237] ==== Done alignment in 1619.67 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 99785374 all_reads_len= 3187603430 min_read_len= 75 max_read_len= 40 total_aligned= 15098001 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.574973 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.584689] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.470485 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.000934376 sec
+[report:93] Report Processor: 1 thread: 140124415309568 started. Memory KB: 914
+[report:93] Report Processor: 0 thread: 140124423702272 started. Memory KB: 914
+[next:433] EOF FWD reached. Total reads: 24946344
+[next:433] EOF REV reached. Total reads: 24946344
+[report:152] Report processor: 0 thread: 140124423702272 done. Processed reads: 49892688 Invalid reads: 0 Memory KB: 914
+[next:433] EOF FWD reached. Total reads: 24946343
+[next:433] EOF REV reached. Total reads: 24946343
+[report:152] Report processor: 1 thread: 140124415309568 done. Processed reads: 49892686 Invalid reads: 0 Memory KB: 914
+[writeReports:211] done reference 0 part: 1 in 2850.76 sec
+[writeReports:217] references unloaded in 0.000258376 sec Memory KB: 914
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_rev.fq.gz"
+[writeReports:259] === done Reports in 2856.8 sec ===
+
+/home/jsolorzano/work/kf_fastqs/PDAC227Tkf1_R1.fastq.gz
+/home/jsolorzano/work/kf_fastqs/PDAC227Tkf1_R2.fastq.gz
+[process:1372] === Options processing starts ... ===
+Found value: sortmerna
+Found flag: --threads
+Found value: 2 of previous flag: --threads
+Found flag: --ref
+Found value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta of previous flag: --ref
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC227Tkf1_R1.fastq.gz of previous flag: --reads
+Found flag: --reads
+Found value: /home/jsolorzano/work/kf_fastqs/PDAC227Tkf1_R2.fastq.gz of previous flag: --reads
+Found flag: --workdir
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/ of previous flag: --workdir
+Found flag: --fastx
+Found value: rRNA_aligned of previous flag: --fastx
+Found flag: --other
+Found value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1 of previous flag: --other
+Found flag: --paired_in
+Previous flag: --paired_in is Boolean. Setting to True
+Found flag: --zip-out
+Previous flag: --zip-out is Boolean. Setting to True
+Found flag: --out2
+[opt_workdir:990] Using WORKDIR: "/home/jsolorzano/work/kf_fastqs/sortmerna/" as specified
+[process:1456] Processing option: fastx with value: rRNA_aligned
+[process:1456] Processing option: other with value: /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1
+[process:1456] Processing option: out2 with value: 
+[process:1456] Processing option: paired_in with value: 
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC227Tkf1_R1.fastq.gz
+[opt_reads:97] Processing reads file [1] out of total [2] files
+[process:1456] Processing option: reads with value: /home/jsolorzano/work/kf_fastqs/PDAC227Tkf1_R2.fastq.gz
+[opt_reads:97] Processing reads file [2] out of total [2] files
+[process:1456] Processing option: ref with value: /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta
+[opt_ref:157] Processing reference [1] out of total [1] references
+[opt_ref:205] File "/home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta" exists and is readable
+[process:1456] Processing option: threads with value: 2
+[process:1456] Processing option: zip-out with value: 
+[process:1476] === Options processing done ===
+[process:1477] Alignment type: [best:1 num_alignments:1 min_lis:2 seeds:2]
+[validate_kvdbdir:1223] Key-value DB location "/home/jsolorzano/work/kf_fastqs/sortmerna/kvdb"
+[validate_idxdir:1189] Using index directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx"
+[validate_idxdir:1205] IDX directory: "/home/jsolorzano/work/kf_fastqs/sortmerna/idx" exists and is not empty
+[validate_readb_dir:1281] Using split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb"
+[validate_readb_dir:1297] split reads directory : "/home/jsolorzano/work/kf_fastqs/sortmerna/readb" exists and is not empty
+[main:62] Running command:
+sortmerna --threads 2 --ref /home/jsolorzano/work/kf_fastqs/PDXrRNAs_ensembl75.fasta --reads /home/jsolorzano/work/kf_fastqs/PDAC227Tkf1_R1.fastq.gz --reads /home/jsolorzano/work/kf_fastqs/PDAC227Tkf1_R2.fastq.gz --workdir /home/jsolorzano/work/kf_fastqs/sortmerna/ --fastx rRNA_aligned --other /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1 --paired_in --zip-out --out2 
+[Index:102] Found 4 non-empty index files. Skipping indexing.
+[init:108] Readfeed init started
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC227Tkf1_R1.fastq.gz" is FASTQ gzipped
+[define_format:885] file: "/home/jsolorzano/work/kf_fastqs/PDAC227Tkf1_R2.fastq.gz" is FASTQ gzipped
+[count_reads:919] started count  ...   
+[next:311] EOF FWD reached. Total reads: 82957548
+[next:311] EOF REV reached. Total reads: 82957548
+[count_reads:949] done count. Elapsed time: 716.582 sec. Total reads: 165915096
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[init_split_files:971] added file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[is_split_ready:723] found existing readfeed descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[split:583] start splitting. Using number of splits equals number of processing threads: 2
+[clean:1102] found descriptor /home/jsolorzano/work/kf_fastqs/sortmerna/readb/readfeed
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_0.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/fwd_1.fq.gz
+[clean:1146] removing split file: /home/jsolorzano/work/kf_fastqs/sortmerna/readb/rev_1.fq.gz
+[next:311] EOF FWD reached. Total reads: 82957548
+[next:311] EOF REV reached. Total reads: 82957548
+[split:694] Done splitting. Reads count: 165915096 Runtime sec: 6972.87
+
+[init:135] Readfeed init done in sec [7689.47]
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 165915096 all_reads_len= 3852167130 min_read_len= 75 max_read_len= 40 total_aligned= 0 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[align:143] ==== Starting alignment ====
+[align:146] Number of cores: 64
+[align:163] Using number of Processor threads: 2
+[Refstats:60] Index Statistics calculation starts ... done in: 0.523819 sec
+[align:185] Loading index: 0 part: 1/1 Memory KB: 10 ... 
+[align:190] done in [0.207433] sec Memory KB: 25
+[align:193] Loading references ...
+[align:197] done in [0.0122359] sec. Memory KB: 25
+[align2:70] Processor 0 thread 140605904623360 started
+[align2:70] Processor 1 thread 140605913016064 started
+[next:433] EOF FWD reached. Total reads: 41478774
+[next:433] EOF REV reached. Total reads: 41478774
+[align2:133] Processor 1 thread 140605913016064 done. Processed 82957548 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 38223116 Runtime sec: 3448.38
+[next:433] EOF FWD reached. Total reads: 41478774
+[next:433] EOF REV reached. Total reads: 41478774
+[align2:133] Processor 0 thread 140605904623360 done. Processed 82957548 reads. Skipped already processed: 0 reads Aligned reads (passing E-value): 38150982 Runtime sec: 3880.16
+[align:220] done index: 0 part: 1 in 3880.16 sec Memory KB: 3207
+[align:227] Index and References unloaded in 0.00986623 sec. Memory KB: 3207
+[align:237] ==== Done alignment in 3880.39 sec ====
+
+[store_to_db:292] Stored Reads statistics to DB:
+     all_reads_count= 165915096 all_reads_len= 3852167130 min_read_len= 75 max_read_len= 40 total_aligned= 76374098 total_aligned_id= 0 total_aligned_cov= 0 total_aligned_id_cov= 0 total_denovo= 0 num_short= 0 reads_matched_per_db= TODO is_stats_calc= 0 is_total_reads_mapped_cov= 0
+
+[writeSummary:179] ==== Starting summary of alignment statistics ====
+[Refstats:60] Index Statistics calculation starts ... done in: 0.508604 sec
+[write:62] Using summary file: /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned.log
+[writeSummary:185] ==== Done summary in sec [0.520402] ====
+
+[writeReports:160] === Report generation starts ===
+[writeReports:175] Restored Readstats from DB: 1
+[Refstats:60] Index Statistics calculation starts ... done in: 0.462824 sec
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[validate_out_type:139] Output type: 
+1-file  2-files  paired  paired_in  paired_out  out2  sout  other  otype
+           +        +       +                      +           +     2e
+[set_num_out:162] num_out: 2
+[init:60] num_out: 2
+[writeReports:190] loading reference 0 part 1/1 ... done in 0.0031604 sec
+[report:93] Report Processor: 0 thread: 140605913016064 started. Memory KB: 3205
+[report:93] Report Processor: 1 thread: 140605904623360 started. Memory KB: 3205
+[next:433] EOF FWD reached. Total reads: 41478774
+[next:433] EOF REV reached. Total reads: 41478774
+[report:152] Report processor: 0 thread: 140605913016064 done. Processed reads: 82957548 Invalid reads: 0 Memory KB: 3214
+[next:433] EOF FWD reached. Total reads: 41478774
+[next:433] EOF REV reached. Total reads: 41478774
+[report:152] Report processor: 1 thread: 140605904623360 done. Processed reads: 82957548 Invalid reads: 0 Memory KB: 3214
+[writeReports:211] done reference 0 part: 1 in 4029.55 sec
+[writeReports:217] references unloaded in 0.000262049 sec Memory KB: 3214
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz for reading.
+[merge:155] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz
+[merge:158] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/aligned_rev.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_fwd_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_fwd_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_fwd_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_fwd_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_fwd_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_fwd.fq.gz"
+[openfr:114] Opened output file /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_rev_1.fq.gz for reading.
+[merge:130] merged /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_rev_1.fq.gz -> /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_rev_0.fq.gz
+[merge:133] deleted /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_rev_1.fq.gz
+[strip_path_sfx:154] moving /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_rev_0.fq.gz -> "/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_rev.fq.gz"
+[writeReports:259] === done Reports in 4037.99 sec ===
+
+ls: no se puede acceder a /home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/*.fastq.gz: No existe el fichero o el directorio
+Exception in thread "main" java.awt.AWTError: Can't connect to X11 window server using 'localhost:11.0' as the value of the DISPLAY variable.
+	at sun.awt.X11GraphicsEnvironment.initDisplay(Native Method)
+	at sun.awt.X11GraphicsEnvironment.access$200(X11GraphicsEnvironment.java:65)
+	at sun.awt.X11GraphicsEnvironment$1.run(X11GraphicsEnvironment.java:115)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at sun.awt.X11GraphicsEnvironment.<clinit>(X11GraphicsEnvironment.java:74)
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:264)
+	at java.awt.GraphicsEnvironment.createGE(GraphicsEnvironment.java:103)
+	at java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment(GraphicsEnvironment.java:82)
+	at sun.awt.X11.XToolkit.<clinit>(XToolkit.java:126)
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:264)
+	at java.awt.Toolkit$2.run(Toolkit.java:860)
+	at java.awt.Toolkit$2.run(Toolkit.java:855)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.awt.Toolkit.getDefaultToolkit(Toolkit.java:854)
+	at javax.swing.UIManager.getSystemLookAndFeelClassName(UIManager.java:611)
+	at uk.ac.babraham.FastQC.FastQCApplication.main(FastQCApplication.java:322)
+[WARNING]         multiqc : MultiQC Version v1.10.1 now available!
+[INFO   ]         multiqc : This is MultiQC v1.7
+[INFO   ]         multiqc : Template    : default
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC200Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC200Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC201T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC201T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC201Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC201Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC202T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC202T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC202Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC202Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC203T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC203T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC203Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC203Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC204T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC204T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC204Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC204Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC205T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC205T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC205Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC205Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC206T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC206T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC206Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC206Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC207T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC207T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC207Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC207Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC208T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC208T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC208Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC208Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC209T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC209T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC209Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC209Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC210T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC210T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC210Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC210Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC211T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC211T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC211Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC211Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC212T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC212T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC213T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC213T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC213Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC213Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC214T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC214T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC214Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC214Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC215T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC215T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC215Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC215Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC216T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC216T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC216Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC216Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC217T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC217T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC217Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC217Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC218T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC218T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC218Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC218Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC219T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC219T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC219Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC219Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC220Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC221Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC222Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC223Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC224Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC225Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC226Tkf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227T_F8-9kf1_rev.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_fwd.fq.gz'
+[INFO   ]         multiqc : Searching '/home/jsolorzano/work/kf_fastqs/sortmerna/out/rRNAfree/PDAC227Tkf1_rev.fq.gz'
+[WARNING]         multiqc : No analysis results found. Cleaning up..
+[INFO   ]         multiqc : MultiQC complete

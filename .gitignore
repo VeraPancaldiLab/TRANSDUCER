@@ -1,0 +1,21 @@
+
+# folders to force load
+!**/multiqc/
+
+# filetypes to ignore (all but scripts, and intermediate data) 
+*.pdf
+*.jpg
+*.png
+*.zip
+*.gz
+*.fasta
+*.fa
+*.fastq
+*.fq
+*.bam
+*.sam
+*.gtf
+
+# specific dirs
+02_Raw_data/Fix-OneDrive-Zip
+02_Raw_data/02_rRNA_removal_and_Trimming_check/300421_FredericIdea/findkmer/

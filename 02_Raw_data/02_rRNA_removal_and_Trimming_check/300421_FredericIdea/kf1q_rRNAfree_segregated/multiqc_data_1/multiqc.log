@@ -1,0 +1,364 @@
+[2021-05-19 10:34:04,158] multiqc                                            [DEBUG  ]  No MultiQC config found: /usr/local/bioinfo/src/MultiQC/venv_multiqc-v1.7/lib/python3.6/site-packages/multiqc_config.yaml
+[2021-05-19 10:34:04,159] multiqc                                            [DEBUG  ]  No MultiQC config found: /home/jsolorzano/.multiqc_config.yaml
+[2021-05-19 10:34:04,159] multiqc                                            [DEBUG  ]  No MultiQC config found: multiqc_config.yaml
+[2021-05-19 10:34:04,159] multiqc                                            [DEBUG  ]  Command used: /usr/local/bioinfo/src/MultiQC/venv_multiqc-v1.7/bin/multiqc PDAC201T_F8-9kf1_fwd_fastqc.html PDAC201T_F8-9kf1_fwd_fastqc.zip PDAC201T_F8-9kf1_fwd.fq.gz PDAC201T_F8-9kf1_rev_fastqc.html PDAC201T_F8-9kf1_rev_fastqc.zip PDAC201T_F8-9kf1_rev.fq.gz PDAC202T_F8-9kf1_fwd_fastqc.html PDAC202T_F8-9kf1_fwd_fastqc.zip PDAC202T_F8-9kf1_fwd.fq.gz PDAC202T_F8-9kf1_rev_fastqc.html PDAC202T_F8-9kf1_rev_fastqc.zip PDAC202T_F8-9kf1_rev.fq.gz PDAC203T_F8-9kf1_fwd_fastqc.html PDAC203T_F8-9kf1_fwd_fastqc.zip PDAC203T_F8-9kf1_fwd.fq.gz PDAC203T_F8-9kf1_rev_fastqc.html PDAC203T_F8-9kf1_rev_fastqc.zip PDAC203T_F8-9kf1_rev.fq.gz PDAC204T_F8-9kf1_fwd_fastqc.html PDAC204T_F8-9kf1_fwd_fastqc.zip PDAC204T_F8-9kf1_fwd.fq.gz PDAC204T_F8-9kf1_rev_fastqc.html PDAC204T_F8-9kf1_rev_fastqc.zip PDAC204T_F8-9kf1_rev.fq.gz PDAC205T_F8-9kf1_fwd_fastqc.html PDAC205T_F8-9kf1_fwd_fastqc.zip PDAC205T_F8-9kf1_fwd.fq.gz PDAC205T_F8-9kf1_rev_fastqc.html PDAC205T_F8-9kf1_rev_fastqc.zip PDAC205T_F8-9kf1_rev.fq.gz PDAC206T_F8-9kf1_fwd_fastqc.html PDAC206T_F8-9kf1_fwd_fastqc.zip PDAC206T_F8-9kf1_fwd.fq.gz PDAC206T_F8-9kf1_rev_fastqc.html PDAC206T_F8-9kf1_rev_fastqc.zip PDAC206T_F8-9kf1_rev.fq.gz PDAC207T_F8-9kf1_fwd_fastqc.html PDAC207T_F8-9kf1_fwd_fastqc.zip PDAC207T_F8-9kf1_fwd.fq.gz PDAC207T_F8-9kf1_rev_fastqc.html PDAC207T_F8-9kf1_rev_fastqc.zip PDAC207T_F8-9kf1_rev.fq.gz PDAC208T_F8-9kf1_fwd_fastqc.html PDAC208T_F8-9kf1_fwd_fastqc.zip PDAC208T_F8-9kf1_fwd.fq.gz PDAC208T_F8-9kf1_rev_fastqc.html PDAC208T_F8-9kf1_rev_fastqc.zip PDAC208T_F8-9kf1_rev.fq.gz PDAC209T_F8-9kf1_fwd_fastqc.html PDAC209T_F8-9kf1_fwd_fastqc.zip PDAC209T_F8-9kf1_fwd.fq.gz PDAC209T_F8-9kf1_rev_fastqc.html PDAC209T_F8-9kf1_rev_fastqc.zip PDAC209T_F8-9kf1_rev.fq.gz PDAC210T_F8-9kf1_fwd_fastqc.html PDAC210T_F8-9kf1_fwd_fastqc.zip PDAC210T_F8-9kf1_fwd.fq.gz PDAC210T_F8-9kf1_rev_fastqc.html PDAC210T_F8-9kf1_rev_fastqc.zip PDAC210T_F8-9kf1_rev.fq.gz PDAC211T_F8-9kf1_fwd_fastqc.html PDAC211T_F8-9kf1_fwd_fastqc.zip PDAC211T_F8-9kf1_fwd.fq.gz PDAC211T_F8-9kf1_rev_fastqc.html PDAC211T_F8-9kf1_rev_fastqc.zip PDAC211T_F8-9kf1_rev.fq.gz PDAC212T_F8-9kf1_fwd_fastqc.html PDAC212T_F8-9kf1_fwd_fastqc.zip PDAC212T_F8-9kf1_fwd.fq.gz PDAC212T_F8-9kf1_rev_fastqc.html PDAC212T_F8-9kf1_rev_fastqc.zip PDAC212T_F8-9kf1_rev.fq.gz PDAC213T_F8-9kf1_fwd_fastqc.html PDAC213T_F8-9kf1_fwd_fastqc.zip PDAC213T_F8-9kf1_fwd.fq.gz PDAC213T_F8-9kf1_rev_fastqc.html PDAC213T_F8-9kf1_rev_fastqc.zip PDAC213T_F8-9kf1_rev.fq.gz PDAC214T_F8-9kf1_fwd_fastqc.html PDAC214T_F8-9kf1_fwd_fastqc.zip PDAC214T_F8-9kf1_fwd.fq.gz PDAC214T_F8-9kf1_rev_fastqc.html PDAC214T_F8-9kf1_rev_fastqc.zip PDAC214T_F8-9kf1_rev.fq.gz PDAC215T_F8-9kf1_fwd_fastqc.html PDAC215T_F8-9kf1_fwd_fastqc.zip PDAC215T_F8-9kf1_fwd.fq.gz PDAC215T_F8-9kf1_rev_fastqc.html PDAC215T_F8-9kf1_rev_fastqc.zip PDAC215T_F8-9kf1_rev.fq.gz PDAC216T_F8-9kf1_fwd_fastqc.html PDAC216T_F8-9kf1_fwd_fastqc.zip PDAC216T_F8-9kf1_fwd.fq.gz PDAC216T_F8-9kf1_rev_fastqc.html PDAC216T_F8-9kf1_rev_fastqc.zip PDAC216T_F8-9kf1_rev.fq.gz PDAC217T_F8-9kf1_fwd_fastqc.html PDAC217T_F8-9kf1_fwd_fastqc.zip PDAC217T_F8-9kf1_fwd.fq.gz PDAC217T_F8-9kf1_rev_fastqc.html PDAC217T_F8-9kf1_rev_fastqc.zip PDAC217T_F8-9kf1_rev.fq.gz PDAC218T_F8-9kf1_fwd_fastqc.html PDAC218T_F8-9kf1_fwd_fastqc.zip PDAC218T_F8-9kf1_fwd.fq.gz PDAC218T_F8-9kf1_rev_fastqc.html PDAC218T_F8-9kf1_rev_fastqc.zip PDAC218T_F8-9kf1_rev.fq.gz PDAC219T_F8-9kf1_fwd_fastqc.html PDAC219T_F8-9kf1_fwd_fastqc.zip PDAC219T_F8-9kf1_fwd.fq.gz PDAC219T_F8-9kf1_rev_fastqc.html PDAC219T_F8-9kf1_rev_fastqc.zip PDAC219T_F8-9kf1_rev.fq.gz PDAC220T_F8-9kf1_fwd_fastqc.html PDAC220T_F8-9kf1_fwd_fastqc.zip PDAC220T_F8-9kf1_fwd.fq.gz PDAC220T_F8-9kf1_rev_fastqc.html PDAC220T_F8-9kf1_rev_fastqc.zip PDAC220T_F8-9kf1_rev.fq.gz PDAC221T_F8-9kf1_fwd_fastqc.html PDAC221T_F8-9kf1_fwd_fastqc.zip PDAC221T_F8-9kf1_fwd.fq.gz PDAC221T_F8-9kf1_rev_fastqc.html PDAC221T_F8-9kf1_rev_fastqc.zip PDAC221T_F8-9kf1_rev.fq.gz PDAC222T_F8-9kf1_fwd_fastqc.html PDAC222T_F8-9kf1_fwd_fastqc.zip PDAC222T_F8-9kf1_fwd.fq.gz PDAC222T_F8-9kf1_rev_fastqc.html PDAC222T_F8-9kf1_rev_fastqc.zip PDAC222T_F8-9kf1_rev.fq.gz PDAC223T_F8-9kf1_fwd_fastqc.html PDAC223T_F8-9kf1_fwd_fastqc.zip PDAC223T_F8-9kf1_fwd.fq.gz PDAC223T_F8-9kf1_rev_fastqc.html PDAC223T_F8-9kf1_rev_fastqc.zip PDAC223T_F8-9kf1_rev.fq.gz PDAC224T_F8-9kf1_fwd_fastqc.html PDAC224T_F8-9kf1_fwd_fastqc.zip PDAC224T_F8-9kf1_fwd.fq.gz PDAC224T_F8-9kf1_rev_fastqc.html PDAC224T_F8-9kf1_rev_fastqc.zip PDAC224T_F8-9kf1_rev.fq.gz PDAC225T_F8-9kf1_fwd_fastqc.html PDAC225T_F8-9kf1_fwd_fastqc.zip PDAC225T_F8-9kf1_fwd.fq.gz PDAC225T_F8-9kf1_rev_fastqc.html PDAC225T_F8-9kf1_rev_fastqc.zip PDAC225T_F8-9kf1_rev.fq.gz PDAC226T_F8-9kf1_fwd_fastqc.html PDAC226T_F8-9kf1_fwd_fastqc.zip PDAC226T_F8-9kf1_fwd.fq.gz PDAC226T_F8-9kf1_rev_fastqc.html PDAC226T_F8-9kf1_rev_fastqc.zip PDAC226T_F8-9kf1_rev.fq.gz PDAC227T_F8-9kf1_fwd_fastqc.html PDAC227T_F8-9kf1_fwd_fastqc.zip PDAC227T_F8-9kf1_fwd.fq.gz PDAC227T_F8-9kf1_rev_fastqc.html PDAC227T_F8-9kf1_rev_fastqc.zip PDAC227T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,465] multiqc                                            [WARNING]  MultiQC Version v1.10.1 now available!
+[2021-05-19 10:34:04,465] multiqc                                            [INFO   ]  This is MultiQC v1.7
+[2021-05-19 10:34:04,465] multiqc                                            [DEBUG  ]  Command     : /usr/local/bioinfo/src/MultiQC/venv_multiqc-v1.7/bin/multiqc PDAC201T_F8-9kf1_fwd_fastqc.html PDAC201T_F8-9kf1_fwd_fastqc.zip PDAC201T_F8-9kf1_fwd.fq.gz PDAC201T_F8-9kf1_rev_fastqc.html PDAC201T_F8-9kf1_rev_fastqc.zip PDAC201T_F8-9kf1_rev.fq.gz PDAC202T_F8-9kf1_fwd_fastqc.html PDAC202T_F8-9kf1_fwd_fastqc.zip PDAC202T_F8-9kf1_fwd.fq.gz PDAC202T_F8-9kf1_rev_fastqc.html PDAC202T_F8-9kf1_rev_fastqc.zip PDAC202T_F8-9kf1_rev.fq.gz PDAC203T_F8-9kf1_fwd_fastqc.html PDAC203T_F8-9kf1_fwd_fastqc.zip PDAC203T_F8-9kf1_fwd.fq.gz PDAC203T_F8-9kf1_rev_fastqc.html PDAC203T_F8-9kf1_rev_fastqc.zip PDAC203T_F8-9kf1_rev.fq.gz PDAC204T_F8-9kf1_fwd_fastqc.html PDAC204T_F8-9kf1_fwd_fastqc.zip PDAC204T_F8-9kf1_fwd.fq.gz PDAC204T_F8-9kf1_rev_fastqc.html PDAC204T_F8-9kf1_rev_fastqc.zip PDAC204T_F8-9kf1_rev.fq.gz PDAC205T_F8-9kf1_fwd_fastqc.html PDAC205T_F8-9kf1_fwd_fastqc.zip PDAC205T_F8-9kf1_fwd.fq.gz PDAC205T_F8-9kf1_rev_fastqc.html PDAC205T_F8-9kf1_rev_fastqc.zip PDAC205T_F8-9kf1_rev.fq.gz PDAC206T_F8-9kf1_fwd_fastqc.html PDAC206T_F8-9kf1_fwd_fastqc.zip PDAC206T_F8-9kf1_fwd.fq.gz PDAC206T_F8-9kf1_rev_fastqc.html PDAC206T_F8-9kf1_rev_fastqc.zip PDAC206T_F8-9kf1_rev.fq.gz PDAC207T_F8-9kf1_fwd_fastqc.html PDAC207T_F8-9kf1_fwd_fastqc.zip PDAC207T_F8-9kf1_fwd.fq.gz PDAC207T_F8-9kf1_rev_fastqc.html PDAC207T_F8-9kf1_rev_fastqc.zip PDAC207T_F8-9kf1_rev.fq.gz PDAC208T_F8-9kf1_fwd_fastqc.html PDAC208T_F8-9kf1_fwd_fastqc.zip PDAC208T_F8-9kf1_fwd.fq.gz PDAC208T_F8-9kf1_rev_fastqc.html PDAC208T_F8-9kf1_rev_fastqc.zip PDAC208T_F8-9kf1_rev.fq.gz PDAC209T_F8-9kf1_fwd_fastqc.html PDAC209T_F8-9kf1_fwd_fastqc.zip PDAC209T_F8-9kf1_fwd.fq.gz PDAC209T_F8-9kf1_rev_fastqc.html PDAC209T_F8-9kf1_rev_fastqc.zip PDAC209T_F8-9kf1_rev.fq.gz PDAC210T_F8-9kf1_fwd_fastqc.html PDAC210T_F8-9kf1_fwd_fastqc.zip PDAC210T_F8-9kf1_fwd.fq.gz PDAC210T_F8-9kf1_rev_fastqc.html PDAC210T_F8-9kf1_rev_fastqc.zip PDAC210T_F8-9kf1_rev.fq.gz PDAC211T_F8-9kf1_fwd_fastqc.html PDAC211T_F8-9kf1_fwd_fastqc.zip PDAC211T_F8-9kf1_fwd.fq.gz PDAC211T_F8-9kf1_rev_fastqc.html PDAC211T_F8-9kf1_rev_fastqc.zip PDAC211T_F8-9kf1_rev.fq.gz PDAC212T_F8-9kf1_fwd_fastqc.html PDAC212T_F8-9kf1_fwd_fastqc.zip PDAC212T_F8-9kf1_fwd.fq.gz PDAC212T_F8-9kf1_rev_fastqc.html PDAC212T_F8-9kf1_rev_fastqc.zip PDAC212T_F8-9kf1_rev.fq.gz PDAC213T_F8-9kf1_fwd_fastqc.html PDAC213T_F8-9kf1_fwd_fastqc.zip PDAC213T_F8-9kf1_fwd.fq.gz PDAC213T_F8-9kf1_rev_fastqc.html PDAC213T_F8-9kf1_rev_fastqc.zip PDAC213T_F8-9kf1_rev.fq.gz PDAC214T_F8-9kf1_fwd_fastqc.html PDAC214T_F8-9kf1_fwd_fastqc.zip PDAC214T_F8-9kf1_fwd.fq.gz PDAC214T_F8-9kf1_rev_fastqc.html PDAC214T_F8-9kf1_rev_fastqc.zip PDAC214T_F8-9kf1_rev.fq.gz PDAC215T_F8-9kf1_fwd_fastqc.html PDAC215T_F8-9kf1_fwd_fastqc.zip PDAC215T_F8-9kf1_fwd.fq.gz PDAC215T_F8-9kf1_rev_fastqc.html PDAC215T_F8-9kf1_rev_fastqc.zip PDAC215T_F8-9kf1_rev.fq.gz PDAC216T_F8-9kf1_fwd_fastqc.html PDAC216T_F8-9kf1_fwd_fastqc.zip PDAC216T_F8-9kf1_fwd.fq.gz PDAC216T_F8-9kf1_rev_fastqc.html PDAC216T_F8-9kf1_rev_fastqc.zip PDAC216T_F8-9kf1_rev.fq.gz PDAC217T_F8-9kf1_fwd_fastqc.html PDAC217T_F8-9kf1_fwd_fastqc.zip PDAC217T_F8-9kf1_fwd.fq.gz PDAC217T_F8-9kf1_rev_fastqc.html PDAC217T_F8-9kf1_rev_fastqc.zip PDAC217T_F8-9kf1_rev.fq.gz PDAC218T_F8-9kf1_fwd_fastqc.html PDAC218T_F8-9kf1_fwd_fastqc.zip PDAC218T_F8-9kf1_fwd.fq.gz PDAC218T_F8-9kf1_rev_fastqc.html PDAC218T_F8-9kf1_rev_fastqc.zip PDAC218T_F8-9kf1_rev.fq.gz PDAC219T_F8-9kf1_fwd_fastqc.html PDAC219T_F8-9kf1_fwd_fastqc.zip PDAC219T_F8-9kf1_fwd.fq.gz PDAC219T_F8-9kf1_rev_fastqc.html PDAC219T_F8-9kf1_rev_fastqc.zip PDAC219T_F8-9kf1_rev.fq.gz PDAC220T_F8-9kf1_fwd_fastqc.html PDAC220T_F8-9kf1_fwd_fastqc.zip PDAC220T_F8-9kf1_fwd.fq.gz PDAC220T_F8-9kf1_rev_fastqc.html PDAC220T_F8-9kf1_rev_fastqc.zip PDAC220T_F8-9kf1_rev.fq.gz PDAC221T_F8-9kf1_fwd_fastqc.html PDAC221T_F8-9kf1_fwd_fastqc.zip PDAC221T_F8-9kf1_fwd.fq.gz PDAC221T_F8-9kf1_rev_fastqc.html PDAC221T_F8-9kf1_rev_fastqc.zip PDAC221T_F8-9kf1_rev.fq.gz PDAC222T_F8-9kf1_fwd_fastqc.html PDAC222T_F8-9kf1_fwd_fastqc.zip PDAC222T_F8-9kf1_fwd.fq.gz PDAC222T_F8-9kf1_rev_fastqc.html PDAC222T_F8-9kf1_rev_fastqc.zip PDAC222T_F8-9kf1_rev.fq.gz PDAC223T_F8-9kf1_fwd_fastqc.html PDAC223T_F8-9kf1_fwd_fastqc.zip PDAC223T_F8-9kf1_fwd.fq.gz PDAC223T_F8-9kf1_rev_fastqc.html PDAC223T_F8-9kf1_rev_fastqc.zip PDAC223T_F8-9kf1_rev.fq.gz PDAC224T_F8-9kf1_fwd_fastqc.html PDAC224T_F8-9kf1_fwd_fastqc.zip PDAC224T_F8-9kf1_fwd.fq.gz PDAC224T_F8-9kf1_rev_fastqc.html PDAC224T_F8-9kf1_rev_fastqc.zip PDAC224T_F8-9kf1_rev.fq.gz PDAC225T_F8-9kf1_fwd_fastqc.html PDAC225T_F8-9kf1_fwd_fastqc.zip PDAC225T_F8-9kf1_fwd.fq.gz PDAC225T_F8-9kf1_rev_fastqc.html PDAC225T_F8-9kf1_rev_fastqc.zip PDAC225T_F8-9kf1_rev.fq.gz PDAC226T_F8-9kf1_fwd_fastqc.html PDAC226T_F8-9kf1_fwd_fastqc.zip PDAC226T_F8-9kf1_fwd.fq.gz PDAC226T_F8-9kf1_rev_fastqc.html PDAC226T_F8-9kf1_rev_fastqc.zip PDAC226T_F8-9kf1_rev.fq.gz PDAC227T_F8-9kf1_fwd_fastqc.html PDAC227T_F8-9kf1_fwd_fastqc.zip PDAC227T_F8-9kf1_fwd.fq.gz PDAC227T_F8-9kf1_rev_fastqc.html PDAC227T_F8-9kf1_rev_fastqc.zip PDAC227T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,466] multiqc                                            [DEBUG  ]  Working dir : /work/jsolorzano/kf_fastqs/sortmerna/out/rRNAfree
+[2021-05-19 10:34:04,466] multiqc                                            [INFO   ]  Template    : default
+[2021-05-19 10:34:04,466] multiqc                                            [INFO   ]  Searching 'PDAC201T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,466] multiqc                                            [INFO   ]  Searching 'PDAC201T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,466] multiqc                                            [INFO   ]  Searching 'PDAC201T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,466] multiqc                                            [INFO   ]  Searching 'PDAC201T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,466] multiqc                                            [INFO   ]  Searching 'PDAC201T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,467] multiqc                                            [INFO   ]  Searching 'PDAC201T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,467] multiqc                                            [INFO   ]  Searching 'PDAC202T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,467] multiqc                                            [INFO   ]  Searching 'PDAC202T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,467] multiqc                                            [INFO   ]  Searching 'PDAC202T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,467] multiqc                                            [INFO   ]  Searching 'PDAC202T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,467] multiqc                                            [INFO   ]  Searching 'PDAC202T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,467] multiqc                                            [INFO   ]  Searching 'PDAC202T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,468] multiqc                                            [INFO   ]  Searching 'PDAC203T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,468] multiqc                                            [INFO   ]  Searching 'PDAC203T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,468] multiqc                                            [INFO   ]  Searching 'PDAC203T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,468] multiqc                                            [INFO   ]  Searching 'PDAC203T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,468] multiqc                                            [INFO   ]  Searching 'PDAC203T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,468] multiqc                                            [INFO   ]  Searching 'PDAC203T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,468] multiqc                                            [INFO   ]  Searching 'PDAC204T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,468] multiqc                                            [INFO   ]  Searching 'PDAC204T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,469] multiqc                                            [INFO   ]  Searching 'PDAC204T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,469] multiqc                                            [INFO   ]  Searching 'PDAC204T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,469] multiqc                                            [INFO   ]  Searching 'PDAC204T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,469] multiqc                                            [INFO   ]  Searching 'PDAC204T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,469] multiqc                                            [INFO   ]  Searching 'PDAC205T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,469] multiqc                                            [INFO   ]  Searching 'PDAC205T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,469] multiqc                                            [INFO   ]  Searching 'PDAC205T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,470] multiqc                                            [INFO   ]  Searching 'PDAC205T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,470] multiqc                                            [INFO   ]  Searching 'PDAC205T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,470] multiqc                                            [INFO   ]  Searching 'PDAC205T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,470] multiqc                                            [INFO   ]  Searching 'PDAC206T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,470] multiqc                                            [INFO   ]  Searching 'PDAC206T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,470] multiqc                                            [INFO   ]  Searching 'PDAC206T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,470] multiqc                                            [INFO   ]  Searching 'PDAC206T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,470] multiqc                                            [INFO   ]  Searching 'PDAC206T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,471] multiqc                                            [INFO   ]  Searching 'PDAC206T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,471] multiqc                                            [INFO   ]  Searching 'PDAC207T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,471] multiqc                                            [INFO   ]  Searching 'PDAC207T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,471] multiqc                                            [INFO   ]  Searching 'PDAC207T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,471] multiqc                                            [INFO   ]  Searching 'PDAC207T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,471] multiqc                                            [INFO   ]  Searching 'PDAC207T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,471] multiqc                                            [INFO   ]  Searching 'PDAC207T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,471] multiqc                                            [INFO   ]  Searching 'PDAC208T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,472] multiqc                                            [INFO   ]  Searching 'PDAC208T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,472] multiqc                                            [INFO   ]  Searching 'PDAC208T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,472] multiqc                                            [INFO   ]  Searching 'PDAC208T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,472] multiqc                                            [INFO   ]  Searching 'PDAC208T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,472] multiqc                                            [INFO   ]  Searching 'PDAC208T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,472] multiqc                                            [INFO   ]  Searching 'PDAC209T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,472] multiqc                                            [INFO   ]  Searching 'PDAC209T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,473] multiqc                                            [INFO   ]  Searching 'PDAC209T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,473] multiqc                                            [INFO   ]  Searching 'PDAC209T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,473] multiqc                                            [INFO   ]  Searching 'PDAC209T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,473] multiqc                                            [INFO   ]  Searching 'PDAC209T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,473] multiqc                                            [INFO   ]  Searching 'PDAC210T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,473] multiqc                                            [INFO   ]  Searching 'PDAC210T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,473] multiqc                                            [INFO   ]  Searching 'PDAC210T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,473] multiqc                                            [INFO   ]  Searching 'PDAC210T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,474] multiqc                                            [INFO   ]  Searching 'PDAC210T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,474] multiqc                                            [INFO   ]  Searching 'PDAC210T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,474] multiqc                                            [INFO   ]  Searching 'PDAC211T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,474] multiqc                                            [INFO   ]  Searching 'PDAC211T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,474] multiqc                                            [INFO   ]  Searching 'PDAC211T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,474] multiqc                                            [INFO   ]  Searching 'PDAC211T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,474] multiqc                                            [INFO   ]  Searching 'PDAC211T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,474] multiqc                                            [INFO   ]  Searching 'PDAC211T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,475] multiqc                                            [INFO   ]  Searching 'PDAC212T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,475] multiqc                                            [INFO   ]  Searching 'PDAC212T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,475] multiqc                                            [INFO   ]  Searching 'PDAC212T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,475] multiqc                                            [INFO   ]  Searching 'PDAC212T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,475] multiqc                                            [INFO   ]  Searching 'PDAC212T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,475] multiqc                                            [INFO   ]  Searching 'PDAC212T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,475] multiqc                                            [INFO   ]  Searching 'PDAC213T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,475] multiqc                                            [INFO   ]  Searching 'PDAC213T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,476] multiqc                                            [INFO   ]  Searching 'PDAC213T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,476] multiqc                                            [INFO   ]  Searching 'PDAC213T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,476] multiqc                                            [INFO   ]  Searching 'PDAC213T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,476] multiqc                                            [INFO   ]  Searching 'PDAC213T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,476] multiqc                                            [INFO   ]  Searching 'PDAC214T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,476] multiqc                                            [INFO   ]  Searching 'PDAC214T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,476] multiqc                                            [INFO   ]  Searching 'PDAC214T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,476] multiqc                                            [INFO   ]  Searching 'PDAC214T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,477] multiqc                                            [INFO   ]  Searching 'PDAC214T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,477] multiqc                                            [INFO   ]  Searching 'PDAC214T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,477] multiqc                                            [INFO   ]  Searching 'PDAC215T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,477] multiqc                                            [INFO   ]  Searching 'PDAC215T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,477] multiqc                                            [INFO   ]  Searching 'PDAC215T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,477] multiqc                                            [INFO   ]  Searching 'PDAC215T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,477] multiqc                                            [INFO   ]  Searching 'PDAC215T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,477] multiqc                                            [INFO   ]  Searching 'PDAC215T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,478] multiqc                                            [INFO   ]  Searching 'PDAC216T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,478] multiqc                                            [INFO   ]  Searching 'PDAC216T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,478] multiqc                                            [INFO   ]  Searching 'PDAC216T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,478] multiqc                                            [INFO   ]  Searching 'PDAC216T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,478] multiqc                                            [INFO   ]  Searching 'PDAC216T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,478] multiqc                                            [INFO   ]  Searching 'PDAC216T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,478] multiqc                                            [INFO   ]  Searching 'PDAC217T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,478] multiqc                                            [INFO   ]  Searching 'PDAC217T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,478] multiqc                                            [INFO   ]  Searching 'PDAC217T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,479] multiqc                                            [INFO   ]  Searching 'PDAC217T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,479] multiqc                                            [INFO   ]  Searching 'PDAC217T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,479] multiqc                                            [INFO   ]  Searching 'PDAC217T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,479] multiqc                                            [INFO   ]  Searching 'PDAC218T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,479] multiqc                                            [INFO   ]  Searching 'PDAC218T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,479] multiqc                                            [INFO   ]  Searching 'PDAC218T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,479] multiqc                                            [INFO   ]  Searching 'PDAC218T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,479] multiqc                                            [INFO   ]  Searching 'PDAC218T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,480] multiqc                                            [INFO   ]  Searching 'PDAC218T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,480] multiqc                                            [INFO   ]  Searching 'PDAC219T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,480] multiqc                                            [INFO   ]  Searching 'PDAC219T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,480] multiqc                                            [INFO   ]  Searching 'PDAC219T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,480] multiqc                                            [INFO   ]  Searching 'PDAC219T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,480] multiqc                                            [INFO   ]  Searching 'PDAC219T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,480] multiqc                                            [INFO   ]  Searching 'PDAC219T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,480] multiqc                                            [INFO   ]  Searching 'PDAC220T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,481] multiqc                                            [INFO   ]  Searching 'PDAC220T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,481] multiqc                                            [INFO   ]  Searching 'PDAC220T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,481] multiqc                                            [INFO   ]  Searching 'PDAC220T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,481] multiqc                                            [INFO   ]  Searching 'PDAC220T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,481] multiqc                                            [INFO   ]  Searching 'PDAC220T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,481] multiqc                                            [INFO   ]  Searching 'PDAC221T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,481] multiqc                                            [INFO   ]  Searching 'PDAC221T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,481] multiqc                                            [INFO   ]  Searching 'PDAC221T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,482] multiqc                                            [INFO   ]  Searching 'PDAC221T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,482] multiqc                                            [INFO   ]  Searching 'PDAC221T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,482] multiqc                                            [INFO   ]  Searching 'PDAC221T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,482] multiqc                                            [INFO   ]  Searching 'PDAC222T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,482] multiqc                                            [INFO   ]  Searching 'PDAC222T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,482] multiqc                                            [INFO   ]  Searching 'PDAC222T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,482] multiqc                                            [INFO   ]  Searching 'PDAC222T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,482] multiqc                                            [INFO   ]  Searching 'PDAC222T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,482] multiqc                                            [INFO   ]  Searching 'PDAC222T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,483] multiqc                                            [INFO   ]  Searching 'PDAC223T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,483] multiqc                                            [INFO   ]  Searching 'PDAC223T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,483] multiqc                                            [INFO   ]  Searching 'PDAC223T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,483] multiqc                                            [INFO   ]  Searching 'PDAC223T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,483] multiqc                                            [INFO   ]  Searching 'PDAC223T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,483] multiqc                                            [INFO   ]  Searching 'PDAC223T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,483] multiqc                                            [INFO   ]  Searching 'PDAC224T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,483] multiqc                                            [INFO   ]  Searching 'PDAC224T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,484] multiqc                                            [INFO   ]  Searching 'PDAC224T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,484] multiqc                                            [INFO   ]  Searching 'PDAC224T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,484] multiqc                                            [INFO   ]  Searching 'PDAC224T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,484] multiqc                                            [INFO   ]  Searching 'PDAC224T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,484] multiqc                                            [INFO   ]  Searching 'PDAC225T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,484] multiqc                                            [INFO   ]  Searching 'PDAC225T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,484] multiqc                                            [INFO   ]  Searching 'PDAC225T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,484] multiqc                                            [INFO   ]  Searching 'PDAC225T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,485] multiqc                                            [INFO   ]  Searching 'PDAC225T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,485] multiqc                                            [INFO   ]  Searching 'PDAC225T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,485] multiqc                                            [INFO   ]  Searching 'PDAC226T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,485] multiqc                                            [INFO   ]  Searching 'PDAC226T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,485] multiqc                                            [INFO   ]  Searching 'PDAC226T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,485] multiqc                                            [INFO   ]  Searching 'PDAC226T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,485] multiqc                                            [INFO   ]  Searching 'PDAC226T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,485] multiqc                                            [INFO   ]  Searching 'PDAC226T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,485] multiqc                                            [INFO   ]  Searching 'PDAC227T_F8-9kf1_fwd_fastqc.html'
+[2021-05-19 10:34:04,486] multiqc                                            [INFO   ]  Searching 'PDAC227T_F8-9kf1_fwd_fastqc.zip'
+[2021-05-19 10:34:04,486] multiqc                                            [INFO   ]  Searching 'PDAC227T_F8-9kf1_fwd.fq.gz'
+[2021-05-19 10:34:04,486] multiqc                                            [INFO   ]  Searching 'PDAC227T_F8-9kf1_rev_fastqc.html'
+[2021-05-19 10:34:04,486] multiqc                                            [INFO   ]  Searching 'PDAC227T_F8-9kf1_rev_fastqc.zip'
+[2021-05-19 10:34:04,486] multiqc                                            [INFO   ]  Searching 'PDAC227T_F8-9kf1_rev.fq.gz'
+[2021-05-19 10:34:04,487] multiqc                                            [DEBUG  ]  Analysing modules: custom_content, conpair, peddy, methylQA, phantompeakqualtools, qualimap, preseq, quast, qorts, rna_seqc, rsem, rseqc, busco, goleft_indexcov, disambiguate, supernova, deeptools, sargasso, verifybamid, mirtrace, happy, homer, macs2, theta2, snpeff, gatk, htseq, bcftools, featureCounts, dedup, damageprofiler, picard, prokka, samblaster, samtools, bamtools, jellyfish, vcftools, longranger, stacks, bbmap, bismark, biscuit, hicexplorer, hicup, hicpro, salmon, kallisto, slamdunk, star, hisat2, tophat, bowtie2, bowtie1, kat, leehom, adapterRemoval, clipandmerge, cutadapt, flexbar, trimmomatic, skewer, sortmerna, biobloomtools, fastq_screen, afterqc, fastp, fastqc, minionqc, clusterflow, bcl2fastq, interop, flash
+[2021-05-19 10:34:04,487] multiqc                                            [DEBUG  ]  Using temporary directory for creating report: /tmp/tmpm1icl62d
+[2021-05-19 10:34:04,689] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC201T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,700] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC201T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,701] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC201T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,701] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC201T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,701] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC202T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,702] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC202T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,702] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC202T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,703] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC202T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,703] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC203T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,704] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC203T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,704] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC203T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,705] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC203T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,705] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC204T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,705] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC204T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,706] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC204T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,706] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC204T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,707] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC205T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,707] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC205T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,707] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC205T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,708] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC205T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,708] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC206T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,709] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC206T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,709] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC206T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,710] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC206T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,710] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC207T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,710] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC207T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,711] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC207T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,711] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC207T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,711] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC208T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,712] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC208T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,712] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC208T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,713] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC208T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,713] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC209T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,713] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC209T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,714] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC209T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,714] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC209T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,714] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC210T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,715] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC210T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,715] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC210T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,716] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC210T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,716] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC211T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,717] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC211T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,717] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC211T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,717] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC211T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,717] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC212T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,718] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC212T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,718] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC212T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,719] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC212T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,719] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC213T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,720] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC213T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,720] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC213T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,720] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC213T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,720] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC214T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,721] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC214T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,721] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC214T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,722] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC214T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,722] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC215T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,722] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC215T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,723] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC215T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,723] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC215T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,723] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC216T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,724] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC216T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,724] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC216T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,725] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC216T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,725] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC217T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,725] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC217T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,726] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC217T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,726] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC217T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,726] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC218T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,727] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC218T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,727] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC218T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,728] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC218T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,728] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC219T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,728] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC219T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,728] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC219T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,729] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC219T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,729] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC220T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,730] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC220T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,730] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC220T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,730] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC220T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,730] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC221T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,731] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC221T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,731] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC221T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,732] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC221T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,732] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC222T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,732] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC222T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,733] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC222T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,733] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC222T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,733] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC223T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,734] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC223T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,734] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC223T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,734] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC223T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,735] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC224T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,735] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC224T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,735] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC224T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,736] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC224T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,736] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC225T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,736] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC225T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,737] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC225T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,737] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC225T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,737] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC226T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,738] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC226T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,738] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC226T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,738] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC226T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:04,739] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC227T_F8-9kf1_fwd_fastqc.html
+[2021-05-19 10:34:04,739] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC227T_F8-9kf1_fwd.fq.gz
+[2021-05-19 10:34:04,739] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC227T_F8-9kf1_rev_fastqc.html
+[2021-05-19 10:34:04,740] multiqc                                            [DEBUG  ]  Ignoring file as matched an ignore pattern: PDAC227T_F8-9kf1_rev.fq.gz
+[2021-05-19 10:34:06,223] multiqc                                            [DEBUG  ]  No samples found: custom_content
+[2021-05-19 10:34:06,236] multiqc                                            [DEBUG  ]  No samples found: conpair
+[2021-05-19 10:34:06,247] multiqc                                            [DEBUG  ]  No samples found: peddy
+[2021-05-19 10:34:06,259] multiqc                                            [DEBUG  ]  No samples found: methylQA
+[2021-05-19 10:34:06,271] multiqc                                            [DEBUG  ]  No samples found: phantompeakqualtools
+[2021-05-19 10:34:06,288] multiqc                                            [DEBUG  ]  No samples found: qualimap
+[2021-05-19 10:34:06,300] multiqc                                            [DEBUG  ]  No samples found: preseq
+[2021-05-19 10:34:06,313] multiqc                                            [DEBUG  ]  No samples found: quast
+[2021-05-19 10:34:06,324] multiqc                                            [DEBUG  ]  No samples found: qorts
+[2021-05-19 10:34:06,336] multiqc                                            [DEBUG  ]  No samples found: rna_seqc
+[2021-05-19 10:34:06,348] multiqc                                            [DEBUG  ]  No samples found: rsem
+[2021-05-19 10:34:06,382] multiqc                                            [DEBUG  ]  No samples found: rseqc
+[2021-05-19 10:34:06,394] multiqc                                            [DEBUG  ]  No samples found: busco
+[2021-05-19 10:34:06,406] multiqc                                            [DEBUG  ]  No samples found: goleft_indexcov
+[2021-05-19 10:34:06,418] multiqc                                            [DEBUG  ]  No samples found: disambiguate
+[2021-05-19 10:34:06,431] multiqc                                            [DEBUG  ]  No samples found: supernova
+[2021-05-19 10:34:06,465] multiqc                                            [DEBUG  ]  No samples found: deeptools
+[2021-05-19 10:34:06,477] multiqc                                            [DEBUG  ]  No samples found: sargasso
+[2021-05-19 10:34:06,489] multiqc                                            [DEBUG  ]  No samples found: verifybamid
+[2021-05-19 10:34:06,501] multiqc                                            [DEBUG  ]  No samples found: mirtrace
+[2021-05-19 10:34:06,513] multiqc                                            [DEBUG  ]  No samples found: happy
+[2021-05-19 10:34:06,529] multiqc                                            [DEBUG  ]  No samples found: homer
+[2021-05-19 10:34:06,542] multiqc                                            [DEBUG  ]  No samples found: macs2
+[2021-05-19 10:34:06,554] multiqc                                            [DEBUG  ]  No samples found: theta2
+[2021-05-19 10:34:06,565] multiqc                                            [DEBUG  ]  No samples found: snpeff
+[2021-05-19 10:34:06,581] multiqc                                            [DEBUG  ]  No samples found: gatk
+[2021-05-19 10:34:06,591] multiqc                                            [DEBUG  ]  No samples found: htseq
+[2021-05-19 10:34:06,603] multiqc                                            [DEBUG  ]  No samples found: bcftools
+[2021-05-19 10:34:06,612] multiqc                                            [DEBUG  ]  No samples found: featureCounts
+[2021-05-19 10:34:06,622] multiqc                                            [DEBUG  ]  No samples found: dedup
+[2021-05-19 10:34:06,633] multiqc                                            [DEBUG  ]  No samples found: damageprofiler
+[2021-05-19 10:34:06,669] multiqc                                            [DEBUG  ]  No samples found: picard
+[2021-05-19 10:34:06,680] multiqc                                            [DEBUG  ]  No samples found: prokka
+[2021-05-19 10:34:06,691] multiqc                                            [DEBUG  ]  No samples found: samblaster
+[2021-05-19 10:34:06,709] multiqc                                            [DEBUG  ]  No samples found: samtools
+[2021-05-19 10:34:06,722] multiqc                                            [DEBUG  ]  No samples found: bamtools
+[2021-05-19 10:34:06,731] multiqc                                            [DEBUG  ]  No samples found: jellyfish
+[2021-05-19 10:34:06,750] multiqc                                            [DEBUG  ]  No samples found: vcftools
+[2021-05-19 10:34:06,760] multiqc                                            [DEBUG  ]  No samples found: longranger
+[2021-05-19 10:34:06,771] multiqc                                            [DEBUG  ]  No samples found: stacks
+[2021-05-19 10:34:06,815] multiqc                                            [DEBUG  ]  No samples found: bbmap
+[2021-05-19 10:34:06,829] multiqc                                            [DEBUG  ]  No samples found: bismark
+[2021-05-19 10:34:06,842] multiqc                                            [DEBUG  ]  No samples found: biscuit
+[2021-05-19 10:34:06,853] multiqc                                            [DEBUG  ]  No samples found: hicexplorer
+[2021-05-19 10:34:06,864] multiqc                                            [DEBUG  ]  No samples found: hicup
+[2021-05-19 10:34:06,874] multiqc                                            [DEBUG  ]  No samples found: hicpro
+[2021-05-19 10:34:06,885] multiqc                                            [DEBUG  ]  No samples found: salmon
+[2021-05-19 10:34:06,896] multiqc                                            [DEBUG  ]  No samples found: kallisto
+[2021-05-19 10:34:06,907] multiqc                                            [DEBUG  ]  No samples found: slamdunk
+[2021-05-19 10:34:06,917] multiqc                                            [DEBUG  ]  No samples found: star
+[2021-05-19 10:34:06,927] multiqc                                            [DEBUG  ]  No samples found: hisat2
+[2021-05-19 10:34:06,938] multiqc                                            [DEBUG  ]  No samples found: tophat
+[2021-05-19 10:34:06,948] multiqc                                            [DEBUG  ]  No samples found: bowtie2
+[2021-05-19 10:34:06,957] multiqc                                            [DEBUG  ]  No samples found: bowtie1
+[2021-05-19 10:34:06,967] multiqc                                            [DEBUG  ]  No samples found: kat
+[2021-05-19 10:34:06,976] multiqc                                            [DEBUG  ]  No samples found: leehom
+[2021-05-19 10:34:06,986] multiqc                                            [DEBUG  ]  No samples found: adapterRemoval
+[2021-05-19 10:34:06,996] multiqc                                            [DEBUG  ]  No samples found: clipandmerge
+[2021-05-19 10:34:07,006] multiqc                                            [DEBUG  ]  No samples found: cutadapt
+[2021-05-19 10:34:07,016] multiqc                                            [DEBUG  ]  No samples found: flexbar
+[2021-05-19 10:34:07,026] multiqc                                            [DEBUG  ]  No samples found: trimmomatic
+[2021-05-19 10:34:07,036] multiqc                                            [DEBUG  ]  No samples found: skewer
+[2021-05-19 10:34:07,046] multiqc                                            [DEBUG  ]  No samples found: sortmerna
+[2021-05-19 10:34:07,055] multiqc                                            [DEBUG  ]  No samples found: biobloomtools
+[2021-05-19 10:34:07,065] multiqc                                            [DEBUG  ]  No samples found: fastq_screen
+[2021-05-19 10:34:07,074] multiqc                                            [DEBUG  ]  No samples found: afterqc
+[2021-05-19 10:34:07,083] multiqc                                            [DEBUG  ]  No samples found: fastp
+[2021-05-19 10:34:11,182] multiqc.modules.fastqc.fastqc                      [INFO   ]  Found 54 reports
+[2021-05-19 10:34:12,363] multiqc                                            [DEBUG  ]  No samples found: minionqc
+[2021-05-19 10:34:12,371] multiqc                                            [DEBUG  ]  No samples found: clusterflow
+[2021-05-19 10:34:12,379] multiqc                                            [DEBUG  ]  No samples found: bcl2fastq
+[2021-05-19 10:34:12,386] multiqc                                            [DEBUG  ]  No samples found: interop
+[2021-05-19 10:34:12,393] multiqc                                            [DEBUG  ]  No samples found: flash
+[2021-05-19 10:34:12,472] multiqc                                            [INFO   ]  Compressing plot data
+[2021-05-19 10:34:13,487] multiqc                                            [WARNING]  Previous MultiQC output found! Adjusting filenames..
+[2021-05-19 10:34:13,487] multiqc                                            [WARNING]  Use -f or --force to overwrite existing reports instead
+[2021-05-19 10:34:13,487] multiqc                                            [INFO   ]  Report      : multiqc_report_1.html
+[2021-05-19 10:34:13,487] multiqc                                            [INFO   ]  Data        : multiqc_data_1
+[2021-05-19 10:34:13,490] multiqc                                            [DEBUG  ]  Moving data file from '/tmp/tmpm1icl62d/multiqc_data/multiqc_sources.txt' to '/work/jsolorzano/kf_fastqs/sortmerna/out/rRNAfree/multiqc_data_1'
+[2021-05-19 10:34:13,491] multiqc                                            [DEBUG  ]  Moving data file from '/tmp/tmpm1icl62d/multiqc_data/multiqc_data.json' to '/work/jsolorzano/kf_fastqs/sortmerna/out/rRNAfree/multiqc_data_1'
+[2021-05-19 10:34:13,498] multiqc                                            [DEBUG  ]  Moving data file from '/tmp/tmpm1icl62d/multiqc_data/multiqc_general_stats.txt' to '/work/jsolorzano/kf_fastqs/sortmerna/out/rRNAfree/multiqc_data_1'
+[2021-05-19 10:34:13,499] multiqc                                            [DEBUG  ]  Moving data file from '/tmp/tmpm1icl62d/multiqc_data/multiqc_fastqc.txt' to '/work/jsolorzano/kf_fastqs/sortmerna/out/rRNAfree/multiqc_data_1'
+[2021-05-19 10:34:13,760] multiqc                                            [INFO   ]  MultiQC complete

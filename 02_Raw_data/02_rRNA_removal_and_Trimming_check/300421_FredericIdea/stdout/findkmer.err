@@ -1,0 +1,60 @@
+java -ea -Xmx102809m -Xms102809m -cp /usr/local/bioinfo/src/BBMap/bbmap_38.31/current/ jgi.KmerCountExact in=PDAC221Tkf1_fwd_P60.fq out=stdout fastadump=f
+Executing jgi.KmerCountExact [in=PDAC221Tkf1_fwd_P60.fq, out=stdout, fastadump=f]
+
+Initial:
+Memory: max=103312m, total=103312m, free=102234m, used=1078m
+
+Executing kmer.KmerTableSet [in=PDAC221Tkf1_fwd_P60.fq, out=stdout, fastadump=f]
+
+Initial:
+Ways=37, initialSize=128000, prefilter=f, prealloc=f
+Memory: max=103312m, total=103312m, free=101695m, used=1617m
+
+Estimated kmer capacity: 	5001333219
+0.298 seconds.
+After table allocation:
+Memory: max=103312m, total=103312m, free=100617m, used=2695m
+
+After loading:
+Memory: max=103312m, total=103312m, free=86602m, used=16710m
+
+Input:                      	5879961 reads 		440873720 bases.
+
+For K=31
+Unique Kmers:               	29762346
+Average Kmer Count:         	8.858
+Estimated Kmer Depth:       	8.857
+Estimated Read Depth:       	14.812
+
+Load Time:                  	5.463 seconds.
+Kmer Dump Time:             	228.237 seconds.
+java -ea -Xmx91454m -Xms91454m -cp /usr/local/bioinfo/src/BBMap/bbmap_38.31/current/ jgi.KmerCountExact in=PDAC221Tkf1_fwd_P50.fq out=stdout fastadump=f
+Executing jgi.KmerCountExact [in=PDAC221Tkf1_fwd_P50.fq, out=stdout, fastadump=f]
+
+Initial:
+Memory: max=91900m, total=91900m, free=90462m, used=1438m
+
+Executing kmer.KmerTableSet [in=PDAC221Tkf1_fwd_P50.fq, out=stdout, fastadump=f]
+
+Initial:
+Ways=37, initialSize=128000, prefilter=f, prealloc=f
+Memory: max=91900m, total=91900m, free=89503m, used=2397m
+
+Estimated kmer capacity: 	4448384180
+0.147 seconds.
+After table allocation:
+Memory: max=91900m, total=91900m, free=88544m, used=3356m
+
+After loading:
+Memory: max=91900m, total=91900m, free=78954m, used=12946m
+
+Input:                      	1567486 reads 		117519693 bases.
+
+For K=31
+Unique Kmers:               	21506813
+Average Kmer Count:         	3.245
+Estimated Kmer Depth:       	3.108
+Estimated Read Depth:       	5.233
+
+Load Time:                  	2.056 seconds.
+Kmer Dump Time:             	174.104 seconds.
