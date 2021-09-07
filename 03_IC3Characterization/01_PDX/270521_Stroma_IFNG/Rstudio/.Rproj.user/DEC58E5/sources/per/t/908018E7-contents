@@ -1,0 +1,103 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+
+
+
+
+
+
+library(shiny)
+library(plotly)
+library(ggplot2)
+load("TranslatomeDataForShiny.RData")
+
+
+
+ui <-fluidPage(
+  titlePanel("Gene Translation PDAC PDX"),
+  
+  sidebarPanel(
+    textInput(inputId="gene",
+              value="SMAD6",
+              label="Enter gene symbol"
+    ),
+    radioButtons("type", "Color by:",
+                 c("ICA3" = "ica",
+                   "Genes residuals" = "residual"))
+    
+  ),
+  
+  mainPanel(
+    plotlyOutput("mainplot")
+    
+    
+  )
+  
+)
+
+
+
+
+string2probe=function(stringinput){
+  stringinput=toupper(stringinput)	
+  i=which(geneAnnot$GeneName==stringinput)
+  if(length(i)==1){
+    return(rownames(geneAnnot)[i])	
+  }else{
+    return(NA)
+  }
+  
+}
+
+
+
+plotit=function(df,type){
+  if(!is.data.frame(df)){
+    plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
+    text(x = 0.5, y = 0.5, paste("No expression values found for gene ",probe),cex = 1.6, col = "black")
+    return(NULL)
+  }
+  if(type=="ica"){
+    g=ggplot(df,aes(x=tot,y=polysome,col=ICA3,label=CITID))+stat_smooth(method="lm",col="black",fill="#d8d8d8")+scale_color_gradient2(midpoint=0, low="#01665e", mid="#f4f4f4",high="#8c510a")+theme_light()+geom_point(size=5,col="black")+geom_point(size=4)
+  }else{
+    g=ggplot(df,aes(x=tot,y=polysome,col=residuals,label=CITID))+stat_smooth(method="lm",col="black",fill="#d8d8d8")+scale_color_gradient2(midpoint=0, low="#01665e", mid="#f4f4f4",high="#8c510a")+theme_light()+geom_point(size=5,col="black")+geom_point(size=4)
+  }
+  g
+}
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+  getprobe<- reactive({
+    string2probe(input$gene)
+  })
+  
+  
+  getdf <-reactive({
+    pr=getprobe()
+    if(is.na(pr)){return(NA)}
+    
+    
+    data.frame(tot=as.numeric(tot[pr,]),polysome=as.numeric(ribo[pr,]),residuals=as.numeric(resi[pr,]),ICA3=ica[,3],SamplesIDS)
+    
+  })
+  
+  
+  output$mainplot <- renderPlotly({
+    
+    ggplotly(plotit(getdf(),input$type)) %>% 
+      layout( autosize=TRUE)
+    
+  })
+  
+}
+
+
+
+
+shinyApp(ui = ui, server = server)
+
+
+

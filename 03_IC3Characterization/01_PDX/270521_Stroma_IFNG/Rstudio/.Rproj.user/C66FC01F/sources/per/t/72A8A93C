@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1532623394420.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "55|25|67|0|\n",
+    "hash" : "1386321163",
+    "id" : "72A8A93C",
+    "lastKnownWriteTime" : 1532623622,
+    "last_content_update" : 1532623622279,
+    "path" : "~/Workspace/DEV/translatomeApp/app.R",
+    "project_path" : "app.R",
+    "properties" : {
+        "cursorPosition" : "5,0",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

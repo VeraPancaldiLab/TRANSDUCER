@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1580908348747.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E8E5816D",
+    "lastKnownWriteTime" : 1606747720,
+    "last_content_update" : 1606747720,
+    "path" : "~/Traductomes/PDX/Rstudio/app.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "13,35",
+        "scrollLine" : "4"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
