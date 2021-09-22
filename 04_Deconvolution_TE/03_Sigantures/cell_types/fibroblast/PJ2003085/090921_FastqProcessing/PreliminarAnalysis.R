@@ -4,6 +4,7 @@ library(corrplot)
 library(reshape)
 library(MultiAssayExperiment) #BiocManager::install("MultiAssayExperiment")
 library(lmtest)
+library(ggridges)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/04_Deconvolution_TE/03_Sigantures/cell_types/fibroblast/PJ2003085/090921_FastqProcessing")
 
@@ -100,29 +101,6 @@ ggplot(aes(x=`sMAYCL-tot`, y=`sMAYCL-Pol`)) + geom_point(size=4) +
   labs(title = norm_res)
 
 
-### data reshape
-# tmpd <- t(counts_res)
-# 
-# tmpd.pol <- tmpd[sample_info[sample_info$fraction == "Polysome", "sample", drop=T],]
-# rownames(tmpd.pol) <- sample_info[sample_info$fraction == "Polysome", "origin", drop=T]
-# colnames(tmpd.pol) <- paste(colnames(tmpd.pol), ".pol", sep = "")
-# 
-# tmpd.tot <- tmpd[sample_info[sample_info$fraction == "Total", "sample", drop=T],]
-# rownames(tmpd.tot) <- sample_info[sample_info$fraction == "Total", "origin", drop=T]
-# colnames(tmpd.tot) <- paste(colnames(tmpd.tot), ".tot", sep = "")
-# 
-# tmpd <- merge(tmpd.tot, tmpd.pol, by="row.names") %>% 
-#   column_to_rownames("Row.names")
-# 
-# a <- "ENSG00000278384.tot"
-# b <- "ENSG00000278384.pol"
-# 
-# fit <- lm(get(a)~get(b), data = tmpd)
-# plot(ENSG00000278384.tot~ENSG00000278384.pol, data = tmpd)
-# text(tmpd[,b,drop =T], tmpd[,a,drop =T], labels = rownames(tmpd),  pos =1 )
-# abline(fit)
-# residuals(fit)
-
 
 ### Multiexpression set adaptation
 counts_res[,sample_info[sample_info$fraction == "Polysome", "sample", drop=T]] %>% 
@@ -144,6 +122,7 @@ mae <- MultiAssayExperiment(experiments = list(Total = total_res,
                      colData = colData_res,
                      metadata = data.frame(normalization = norm_res,
                                            genes = rownames(counts_res)))
+### TE calculation
 calculaTE <- function(x)
   {
   fit <- lm(mae@ExperimentList$Polysome[x,] ~ mae@ExperimentList$Total[x,])
@@ -158,7 +137,72 @@ lapply(mae@metadata$genes, calculaTE) %>%
    as.data.frame(row.names = c("EnsemblID", rownames(colData(mae)),
                                "Phomo", "Pnorm"))  %>% t() %>% as_tibble() -> TEs.unf
 
-TEs.unf %>% column_to_rownames("EnsemblID") %>% # Turn the columns into numeruc values
+TEs.unf %>% column_to_rownames("EnsemblID") %>%
+  mutate_all(function(x) as.numeric(as.character(x))) -> TEs.unf
    
-   
-TEs.unf %>% filter() # Filter based in the pvalue
+### Filter out of non valid genes lm and add TEs to Multiassay.
+TEs.unf %>% filter(Phomo > 0.05 & Pnorm > 0.05) %>%
+  select(!c(Phomo, Pnorm)) %>% data.matrix() -> TEs # Filter based in the pvalue
+
+print(paste(nrow(TEs), " out of ",
+            nrow(TEs.unf), " can be kept for TE analysis."))
+
+mae <- c(mae, TE = TEs)
+
+### non negative TE transformation
+min_TEs <- min(TEs)
+TEs.nneg <- TEs + abs(min_TEs) + 1
+
+all(sort(TEs.nneg, index.return = T)$ix == sort(TEs, index.return = T)$ix) # false because there's some equal TEs that mess out the sorting 
+
+ggplot(as.data.frame(TEs), aes(x = s17T)) + 
+  geom_density()
+
+ggplot(as.data.frame(TEs.nneg), aes(x = s17T)) + 
+  geom_density()
+
+### mean sample comparisons
+vs <- "mean"
+genes <- rownames(experiments(mae)$TE)
+means.mae <- data.frame(row.names = genes)
+means.mae$Total <- apply(experiments(mae)$Total[genes,],1,mean)
+means.mae$Polysome <- apply(experiments(mae)$Polysome[genes,],1,mean)
+means.mae$TE <- apply(TEs.nneg[genes,],1,mean)
+
+#### calculate FC
+l2fc.Total <- apply(mae@ExperimentList$Total[genes,], 2,
+                        function(x) x/means.mae$Total) 
+l2fc.Polysome <- apply(mae@ExperimentList$Polysome[genes,], 2,
+                           function(x) x/means.mae$Polysome)
+l2fc.TE <- apply(TEs.nneg[genes,], 2,
+                     function(x) x/means.mae$TE)
+
+l2fc.Total = log2(l2fc.Total[rowMins(l2fc.Total)!=0,])
+l2fc.Polysome = log2(l2fc.Polysome[rowMins(l2fc.Polysome)!=0,])
+l2fc.TE = log2(l2fc.TE[rowMins(l2fc.TE)!=0,])
+
+ggplot(melt(l2fc.Total), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
+  scale_x_continuous("l2FC") + 
+  labs(title = paste("TotalRNA vs.", vs)) +
+  xlim(-13,5) +
+  theme_classic()
+
+ggplot(melt(l2fc.Polysome), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
+  scale_x_continuous("l2FC") + 
+  labs(title = paste("Polysome vs.", vs)) +
+  xlim(-13,5) +
+  theme_classic()
+
+ggplot(melt(l2fc.TE), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
+  scale_x_continuous("l2FC") + 
+  labs(title = paste("TEs vs.", vs)) +
+  xlim(-13,5) +
+  theme_classic()
+
+#### Saving of a single df for indepth analysis
+Foldchanges <- merge(l2fc.Total, l2fc.Polysome, by="row.names",
+                     all =T, suffixes = c(".Total", ".Polysome")) %>% column_to_rownames("Row.names")
+Foldchanges <- merge(Foldchanges, l2fc.TE, by="row.names",
+                     all =T, suffixes = c("", ".TE")) %>% column_to_rownames("Row.names")
+filename <- paste(paste("02_Output/", vs, sep =""),"foldchanges.tsv", sep = ".")
+Foldchanges %>% write_tsv(filename)
