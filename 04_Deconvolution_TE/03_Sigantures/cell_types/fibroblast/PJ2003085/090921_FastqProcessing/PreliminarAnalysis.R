@@ -9,13 +9,13 @@ library(ggridges)
 setwd("/home/jacobo/Documents/02_TRANSDUCER/04_Deconvolution_TE/03_Sigantures/cell_types/fibroblast/PJ2003085/090921_FastqProcessing")
 
 #load data and metadata
-read_tsv("02_Output/rawcounts.tsv") %>% 
+read_tsv("02_Output/rawcounts_CDS.tsv") %>% 
   column_to_rownames("EnsemblID") -> counts
 
-read_tsv("02_Output/filteredcounts.tsv") %>%
+read_tsv("02_Output/filteredcounts_CDS.tsv") %>%
   column_to_rownames("EnsemblID") -> counts_fil
 
-read_tsv("02_Output/tmmcounts.tsv") %>%
+read_tsv("02_Output/tmmcounts_CDS.tsv") %>%
   column_to_rownames("EnsemblID") -> counts_tmm 
 
 read_tsv("01_Input/metadata.tsv") -> sample_info
@@ -81,7 +81,7 @@ pca_toplot %>%
   labs(title = norm_res)
 
 ## Similarity through whole genome correlation
-stat = "spearman"
+stat = "pearson"
 corr <- rcorr(data.matrix(counts_res), type = stat)
 corrplot(corr = corr$r,
          p.mat = corr$P,
@@ -95,11 +95,12 @@ corrplot(corr = corr$r,
 
 counts_res %>% 
   as.data.frame %>%
-ggplot(aes(x=`sMAYCL-tot`, y=`sMAYCL-Pol`)) + geom_point(size=4) +
+ggplot(aes(x=`sDALJO-tot`, y=`sDALJO-Pol`)) + geom_point(size=4) +
+  xlim(range(counts_res)) +
+  ylim(range(counts_res)) +
   theme_bw() + 
   theme(legend.position="top") +
-  labs(title = norm_res)
-
+  labs(title = norm_res) 
 
 
 ### Multiexpression set adaptation
@@ -142,13 +143,13 @@ TEs.unf %>% column_to_rownames("EnsemblID") %>%
    
 ### Filter out of non valid genes lm and add TEs to Multiassay.
 TEs.unf %>% filter(Phomo > 0.05 & Pnorm > 0.05) %>%
-  select(!c(Phomo, Pnorm)) %>% data.matrix() -> TEs # Filter based in the pvalue
+  dplyr::select(!c(Phomo, Pnorm)) %>% data.matrix() -> TEs # Filter based in the pvalue
 
 print(paste(nrow(TEs), " out of ",
             nrow(TEs.unf), " can be kept for TE analysis."))
 
 mae <- c(mae, TE = TEs)
-
+mae %>% write_rds("02_Output/multiassay.RDS")
 ### non negative TE transformation
 min_TEs <- min(TEs)
 TEs.nneg <- TEs + abs(min_TEs) + 1
@@ -177,9 +178,15 @@ l2fc.Polysome <- apply(mae@ExperimentList$Polysome[genes,], 2,
 l2fc.TE <- apply(TEs.nneg[genes,], 2,
                      function(x) x/means.mae$TE)
 
-l2fc.Total = log2(l2fc.Total[rowMins(l2fc.Total)!=0,])
-l2fc.Polysome = log2(l2fc.Polysome[rowMins(l2fc.Polysome)!=0,])
-l2fc.TE = log2(l2fc.TE[rowMins(l2fc.TE)!=0,])
+l2fc.Total = log2(l2fc.Total)
+l2fc.Polysome = log2(l2fc.Polysome)
+l2fc.TE = log2(l2fc.TE)
+############################################################old version excluding genes with -inf, 
+############################################################wich turned whole fractions to NA aftecting GSEA. Delete
+# l2fc.Total = log2(l2fc.Total[rowMins(l2fc.Total)!=0,])
+# l2fc.Polysome = log2(l2fc.Polysome[rowMins(l2fc.Polysome)!=0,])
+# l2fc.TE = log2(l2fc.TE[rowMins(l2fc.TE)!=0,])
+############################################################
 
 ggplot(melt(l2fc.Total), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
   scale_x_continuous("l2FC") + 
@@ -199,10 +206,71 @@ ggplot(melt(l2fc.TE), aes(x = value, y = X2)) + geom_density_ridges(rel_min_heig
   xlim(-13,5) +
   theme_classic()
 
+#### Translation Efficacy plots
+ct = "sDALJO" # s17AAO2007 s17T sDALJO sMAYCL
+
+common_genes = intersect(rownames(l2fc.Total), rownames(l2fc.Polysome))
+
+plot(x=l2fc.Total[common_genes,ct],y=l2fc.Polysome[common_genes,ct], pch=19, cex=.8,
+     xlab="total mRNA log2FC",
+     ylab = "translated mRNA log2FC",
+     xlim=c(-10,2),
+     ylim=c(-10,2),
+     col="grey")
+title(paste(ct, "vs.", vs))
+abline(h=0,lty=2)
+abline(v=0,lty=2)
+abline(a = 0, b = 1, lty = 2)
+
+plot.new()
+plot.window(xlim=c(-10,2),
+            ylim=c(-10,2))
+box(which = "plot")
+for (i in 1:4){
+  ct = c("s17AAO2007", "s17T", "sDALJO", "sMAYCL")[i]
+  color = c("red", "blue", "green", "lightblue")[i]
+  points(x=l2fc.Total[common_genes,ct],y=l2fc.Polysome[common_genes,ct],
+       pch=19, cex=.8,
+       xlim=c(-10,2),
+       ylim=c(-10,2),
+       col= alpha(color, 0.4))
+  
+}
+title("overlapping celltypes TEs")
+abline(h=0,lty=2)
+abline(v=0,lty=2)
+abline(a = 0, b = 1, lty = 2)
+
 #### Saving of a single df for indepth analysis
-Foldchanges <- merge(l2fc.Total, l2fc.Polysome, by="row.names",
+foldchanges <- merge(l2fc.Total, l2fc.Polysome, by="row.names",
                      all =T, suffixes = c(".Total", ".Polysome")) %>% column_to_rownames("Row.names")
-Foldchanges <- merge(Foldchanges, l2fc.TE, by="row.names",
-                     all =T, suffixes = c("", ".TE")) %>% column_to_rownames("Row.names")
+foldchanges <- merge(foldchanges, l2fc.TE, by="row.names",
+                     all =T) %>% dplyr::rename(s17AAO2007.TE = s17AAO2007,
+                                        s17T.TE = s17T, 
+                                        sDALJO.TE = sDALJO, 
+                                        sMAYCL.TE = sMAYCL)
 filename <- paste(paste("02_Output/", vs, sep =""),"foldchanges.tsv", sep = ".")
-Foldchanges %>% write_tsv(filename)
+foldchanges %>% write_tsv(filename)
+
+
+# APENDIX
+
+## Why Max foldchange is 2?
+fc4 <- function(x) {
+  return(x/(mean(c(0,0,0,x))))
+}
+
+plot(fc4(2)) #Why this dont work?? whatever I put here its always 4 
+plot(fc4)    # but here it shows something different
+
+# How many 2 and -inf foldchanges are in each column?
+for (col in colnames(foldchanges)){
+  cat(col, "\n")
+  cat("-Inf: ")
+  cat(table(foldchanges[col] == -Inf))
+  
+  cat("\n 2: ")
+  cat(table(foldchanges[col] == 2))
+  
+  cat("\n\n")
+}
