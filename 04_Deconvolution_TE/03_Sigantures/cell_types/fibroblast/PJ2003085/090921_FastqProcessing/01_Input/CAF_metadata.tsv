@@ -1,0 +1,25 @@
+rawID	Name	number	Official_name	Inmortalized	tissue_origin	other	sex	age	tumor_differentiation	initial_sample	treatment_neoadjuvant	OS	plate_date	passes	proliferation	extraction_group
+D208R107	MAYCLhtert	CAF1	CAF1_htert	htert			M	67	Moderately_differentiated	Limoges	no	21	6/17/2019	9	1	ext2
+D208R095	MAYCLpr	CAF1	CAF1_p	primary			M	67	Moderately_differentiated	Limoges	no	21	4/12/2019	6	1	ext1
+D208R090	AUDMAMcxtum	CAF13	CAF13		tumour		F	68	Moderately_differentiated	Limoges	no	37	3/25/2019	3	0	ext1
+D208R092	GALSOMcxsain	CAF14	CAF14__h		healthy		F	47	Moderately_differentiated	Limoges	no	36	4/5/2019	4	1	ext1
+D208R089	GALSOMcxtum	CAF14	CAF14__t		tumour		F	47	Moderately_differentiated	Limoges	no	36	3/25/2019	5	1	ext1
+D208R099	CHAGEhtert	CAF19	CAF19_htert	htert	healthy		M	61	Moderately_differentiated	Limoges	no	53	4/19/2019	12	2	ext2
+D208R105	CHAGEp	CAF19	CAF19_p	primary	healthy		M	61	Moderately_differentiated	Limoges	no	53	6/11/2019	3	0	ext2
+D208R098	17TA	CAF2	CAF2___subA	primary		subpopulation_A							4/19/2019	4	2	ext2
+D208R088	17Thtert	CAF2	CAF2_htert__AB	htert		mixed_AB							3/25/2019	15	0	ext1
+D208R102	DALSO	CAF20	CAF20				M	44	Moderately_differentiated	Limoges	no	53	6/3/2019	6	2	ext2
+D208R087	Gouchhtert	CAF23	CAF23_htert	htert	tumour		F	61	Moderately_differentiated	Limoges	no	1	3/25/2019	15	0	ext1
+D208R091	Gouchp	CAF23	CAF23_p	primary	tumour		F	61	Moderately_differentiated	Limoges	no	1	4/5/2019	5	1	ext1
+D208R096	MAUDO	CAF24	CAF24				F	65	Moderately_differentiated	Limoges	no	65	4/15/2019	3	1	ext1
+D208R101	PEYMI	CAF27	CAF27		healthy		M	62	Moderately_differentiated	Limoges	no	49	4/22/2019	4	1	ext2
+D208R094	02136htert	CAF3	CAF3_htert	htert			F		well_differenciated	Marseille		80	4/12/2019	17	2	ext1
+D208R106	02136p	CAF3	CAF3_p	primary			F		well_differenciated	Marseille		80	6/11/2019	6	0	ext2
+D208R093	CAF2007	CAF31	CAF31										4/12/2019	5	2	ext1
+D208R108	1910	CAF32	CAF32___TBC			TO_BE_CONFIRMED							6/17/2019	4	2	ext2
+D208R100	RPMI1	CAF33	CAF33										4/22/2019	8	1	ext2
+D208R109	DPC6	CAF36	CAF36							Paris			6/17/2019	4	2	ext2
+D208R086	17AC	CAF37	CAF37										3/16/2019	14	2	ext1
+D208R103	CALMAT	CAF38	CAF38___TBC			TO_BE_CONFIRMED							6/3/2019	3	2	ext2
+D208R104	BAABEp	CAF7	CAF7_p	primary			M	68	Moderately_differentiated	Limoges	no	17	6/11/2019	7	1	ext2
+D208R097	02139htert	CAF9	CAF9_htert	htert			F		well_differenciated	Marseille		81	4/15/2019	15	1	ext1
