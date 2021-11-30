@@ -1,0 +1,878 @@
+
+        ==========     _____ _    _ ____  _____  ______          _____  
+        =====         / ____| |  | |  _ \|  __ \|  ____|   /\   |  __ \ 
+          =====      | (___ | |  | | |_) | |__) | |__     /  \  | |  | |
+            ====      \___ \| |  | |  _ <|  _  /|  __|   / /\ \ | |  | |
+              ====    ____) | |__| | |_) | | \ \| |____ / ____ \| |__| |
+        ==========   |_____/ \____/|____/|_|  \_\______/_/    \_\_____/
+       Rsubread 1.26.1
+
+//========================== featureCounts setting ===========================\\
+||                                                                            ||
+||             Input files : 56 BAM files                                     ||
+||                           P 01_Input/output_bams/PDAC200T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC200T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC201T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC201T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC202T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC202T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC203T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC203T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC204T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC204T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC205T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC205T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC206T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC206T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC207T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC207T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC208T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC208T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC209T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC209T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC210T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC210T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC211T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC211T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC212T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC212T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC213T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC213T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC214T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC214T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC215T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC215T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC216T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC216T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC217T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC217T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC218T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC218T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC219T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC219T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC220T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC220T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC221T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC221T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC222T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC222T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC223T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC223T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC224T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC224T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC225T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC225T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC226T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC226T_F8-9_Aligned ... ||
+||                           P 01_Input/output_bams/PDAC227T_Aligned.sort ... ||
+||                           P 01_Input/output_bams/PDAC227T_F8-9_Aligned ... ||
+||                                                                            ||
+||      Dir for temp files : .                                                ||
+||                 Threads : 14                                               ||
+||                   Level : meta-feature level                               ||
+||              Paired-end : yes                                              ||
+||         Strand specific : no                                               ||
+||      Multimapping reads : not counted                                      ||
+|| Multi-overlapping reads : counted                                          ||
+||   Min overlapping bases : 1                                                ||
+||                                                                            ||
+||          Chimeric reads : counted                                          ||
+||        Both ends mapped : not required                                     ||
+||                                                                            ||
+\\===================== http://subread.sourceforge.net/ ======================//
+
+//================================= Running ==================================\\
+||                                                                            ||
+|| Load annotation file 02_Output/combined_reference/combined.gtf ...         ||
+||    Features : 1934708                                                      ||
+||    Meta-features : 102856                                                  ||
+||    Chromosomes/contigs : 323                                               ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC200T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 96075152                                              ||
+||    Successfully assigned fragments : 43649396 (45.4%)                      ||
+||    Running time : 3.71 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC200T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 226378080                                             ||
+||    Successfully assigned fragments : 23530734 (10.4%)                      ||
+||    Running time : 5.12 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC201T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 186748523                                             ||
+||    Successfully assigned fragments : 98337284 (52.7%)                      ||
+||    Running time : 31.57 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC201T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 115433509                                             ||
+||    Successfully assigned fragments : 39188284 (33.9%)                      ||
+||    Running time : 14.75 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC202T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 138372775                                             ||
+||    Successfully assigned fragments : 74049838 (53.5%)                      ||
+||    Running time : 12.67 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC202T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 52101159                                              ||
+||    Successfully assigned fragments : 39576277 (76.0%)                      ||
+||    Running time : 3.12 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC203T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 102353426                                             ||
+||    Successfully assigned fragments : 49944259 (48.8%)                      ||
+||    Running time : 7.93 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC203T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 167864741                                             ||
+||    Successfully assigned fragments : 29410463 (17.5%)                      ||
+||    Running time : 33.68 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC204T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 123178783                                             ||
+||    Successfully assigned fragments : 63025946 (51.2%)                      ||
+||    Running time : 10.19 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC204T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 80497247                                              ||
+||    Successfully assigned fragments : 20806166 (25.8%)                      ||
+||    Running time : 9.68 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC205T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 123830551                                             ||
+||    Successfully assigned fragments : 52745147 (42.6%)                      ||
+||    Running time : 14.13 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC205T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 91546198                                              ||
+||    Successfully assigned fragments : 41412989 (45.2%)                      ||
+||    Running time : 7.96 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC206T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 259971180                                             ||
+||    Successfully assigned fragments : 91680179 (35.3%)                      ||
+||    Running time : 52.67 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC206T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 60511886                                              ||
+||    Successfully assigned fragments : 27628486 (45.7%)                      ||
+||    Running time : 5.00 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC207T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 125279194                                             ||
+||    Successfully assigned fragments : 34360884 (27.4%)                      ||
+||    Running time : 15.42 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC207T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 162764434                                             ||
+||    Successfully assigned fragments : 18689662 (11.5%)                      ||
+||    Running time : 27.76 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC208T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 135158106                                             ||
+||    Successfully assigned fragments : 65211290 (48.2%)                      ||
+||    Running time : 13.18 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC208T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 96421438                                              ||
+||    Successfully assigned fragments : 21674928 (22.5%)                      ||
+||    Running time : 12.88 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC209T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 117884620                                             ||
+||    Successfully assigned fragments : 54811711 (46.5%)                      ||
+||    Running time : 11.30 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC209T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 47545459                                              ||
+||    Successfully assigned fragments : 28857907 (60.7%)                      ||
+||    Running time : 3.03 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC210T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 90461699                                              ||
+||    Successfully assigned fragments : 54543441 (60.3%)                      ||
+||    Running time : 7.72 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC210T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 75375373                                              ||
+||    Successfully assigned fragments : 25612710 (34.0%)                      ||
+||    Running time : 8.29 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC211T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 139204151                                             ||
+||    Successfully assigned fragments : 71037229 (51.0%)                      ||
+||    Running time : 12.98 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC211T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 75190144                                              ||
+||    Successfully assigned fragments : 26468577 (35.2%)                      ||
+||    Running time : 7.16 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC212T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 116442872                                             ||
+||    Successfully assigned fragments : 46744494 (40.1%)                      ||
+||    Running time : 11.64 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC212T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 92359804                                              ||
+||    Successfully assigned fragments : 39383775 (42.6%)                      ||
+||    Running time : 7.19 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC213T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 198032747                                             ||
+||    Successfully assigned fragments : 70015709 (35.4%)                      ||
+||    Running time : 47.92 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC213T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 149392311                                             ||
+||    Successfully assigned fragments : 20215420 (13.5%)                      ||
+||    Running time : 30.06 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC214T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 144696098                                             ||
+||    Successfully assigned fragments : 33174683 (22.9%)                      ||
+||    Running time : 24.18 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC214T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 142679992                                             ||
+||    Successfully assigned fragments : 22302750 (15.6%)                      ||
+||    Running time : 26.19 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC215T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 387196744                                             ||
+||    Successfully assigned fragments : 106674367 (27.6%)                     ||
+||    Running time : 12.45 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC215T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 152807951                                             ||
+||    Successfully assigned fragments : 8936343 (5.8%)                        ||
+||    Running time : 31.85 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC216T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 120084027                                             ||
+||    Successfully assigned fragments : 60916913 (50.7%)                      ||
+||    Running time : 9.18 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC216T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 96921893                                              ||
+||    Successfully assigned fragments : 24341826 (25.1%)                      ||
+||    Running time : 11.73 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC217T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 127815283                                             ||
+||    Successfully assigned fragments : 47789418 (37.4%)                      ||
+||    Running time : 13.97 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC217T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 100262424                                             ||
+||    Successfully assigned fragments : 21263787 (21.2%)                      ||
+||    Running time : 12.54 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC218T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 167088379                                             ||
+||    Successfully assigned fragments : 61419652 (36.8%)                      ||
+||    Running time : 26.74 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC218T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 81611628                                              ||
+||    Successfully assigned fragments : 37123293 (45.5%)                      ||
+||    Running time : 6.91 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC219T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 137302538                                             ||
+||    Successfully assigned fragments : 69220838 (50.4%)                      ||
+||    Running time : 10.84 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC219T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 71070526                                              ||
+||    Successfully assigned fragments : 13647112 (19.2%)                      ||
+||    Running time : 7.90 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC220T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 126500591                                             ||
+||    Successfully assigned fragments : 69625762 (55.0%)                      ||
+||    Running time : 12.32 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC220T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 119319307                                             ||
+||    Successfully assigned fragments : 13021546 (10.9%)                      ||
+||    Running time : 23.54 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC221T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 130133398                                             ||
+||    Successfully assigned fragments : 52844495 (40.6%)                      ||
+||    Running time : 17.14 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC221T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 75096873                                              ||
+||    Successfully assigned fragments : 16053685 (21.4%)                      ||
+||    Running time : 9.69 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC222T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 131324601                                             ||
+||    Successfully assigned fragments : 70329367 (53.6%)                      ||
+||    Running time : 11.37 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC222T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 67252051                                              ||
+||    Successfully assigned fragments : 25818369 (38.4%)                      ||
+||    Running time : 5.61 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC223T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 146475785                                             ||
+||    Successfully assigned fragments : 60643360 (41.4%)                      ||
+||    Running time : 16.83 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC223T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 106493478                                             ||
+||    Successfully assigned fragments : 19868580 (18.7%)                      ||
+||    Running time : 15.87 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC224T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 133350881                                             ||
+||    Successfully assigned fragments : 57955181 (43.5%)                      ||
+||    Running time : 14.94 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC224T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 70847918                                              ||
+||    Successfully assigned fragments : 45154913 (63.7%)                      ||
+||    Running time : 5.44 minutes                                             ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC225T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 119980743                                             ||
+||    Successfully assigned fragments : 62550251 (52.1%)                      ||
+||    Running time : 12.00 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC225T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 66588171                                              ||
+||    Successfully assigned fragments : 34087086 (51.2%)                      ||
+||    Running time : 11.05 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC226T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 147604283                                             ||
+||    Successfully assigned fragments : 67791862 (45.9%)                      ||
+||    Running time : 35.14 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC226T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 161977953                                             ||
+||    Successfully assigned fragments : 18056201 (11.1%)                      ||
+||    Running time : 68.34 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC227T_Aligned.sortedByCoord.o ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 133333252                                             ||
+||    Successfully assigned fragments : 34626797 (26.0%)                      ||
+||    Running time : 34.99 minutes                                            ||
+||                                                                            ||
+|| Process BAM file 01_Input/output_bams/PDAC227T_F8-9_Aligned.sortedByCo ... ||
+||    Paired-end reads are included.                                          ||
+||    Assign fragments (read pairs) to features...                            ||
+||                                                                            ||
+||    WARNING: reads from the same pair were found not adjacent to each       ||
+||             other in the input (due to read sorting by location or         ||
+||             reporting of multi-mapping read pairs).                        ||
+||                                                                            ||
+||    Read re-ordering is performed.                                          ||
+||                                                                            ||
+||    Total fragments : 67344948                                              ||
+||    Successfully assigned fragments : 34655725 (51.5%)                      ||
+||    Running time : 10.70 minutes                                            ||
+||                                                                            ||
+||                         Read assignment finished.                          ||
+||                                                                            ||
+\\===================== http://subread.sourceforge.net/ ======================//
+
