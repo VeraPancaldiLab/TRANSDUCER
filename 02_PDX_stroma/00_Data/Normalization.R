@@ -10,6 +10,9 @@ rownames(counts) %>% str_detect("ENSG") -> Tumor_or_stroma
 counts %>% as_tibble(rownames = "EnsemblID") %>% .[Tumor_or_stroma,] -> countsTumor
 counts %>% as_tibble(rownames = "EnsemblID") %>% .[!Tumor_or_stroma,] -> countsHost
 
+countsTumor %>% write_tsv("Processed_data/countsTumor_raw.tsv")
+countsHost %>% write_tsv("Processed_data/countsHost_raw.tsv")
+
 ## by fraction, and put universal names
 colnames(counts) %>% str_detect("_F8-9", negate = T) %>% 
   colnames(counts)[.] -> names_total
@@ -26,66 +29,62 @@ sample_names = tibble(total = names_total,
                       polysome = names_polysome,
                       standard = translate[names_total]) #OK
 
+# TMM normalize 
+countsTumor %>% column_to_rownames("EnsemblID") %>% DGEList() %>%
+  calcNormFactors(method = "TMM") %>%
+  cpm() -> countsTumor.tmm
+
+countsHost %>% column_to_rownames("EnsemblID") %>% DGEList() %>% 
+  calcNormFactors(method = "TMM") %>%
+  cpm() -> countsHost.tmm
+
 ## Split Tumour
-countsTumor %>% dplyr::select(c("EnsemblID", sample_names$total)) %>%
-  rename_at(sample_names$total, ~ sample_names$standard) -> countsTumor_tot
-countsTumor_tot %>% write_tsv("Processed_data/countsTumor_total.tsv")
-
-countsTumor %>% dplyr::select(c("EnsemblID", sample_names$polysome)) %>%
-  rename_at(sample_names$polysome, ~ sample_names$standard) -> countsTumor_pol  # this renames with official sample names
-countsTumor_pol %>% write_tsv("Processed_data/countsTumor_polysome.tsv") 
-
-## Split Stroma
-countsHost %>% dplyr::select(c("EnsemblID", sample_names$total)) %>%
-  rename_at(sample_names$total, ~ sample_names$standard) -> countsHost_tot
-countsHost_tot %>% write_tsv("Processed_data/countsHost_total.tsv")  
-
-countsHost %>% dplyr::select(c("EnsemblID", sample_names$polysome)) %>%
-  rename_at(sample_names$polysome, ~ sample_names$standard) -> countsHost_pol # this renames with official sample names
-countsHost_pol %>% write_tsv("Processed_data/countsHost_polysome.tsv")
-
-
-# Filter (no need, already filtered for non 0)
-for (x in list(countsTumor_tot, countsTumor_pol,
-           countsHost_tot, countsHost_pol)){
-  print(min(rowSums(x!=0) > 0))
+PDX_count_spliter <- function(dat, conversion, fraction){
+  dat %>% as_tibble(rownames = "EnsemblID") %>% dplyr::select(c("EnsemblID", conversion[[fraction]])) %>%
+    rename_at(conversion[[fraction]], ~ conversion[["standard"]])
 }
 
+## Split Tumour
+PDX_count_spliter(countsTumor.tmm, sample_names, "total") -> countsTumor.tmm_tot
+PDX_count_spliter(countsTumor, sample_names, "total") -> countsTumor_tot
+countsTumor.tmm_tot %>% write_tsv("Processed_data/countsTumor_tmm_tot.tsv")
+countsTumor_tot %>% write_tsv("Processed_data/countsTumor_tot.tsv")
 
-# TMM norm
-countsTumor_tot %>% column_to_rownames("EnsemblID") %>%
-  DGEList() %>% calcNormFactors(method = "TMM") %>%
-  cpm() -> countsTumor_tot.tmm
+PDX_count_spliter(countsTumor.tmm, sample_names, "polysome") -> countsTumor.tmm_pol
+PDX_count_spliter(countsTumor, sample_names, "polysome") -> countsTumor_pol
+countsTumor.tmm_pol %>% write_tsv("Processed_data/countsTumor_tmm_pol.tsv")
+countsTumor_pol %>% write_tsv("Processed_data/countsTumor_pol.tsv")
 
-countsTumor_pol %>% column_to_rownames("EnsemblID") %>%
-  DGEList() %>% calcNormFactors(method = "TMM") %>%
-  cpm() -> countsTumor_pol.tmm
+## Split Stroma
+PDX_count_spliter(countsHost.tmm, sample_names, "total") -> countsHost.tmm_tot
+PDX_count_spliter(countsHost, sample_names, "total") -> countsHost_tot
+countsHost.tmm_tot %>% write_tsv("Processed_data/countsHost_tmm_tot.tsv")
+countsHost_tot %>% write_tsv("Processed_data/countsHost_tot.tsv")
 
-countsHost_tot %>% column_to_rownames("EnsemblID") %>%
-  DGEList() %>% calcNormFactors(method = "TMM") %>%
-  cpm() -> countsHost_tot.tmm
+PDX_count_spliter(countsHost.tmm, sample_names, "polysome") -> countsHost.tmm_pol
+PDX_count_spliter(countsHost, sample_names, "polysome") -> countsHost_pol
+countsHost.tmm_pol %>% write_tsv("Processed_data/countsHost_tmm_pol.tsv")
+countsHost_pol %>% write_tsv("Processed_data/countsHost_pol.tsv")
 
-countsHost_pol %>% column_to_rownames("EnsemblID") %>%
-  DGEList() %>% calcNormFactors(method = "TMM") %>%
-  cpm() -> countsHost_pol.tmm
 
 
 # Boxplots
 raw = list(countsTumor_tot, countsTumor_pol,
            countsHost_tot, countsHost_pol)
 
-tmm = list(countsTumor_tot.tmm, countsTumor_pol.tmm,
-                 countsHost_tot.tmm, countsHost_pol.tmm)
+tmm = list(countsTumor.tmm_tot, countsTumor.tmm_pol,
+                 countsHost.tmm_tot, countsHost.tmm_pol)
 
 plot_title = list("Tumor_tot", "Tumor_pol",
                   "Host_tot", "Host_pol")
 for (i in 1:4){
   
 raw[[i]] %>% column_to_rownames("EnsemblID") -> raw_i
+tmm[[i]] %>%  column_to_rownames("EnsemblID") -> tmm_i
 boxplot(raw_i + 1, log = "y",
           main = paste(plot_title[[i]], "raw", sep = " "), las = 2)
   
-boxplot((tmm[[i]] + 1), log = "y",
+boxplot(tmm_i + 1, log = "y",
           main = paste(plot_title[[i]], "tmm", sep = " "),  las = 2)
   }
 
