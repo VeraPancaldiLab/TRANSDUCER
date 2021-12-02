@@ -18,7 +18,7 @@ read_tsv("02_Output/filteredcounts_CDS.tsv") %>%
 read_tsv("02_Output/tmmcounts_CDS.tsv") %>%
   column_to_rownames("EnsemblID") -> counts_tmm 
 
-read_tsv("01_Input/metadata.tsv") -> sample_info
+read_tsv("01_Input/PJ2003085_metadata.tsv") -> sample_info
 # boxplots of each
 ## original
 boxplot(log2(1+counts), main="log(raw)")
@@ -126,7 +126,7 @@ mae <- MultiAssayExperiment(experiments = list(Total = total_res,
 ### TE calculation
 calculaTE <- function(x)
   {
-  fit <- lm(mae@ExperimentList$Polysome[x,] ~ mae@ExperimentList$Total[x,])
+  fit <- lm(log2(mae@ExperimentList$Polysome[x,]+1) ~ log2(mae@ExperimentList$Total[x,]+1))
   residuals <- fit$residuals
   homoscedasticity <- bptest(fit,studentize = TRUE) # Koenker–Bassett test (homoscedasticity is H0)
   normality <- shapiro.test(residuals)
@@ -197,13 +197,11 @@ ggplot(melt(l2fc.Total), aes(x = value, y = X2)) + geom_density_ridges(rel_min_h
 ggplot(melt(l2fc.Polysome), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
   scale_x_continuous("l2FC") + 
   labs(title = paste("Polysome vs.", vs)) +
-  xlim(-13,5) +
   theme_classic()
 
 ggplot(melt(l2fc.TE), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
   scale_x_continuous("l2FC") + 
   labs(title = paste("TEs vs.", vs)) +
-  xlim(-13,5) +
   theme_classic()
 
 #### Translation Efficacy plots
@@ -214,8 +212,6 @@ common_genes = intersect(rownames(l2fc.Total), rownames(l2fc.Polysome))
 plot(x=l2fc.Total[common_genes,ct],y=l2fc.Polysome[common_genes,ct], pch=19, cex=.8,
      xlab="total mRNA log2FC",
      ylab = "translated mRNA log2FC",
-     xlim=c(-10,2),
-     ylim=c(-10,2),
      col="grey")
 title(paste(ct, "vs.", vs))
 abline(h=0,lty=2)
