@@ -16,7 +16,8 @@ read_tsv("02_Output/filteredcounts_CDS.tsv") %>%
   column_to_rownames("EnsemblID") -> counts_fil
 
 read_tsv("02_Output/tmmcounts_CDS.tsv") %>%
-  column_to_rownames("EnsemblID") -> counts_tmm 
+  column_to_rownames("EnsemblID") -> counts_tmm
+
 
 read_tsv("01_Input/PJ2003085_metadata.tsv") -> sample_info
 # boxplots of each
@@ -178,28 +179,29 @@ l2fc.Polysome <- apply(mae@ExperimentList$Polysome[genes,], 2,
 l2fc.TE <- apply(TEs.nneg[genes,], 2,
                      function(x) x/means.mae$TE)
 
-l2fc.Total = log2(l2fc.Total)
-l2fc.Polysome = log2(l2fc.Polysome)
-l2fc.TE = log2(l2fc.TE)
-############################################################old version excluding genes with -inf, 
-############################################################wich turned whole fractions to NA aftecting GSEA. Delete
-# l2fc.Total = log2(l2fc.Total[rowMins(l2fc.Total)!=0,])
-# l2fc.Polysome = log2(l2fc.Polysome[rowMins(l2fc.Polysome)!=0,])
-# l2fc.TE = log2(l2fc.TE[rowMins(l2fc.TE)!=0,])
-############################################################
+##### To plot total vs Polysome
+l2fc.Total_plot = log2(l2fc.Total[rowMins(l2fc.Total)!=0,])
+l2fc.Polysome_plot = log2(l2fc.Polysome[rowMins(l2fc.Polysome)!=0,])
+l2fc.TE_plot = log2(l2fc.TE[rowMins(l2fc.TE)!=0,])
 
-ggplot(melt(l2fc.Total), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
+##### For GSEA and future analysis
+l2fc.Total_anlyz = log2(l2fc.Total)
+l2fc.Polysome_anlyz = log2(l2fc.Polysome)
+l2fc.TE_anlyz = log2(l2fc.TE)
+
+
+ggplot(melt(l2fc.Total_plot), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
   scale_x_continuous("l2FC") + 
   labs(title = paste("TotalRNA vs.", vs)) +
   xlim(-13,5) +
   theme_classic()
 
-ggplot(melt(l2fc.Polysome), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
+ggplot(melt(l2fc.Polysome_plot), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
   scale_x_continuous("l2FC") + 
   labs(title = paste("Polysome vs.", vs)) +
   theme_classic()
 
-ggplot(melt(l2fc.TE), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
+ggplot(melt(l2fc.TE_plot), aes(x = value, y = X2)) + geom_density_ridges(rel_min_height = 0.00000000000000001) + 
   scale_x_continuous("l2FC") + 
   labs(title = paste("TEs vs.", vs)) +
   theme_classic()
@@ -207,9 +209,9 @@ ggplot(melt(l2fc.TE), aes(x = value, y = X2)) + geom_density_ridges(rel_min_heig
 #### Translation Efficacy plots
 ct = "sDALJO" # s17AAO2007 s17T sDALJO sMAYCL
 
-common_genes = intersect(rownames(l2fc.Total), rownames(l2fc.Polysome))
+common_genes = intersect(rownames(l2fc.Total_plot), rownames(l2fc.Polysome_plot))
 
-plot(x=l2fc.Total[common_genes,ct],y=l2fc.Polysome[common_genes,ct], pch=19, cex=.8,
+plot(x=l2fc.Total_plot[common_genes,ct],y=l2fc.Polysome_plot[common_genes,ct], pch=19, cex=.8,
      xlab="total mRNA log2FC",
      ylab = "translated mRNA log2FC",
      col="grey")
@@ -225,7 +227,7 @@ box(which = "plot")
 for (i in 1:4){
   ct = c("s17AAO2007", "s17T", "sDALJO", "sMAYCL")[i]
   color = c("red", "blue", "green", "lightblue")[i]
-  points(x=l2fc.Total[common_genes,ct],y=l2fc.Polysome[common_genes,ct],
+  points(x=l2fc.Total_plot[common_genes,ct],y=l2fc.Polysome_plot[common_genes,ct],
        pch=19, cex=.8,
        xlim=c(-10,2),
        ylim=c(-10,2),
@@ -238,9 +240,9 @@ abline(v=0,lty=2)
 abline(a = 0, b = 1, lty = 2)
 
 #### Saving of a single df for indepth analysis
-foldchanges <- merge(l2fc.Total, l2fc.Polysome, by="row.names",
+foldchanges <- merge(l2fc.Total_anlyz, l2fc.Polysome_anlyz, by="row.names",
                      all =T, suffixes = c(".Total", ".Polysome")) %>% column_to_rownames("Row.names")
-foldchanges <- merge(foldchanges, l2fc.TE, by="row.names",
+foldchanges <- merge(foldchanges, l2fc.TE_anlyz, by="row.names",
                      all =T) %>% dplyr::rename(s17AAO2007.TE = s17AAO2007,
                                         s17T.TE = s17T, 
                                         sDALJO.TE = sDALJO, 
