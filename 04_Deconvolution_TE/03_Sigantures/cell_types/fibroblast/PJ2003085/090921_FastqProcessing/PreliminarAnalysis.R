@@ -18,6 +18,8 @@ read_tsv("02_Output/filteredcounts_CDS.tsv") %>%
 read_tsv("02_Output/tmmcounts_CDS.tsv") %>%
   column_to_rownames("EnsemblID") -> counts_tmm
 
+log2(counts_tmm +0.01) -> counts_tmm
+#limma::voom(edgeR::calcNormFactors(edgeR::DGEList(counts_fil)))$E -> counts_tmm
 
 read_tsv("01_Input/PJ2003085_metadata.tsv") -> sample_info
 # boxplots of each
@@ -127,7 +129,7 @@ mae <- MultiAssayExperiment(experiments = list(Total = total_res,
 ### TE calculation
 calculaTE <- function(x)
   {
-  fit <- lm(log2(mae@ExperimentList$Polysome[x,]+1) ~ log2(mae@ExperimentList$Total[x,]+1))
+  fit <- lm(mae@ExperimentList$Polysome[x,] ~ mae@ExperimentList$Total[x,])
   residuals <- fit$residuals
   homoscedasticity <- bptest(fit,studentize = TRUE) # Koenker–Bassett test (homoscedasticity is H0)
   normality <- shapiro.test(residuals)
@@ -221,16 +223,16 @@ abline(v=0,lty=2)
 abline(a = 0, b = 1, lty = 2)
 
 plot.new()
-plot.window(xlim=c(-10,2),
-            ylim=c(-10,2))
+plot.window(xlim=c(-10,10),
+            ylim=c(-10,10))
 box(which = "plot")
 for (i in 1:4){
   ct = c("s17AAO2007", "s17T", "sDALJO", "sMAYCL")[i]
   color = c("red", "blue", "green", "lightblue")[i]
   points(x=l2fc.Total_plot[common_genes,ct],y=l2fc.Polysome_plot[common_genes,ct],
        pch=19, cex=.8,
-       xlim=c(-10,2),
-       ylim=c(-10,2),
+       xlim=c(-10,10),
+       ylim=c(-10,10),
        col= alpha(color, 0.4))
   
 }
