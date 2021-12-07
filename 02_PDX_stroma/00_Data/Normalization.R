@@ -1,15 +1,31 @@
 library(tidyverse)
 library(edgeR)
-library(anota2seq)
 ################################################################################
+# Data loading
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/00_Data/")
 load("geneCount_raw_28s.RData")
+equivalences <- read_tsv("sample_names_equivalences.tsv") %>% dplyr::select("fastq_name", "CITID")
+
+cleanTumour <- c("PDAC014T", "PDAC018T", "PDAC029T", "PDAC013T",
+                 "PDAC020T", "PDAC021T", "PDAC003T", "PDAC017T",
+                 "PDAC031T", "PDAC009T", "PDAC012T", "PDAC032T",
+                 "PDAC028T", "PDAC030T", "PDAC006T", "PDAC027T",
+                 "PDAC025T", "PDAC011T", "PDAC016T", "PDAC007T",
+                 "PDAC024T", "PDAC008T", "PDAC026T", "PDAC019T",
+                 "PDAC015T", "PDAC001T", "PDAC022T") #27
+
+cleanHost <- c("PDAC018T", "PDAC029T", "PDAC013T", "PDAC020T",
+               "PDAC021T", "PDAC017T", "PDAC031T", "PDAC012T",
+               "PDAC032T", "PDAC028T", "PDAC030T", "PDAC027T",
+               "PDAC025T", "PDAC011T", "PDAC024T", "PDAC008T",
+               "PDAC026T", "PDAC019T", "PDAC015T", "PDAC001T",
+               "PDAC022T") #21
 
 # Separate reads by fraction and organism
 ## by species (ID)
 rownames(counts) %>% str_detect("ENSG") -> Tumor_or_stroma
-counts %>% as_tibble(rownames = "EnsemblID") %>% .[Tumor_or_stroma,] -> countsTumor
-counts %>% as_tibble(rownames = "EnsemblID") %>% .[!Tumor_or_stroma,] -> countsHost
+counts %>% as_tibble(rownames = "EnsemblID") %>% .[Tumor_or_stroma,] -> countsTumor_mix
+counts %>% as_tibble(rownames = "EnsemblID") %>% .[!Tumor_or_stroma,] -> countsHost_mix
 
 ## by fraction, and put universal names
 colnames(counts) %>% str_detect("_F8-9", negate = T) %>% 
@@ -20,73 +36,112 @@ colnames(counts) %>% str_detect("_F8-9") %>%
 
 all(str_remove(names_polysome, "_F8.9") == names_total) %>% stopifnot()
 
-equivalences <- read_tsv("sample_names_equivalences.tsv") %>% .[,c("fastq_name", "CITID")]
 translate <- deframe(equivalences) # will use this next to adapt all names
 
-sample_names = tibble(total = names_total,
-                      polysome = names_polysome,
+sample_names = tibble(dataT = names_total,
+                      dataP = names_polysome,
                       standard = translate[names_total]) #OK
 
-# 0 gene exclusion & TMM normalize 
-countsTumor %>% column_to_rownames("EnsemblID") %>%
-  .[!(apply(., 1, function(x) any(x == 0))),] %>%    # from anota2seqRemoveZeroSamples()
-  DGEList() %>%
-  calcNormFactors(method = "TMM") %>%
-  cpm() -> countsTumor.tmm
-
-countsHost %>% column_to_rownames("EnsemblID") %>%
-  .[!(apply(., 1, function(x) any(x == 0))),] %>%   # from anota2seqRemoveZeroSamples()
-  DGEList() %>% 
-  calcNormFactors(method = "TMM") %>%
-  cpm() -> countsHost.tmm
-
 
 ## Split Tumour
-PDX_count_spliter <- function(dat, conversion, fraction){
-  dat %>% as_tibble(rownames = "EnsemblID") %>% dplyr::select(c("EnsemblID", conversion[[fraction]])) %>%
-    rename_at(conversion[[fraction]], ~ conversion[["standard"]])
-}
+PDX_count_spliter <- function(dat, conversion){
+  splitted <- list()
+  for (fraction in c("dataT", "dataP")){
+    dat %>% dplyr::select(c("EnsemblID", conversion[[fraction]])) %>%
+      rename_at(conversion[[fraction]], ~ conversion[["standard"]]) %>%
+      column_to_rownames("EnsemblID") -> splitted[[fraction]]
+    
+  }
+  return(splitted)
+  }
 
 ## Split Tumour
-PDX_count_spliter(countsTumor.tmm, sample_names, "total") -> countsTumor.tmm_tot
-PDX_count_spliter(countsTumor, sample_names, "total") -> countsTumor_tot
-countsTumor.tmm_tot %>% write_tsv("Processed_data/countsTumor_tmm_tot.tsv")
-countsTumor_tot %>% write_tsv("Processed_data/countsTumor_raw_tot.tsv")
-
-PDX_count_spliter(countsTumor.tmm, sample_names, "polysome") -> countsTumor.tmm_pol
-PDX_count_spliter(countsTumor, sample_names, "polysome") -> countsTumor_pol
-countsTumor.tmm_pol %>% write_tsv("Processed_data/countsTumor_tmm_pol.tsv")
-countsTumor_pol %>% write_tsv("Processed_data/countsTumor_raw_pol.tsv")
+PDX_count_spliter(countsTumor_mix, sample_names) -> countsTumor
+countsTumor$dataT %>% write_tsv("Processed_data/rawTumor_Cyt.tsv")
+countsTumor$dataP %>% write_tsv("Processed_data/rawTumor_Pol.tsv")
 
 ## Split Stroma
-PDX_count_spliter(countsHost.tmm, sample_names, "total") -> countsHost.tmm_tot
-PDX_count_spliter(countsHost, sample_names, "total") -> countsHost_tot
-countsHost.tmm_tot %>% write_tsv("Processed_data/countsHost_tmm_tot.tsv")
-countsHost_tot %>% write_tsv("Processed_data/countsHost_raw_tot.tsv")
+PDX_count_spliter(countsHost_mix, sample_names) -> countsHost
+countsHost$dataT %>% write_tsv("Processed_data/rawHost_Cyt.tsv")
+countsHost$dataP %>% write_tsv("Processed_data/rawHost_Pol.tsv")
 
-PDX_count_spliter(countsHost.tmm, sample_names, "polysome") -> countsHost.tmm_pol
-PDX_count_spliter(countsHost, sample_names, "polysome") -> countsHost_pol
-countsHost.tmm_pol %>% write_tsv("Processed_data/countsHost_tmm_pol.tsv")
-countsHost_pol %>% write_tsv("Processed_data/countsHost_raw_pol.tsv")
+
+## Remove 0 genes and normalize
+Clean_and_Norm <- function(data, clean_samples){
+  tmpdataT <- data$dataT[clean_samples]
+  tmpdataP <- data$dataP[clean_samples]
+  
+  colnames(tmpdataT) <- paste(clean_samples, "Cyt", sep = "_")
+  colnames(tmpdataP) <- paste(clean_samples, "Pol", sep = "_")
+
+  data_tmp <- cbind(tmpdataT,tmpdataP)
+  
+  filt_tmp <- data_tmp[!(apply(data_tmp, 1, function(x) any(x == 0))),] # from anota2seqRemoveZeroSamples()
+  norm_tmp <- limma::voom(edgeR::calcNormFactors(edgeR::DGEList(filt_tmp)))$E ## TMM-log2 from anota2seqNormalize()
+  
+  norm_t <- norm_tmp[,colnames(tmpdataT)]
+  norm_p <- norm_tmp[,colnames(tmpdataP)]
+  
+  colnames(norm_t) <- gsub("_Cyto","",colnames(norm_t))
+  colnames(norm_p) <- gsub("_Pol","",colnames(norm_p))
+
+  return(list(dataT = norm_t, dataP = norm_p))
+}
+
+
+normTumour <- Clean_and_Norm(data = countsTumor,
+                             clean_samples = cleanTumour)
+
+normHost <- Clean_and_Norm(data = countsHost,
+                          clean_samples = cleanHost)
+
+
 
 # Boxplots
-raw = list(countsTumor_tot, countsTumor_pol,
-           countsHost_tot, countsHost_pol)
 
-tmm = list(countsTumor.tmm_tot, countsTumor.tmm_pol,
-                 countsHost.tmm_tot, countsHost.tmm_pol)
+plot_title = list("Cytosolic", "Polysome")
+for (i in 1:2){
+  countsTumor[[i]] %>% as_tibble( rownames = "EnsemblID") %>%
+    pivot_longer(-EnsemblID, names_to = "samples") %>%
+    ggplot(aes(x= samples, y = value +1)) +
+    geom_violin(fill="gray") +
+    geom_boxplot(width=0.1, fill="white")+
+    scale_y_continuous(trans='log2') +
+    labs(title =  paste(plot_title[[i]], "Tumour Raw", sep = " ")) +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle = 45,  hjust=1, face = "bold")) -> ct
+  print(ct)
+  
+  countsHost[[i]] %>% as_tibble( rownames = "EnsemblID") %>%
+    pivot_longer(-EnsemblID, names_to = "samples") %>%
+    ggplot(aes(x= samples, y = value +1)) +
+    geom_violin(fill="gray") +
+    geom_boxplot(width=0.1, fill="white")+
+    scale_y_continuous(trans='log2') +
+    labs(title =  paste(plot_title[[i]], "Host Raw", sep = " ")) +
+    theme_classic()  +
+    theme(axis.text.x = element_text(angle = 45,  hjust=1, face = "bold")) -> ch
+  print(ch)
 
-plot_title = list("Tumor_tot", "Tumor_pol",
-                  "Host_tot", "Host_pol")
-for (i in 1:4){
+  normTumour[[i]] %>% as_tibble( rownames = "EnsemblID") %>%
+    pivot_longer(-EnsemblID, names_to = "samples") %>%
+    ggplot(aes(x= samples, y = value)) +
+    geom_violin(fill="gray") +
+    geom_boxplot(width=0.1, fill="white")+
+    labs(title =  paste(plot_title[[i]], "Tumour TMM-log2", sep = " ")) +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle = 45,  hjust=1, face = "bold")) -> nt
+  print(nt)
   
-raw[[i]] %>% column_to_rownames("EnsemblID") -> raw_i
-tmm[[i]] %>%  column_to_rownames("EnsemblID") -> tmm_i
-boxplot(raw_i + 1, log = "y",
-          main = paste(plot_title[[i]], "raw", sep = " "), las = 2)
-  
-boxplot(tmm_i + 1, log = "y",
-          main = paste(plot_title[[i]], "tmm", sep = " "),  las = 2)
+  normHost[[i]] %>% as_tibble( rownames = "EnsemblID") %>%
+    pivot_longer(-EnsemblID, names_to = "samples") %>%
+    ggplot(aes(x= samples, y = value)) +
+    geom_violin(fill="gray") +
+    geom_boxplot(width=0.1, fill="white")+
+    labs(title =  paste(plot_title[[i]], "Host TMM-log2", sep = " ")) +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle = 45,  hjust=1, face = "bold")) -> nh
+  print(nh)
   }
 
 
