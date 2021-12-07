@@ -19,6 +19,7 @@
 *.RData
 *.out
 *.tsv
+*.csv
 
 # specific dirs
 02_Output/
