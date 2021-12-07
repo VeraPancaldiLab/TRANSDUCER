@@ -21,6 +21,7 @@
 *.tsv
 *.csv
 *.xlsx
+*.ods
 *.log
 
 # specific dirs
