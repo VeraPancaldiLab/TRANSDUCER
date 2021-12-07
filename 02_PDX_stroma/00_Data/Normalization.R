@@ -11,9 +11,6 @@ rownames(counts) %>% str_detect("ENSG") -> Tumor_or_stroma
 counts %>% as_tibble(rownames = "EnsemblID") %>% .[Tumor_or_stroma,] -> countsTumor
 counts %>% as_tibble(rownames = "EnsemblID") %>% .[!Tumor_or_stroma,] -> countsHost
 
-countsTumor %>% write_tsv("Processed_data/countsTumor_raw.tsv")
-countsHost %>% write_tsv("Processed_data/countsHost_raw.tsv")
-
 ## by fraction, and put universal names
 colnames(counts) %>% str_detect("_F8-9", negate = T) %>% 
   colnames(counts)[.] -> names_total
@@ -30,14 +27,19 @@ sample_names = tibble(total = names_total,
                       polysome = names_polysome,
                       standard = translate[names_total]) #OK
 
-# TMM normalize 
-countsTumor %>% column_to_rownames("EnsemblID") %>% DGEList() %>%
+# 0 gene exclusion & TMM normalize 
+countsTumor %>% column_to_rownames("EnsemblID") %>%
+  .[!(apply(., 1, function(x) any(x == 0))),] %>%    # from anota2seqRemoveZeroSamples()
+  DGEList() %>%
   calcNormFactors(method = "TMM") %>%
   cpm() -> countsTumor.tmm
 
-countsHost %>% column_to_rownames("EnsemblID") %>% DGEList() %>% 
+countsHost %>% column_to_rownames("EnsemblID") %>%
+  .[!(apply(., 1, function(x) any(x == 0))),] %>%   # from anota2seqRemoveZeroSamples()
+  DGEList() %>% 
   calcNormFactors(method = "TMM") %>%
   cpm() -> countsHost.tmm
+
 
 ## Split Tumour
 PDX_count_spliter <- function(dat, conversion, fraction){
@@ -49,34 +51,23 @@ PDX_count_spliter <- function(dat, conversion, fraction){
 PDX_count_spliter(countsTumor.tmm, sample_names, "total") -> countsTumor.tmm_tot
 PDX_count_spliter(countsTumor, sample_names, "total") -> countsTumor_tot
 countsTumor.tmm_tot %>% write_tsv("Processed_data/countsTumor_tmm_tot.tsv")
-countsTumor_tot %>% write_tsv("Processed_data/countsTumor_tot.tsv")
+countsTumor_tot %>% write_tsv("Processed_data/countsTumor_raw_tot.tsv")
 
 PDX_count_spliter(countsTumor.tmm, sample_names, "polysome") -> countsTumor.tmm_pol
 PDX_count_spliter(countsTumor, sample_names, "polysome") -> countsTumor_pol
 countsTumor.tmm_pol %>% write_tsv("Processed_data/countsTumor_tmm_pol.tsv")
-countsTumor_pol %>% write_tsv("Processed_data/countsTumor_pol.tsv")
+countsTumor_pol %>% write_tsv("Processed_data/countsTumor_raw_pol.tsv")
 
 ## Split Stroma
 PDX_count_spliter(countsHost.tmm, sample_names, "total") -> countsHost.tmm_tot
 PDX_count_spliter(countsHost, sample_names, "total") -> countsHost_tot
 countsHost.tmm_tot %>% write_tsv("Processed_data/countsHost_tmm_tot.tsv")
-countsHost_tot %>% write_tsv("Processed_data/countsHost_tot.tsv")
+countsHost_tot %>% write_tsv("Processed_data/countsHost_raw_tot.tsv")
 
 PDX_count_spliter(countsHost.tmm, sample_names, "polysome") -> countsHost.tmm_pol
 PDX_count_spliter(countsHost, sample_names, "polysome") -> countsHost_pol
 countsHost.tmm_pol %>% write_tsv("Processed_data/countsHost_tmm_pol.tsv")
-countsHost_pol %>% write_tsv("Processed_data/countsHost_pol.tsv")
-
-# Analysis with Anota2seq
-anota2seqDataSetFromMatrix(
-  dataP = column_to_rownames(countsHost_pol,"EnsemblID"),
-  dataT = column_to_rownames(countsHost_tot,"EnsemblID"),
-  phenoVec = sample(c(1,2), nrow(sample_names), T),
-  dataType = "RNAseq",
-  filterZeroGenes = TRUE,
-  normalize = TRUE,
-  transformation = "TMM-log2",
-  varCutOff = NULL)
+countsHost_pol %>% write_tsv("Processed_data/countsHost_raw_pol.tsv")
 
 # Boxplots
 raw = list(countsTumor_tot, countsTumor_pol,
