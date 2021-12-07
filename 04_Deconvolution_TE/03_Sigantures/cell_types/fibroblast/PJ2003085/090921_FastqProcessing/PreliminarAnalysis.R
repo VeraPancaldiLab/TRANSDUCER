@@ -15,11 +15,11 @@ read_tsv("02_Output/rawcounts_CDS.tsv") %>%
 read_tsv("02_Output/filteredcounts_CDS.tsv") %>%
   column_to_rownames("EnsemblID") -> counts_fil
 
-read_tsv("02_Output/tmmcounts_CDS.tsv") %>%
-  column_to_rownames("EnsemblID") -> counts_tmm
+# read_tsv("02_Output/tmmcounts_CDS.tsv") %>%
+#   column_to_rownames("EnsemblID") -> counts_tmm
 
-log2(counts_tmm +0.01) -> counts_tmm
-#limma::voom(edgeR::calcNormFactors(edgeR::DGEList(counts_fil)))$E -> counts_tmm
+#log2(counts_tmm +0.01) -> counts_tmm
+limma::voom(edgeR::calcNormFactors(edgeR::DGEList(counts_fil)))$E -> counts_tmm
 
 read_tsv("01_Input/PJ2003085_metadata.tsv") -> sample_info
 # boxplots of each
@@ -77,6 +77,15 @@ pca_toplot %>%
 pca_toplot %>% 
   as.data.frame %>%
   ggplot(aes(x=PC1,y=PC2, color = Yield)) + geom_point(size=4) +
+  theme_bw(base_size=15) + 
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme(legend.position="top") +
+  labs(title = norm_res)
+
+pca_toplot %>% 
+  as.data.frame %>%
+  ggplot(aes(x=PC1,y=PC2, color = Concentration)) + geom_point(size=4) +
   theme_bw(base_size=15) + 
   labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
        y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
