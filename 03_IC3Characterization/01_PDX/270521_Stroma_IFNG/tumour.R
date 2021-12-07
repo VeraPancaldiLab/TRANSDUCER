@@ -8,7 +8,7 @@ library(mMCPcounter)
 library(Hmisc)
 library(corrplot)
 library(ggrepel)
-setwd("/home/jacobo/Documents/03_Sauyeun_paper/01_PDX/270521_Stroma_IFNG/")
+setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/01_PDX/270521_Stroma_IFNG/")
 
 # Data loading
 ## Expression data

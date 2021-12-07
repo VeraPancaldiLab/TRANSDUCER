@@ -6,7 +6,7 @@ library(circlize)
 library(ComplexHeatmap)
 library(Hmisc)
 
-setwd("/home/jacobo/Documents/03_Sauyeun_paper/01_PDX/080721_TFactivity/")
+setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/01_PDX/080721_TFactivity/")
 
 
 # Data loading
