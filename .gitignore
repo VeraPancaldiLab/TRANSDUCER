@@ -18,12 +18,13 @@
 *.RDS
 *.rds
 *.RData
+*.out
+*.tsv
 
 # specific dirs
+02_Output/
+01_Input/
+stdout/
 02_Raw_data/Fix-OneDrive-Zip
 02_Raw_data/02_rRNA_removal_and_Trimming_check/300421_FredericIdea/findkmer/
-/03_IC3Characterization/01_PDX/080721_TFactivity/02_Output/IC3BestTFActivity.tsv
-/03_IC3Characterization/01_PDX/080721_TFactivity/02_Output/IC3BestTFActivity_Gtex.tsv
-/03_IC3Characterization/01_PDX/080721_TFactivity/02_Output/IC3BestTFActivity_PANcancer.tsv
-/03_IC3Characterization/01_PDX/080721_TFactivity/02_Output/IC3BestTFActivity_PANcancer_continuous_IC3.tsv
-/03_IC3Characterization/01_PDX/080721_TFactivity/02_Output/IC3BestTFActivity_PANcancer_groups_IC3.tsv
+SMAP/
