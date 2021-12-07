@@ -20,6 +20,8 @@
 *.out
 *.tsv
 *.csv
+*.xlsx
+*.log
 
 # specific dirs
 02_Output/
