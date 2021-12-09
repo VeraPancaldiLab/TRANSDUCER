@@ -130,3 +130,22 @@ corrplot(corr = corr$r,
          main = paste(statistic, sep = ": "))
 
 # Translation efficacy analysis
+calculaTE <- function(x)
+{
+  dplyr::filter(normHost_cyt, EnsemblID == x)[-1] %>% unlist() -> cyt
+  dplyr::filter(normHost_pol, EnsemblID == x)[-1] %>% unlist() -> pol
+  fit <- lm(cyt ~ pol)
+  residuals <- fit$residuals
+  homoscedasticity <- bptest(fit,studentize = TRUE) # Koenker–Bassett test (homoscedasticity is H0)
+  normality <- shapiro.test(residuals)
+  cooksd <- cooks.distance(fit)
+  oultl <- any(cooksd > (3 * mean(cooksd, na.rm = TRUE)))
+  
+  return(c(x, residuals, homoscedasticity$p.value, normality$p.value, oultl))
+}
+
+all(normHost_cyt$EnsemblID == normHost_pol$EnsemblID) %>% stopifnot()
+all(colnames(normHost_cyt)== colnames(normHost_pol)) %>% stopifnot()
+lapply(normHost_cyt$EnsemblID, calculaTE) %>% 
+  as.data.frame(row.names = c(colnames(normHost_pol),
+                              "Phomo", "Pnorm", "Outliers"))  %>% t() %>% as_tibble() -> TEs.unf
