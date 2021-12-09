@@ -73,7 +73,24 @@ all(rownames(norm_pca$x) == rownames(phenotype)) %>% stopifnot()
 pca_toplot <- cbind(norm_pca$x, phenotype, by="row.names")
 
 
-# function to parplot the desired ammount of PCs related to a given factor.
+#' Plot PCA components in relation to a given factor
+#'@description
+#' this function does a parplot of the desired n of components and color 
+#' them according to a given factor.
+#'
+#'prints a list of spearman correlations of the desired metadata factor
+#'with the IC that best correlate with it, from the ICAs with the different number of components 
+#'
+#'@param pca_toplot data frame containing the PCs and the factors 
+#'you want to use to correlate
+#'@param feat name of the feature to color
+#'@param ncomp number of PCs to plot
+#'@param dotsize to adjust the dotsize manually
+#'
+#'TBD 
+#'continuous coloring
+#'
+
 plot_PCs <- function(pca_toplot, feat, ncomp, dotsize){
   col_factor <- as.factor(pca_toplot[[feat]])
   col_n <- nlevels(col_factor)
@@ -94,18 +111,22 @@ plot_PCs <- function(pca_toplot, feat, ncomp, dotsize){
 plot_PCs(pca_toplot, "fraction", 10, 0.5)
 plot_PCs(pca_toplot, "diabetes", 10, 0.5)
 plot_PCs(pca_toplot, "sample", 10, 0.5)
-## samples (only in first two)
-pca_toplot %>% 
-  as.data.frame %>%
-  ggplot(aes(x=PC1,y=PC2, color = sample)) + geom_point(size=4) +
-  theme_bw(base_size=15) + 
-  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
-       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
-  theme(legend.position="top")
+plot_PCs(pca_toplot, "rna_conc", 10, 0.5)
+plot_PCs(pca_toplot, "ICA1", 10, 0.5)
+plot_PCs(pca_toplot, "ICA2", 10, 0.5)
+plot_PCs(pca_toplot, "ICA3", 10, 0.5)
+plot_PCs(pca_toplot, "ICA4", 10, 0.5)
+plot_PCs(pca_toplot, "ICA5", 10, 0.5)
+plot_PCs(pca_toplot, "ICA6", 10, 0.5)
 
+# Similarity through whole genome correlation
+statistic = "pearson"
+norm_host %>% column_to_rownames("EnsemblID") %>%
+  data.matrix() %>% rcorr(.,type = statistic) -> corr
+corrplot(corr = corr$r,
+         p.mat = corr$P,
+         is.corr = F, order = "hclust",
+         type = "lower",
+         main = paste(statistic, sep = ": "))
 
-
-phenoData <- new("AnnotatedDataFrame", data = phenotype)
-norm_host %>% column_to_rownames("EnsemblID") %>% data.matrix() -> assayData
-
-dset <- ExpressionSet(assayData = assayData, phenoData = phenoData)
+# Translation efficacy analysis
