@@ -135,12 +135,13 @@ calculaTE <- function(x)
   dplyr::filter(normHost_cyt, EnsemblID == x)[-1] %>% unlist() -> cyt
   dplyr::filter(normHost_pol, EnsemblID == x)[-1] %>% unlist() -> pol
   fit <- lm(cyt ~ pol)
+  
   residuals <- fit$residuals
   homoscedasticity <- bptest(fit,studentize = TRUE) # Koenker–Bassett test (homoscedasticity is H0)
   normality <- shapiro.test(residuals)
   cooksd <- cooks.distance(fit)
-  oultl <- any(cooksd > (3 * mean(cooksd, na.rm = TRUE)))
-  
+  #oultl <- any(cooksd > (3 * mean(cooksd, na.rm = TRUE)))
+  oultl <- any(cooksd > 4/21)
   return(c(x, residuals, homoscedasticity$p.value, normality$p.value, oultl))
 }
 
@@ -149,3 +150,6 @@ all(colnames(normHost_cyt)== colnames(normHost_pol)) %>% stopifnot()
 lapply(normHost_cyt$EnsemblID, calculaTE) %>% 
   as.data.frame(row.names = c(colnames(normHost_pol),
                               "Phomo", "Pnorm", "Outliers"))  %>% t() %>% as_tibble() -> TEs.unf
+### Filter out of non valid genes lm and add TEs to Multiassay.
+TEs.unf %>% filter(Phomo > 0.05 & Pnorm > 0.05 & Outliers == F) %>%
+  dplyr::select(!c(Phomo, Pnorm, Outliers)) -> TEs
