@@ -146,88 +146,94 @@ calculaTE <- function(x)
 }
 
 
-# OutlierTest <- function(residualMatrix, confInt=0.01, iter=5, nGraphs=200, #need testing
-#                         generateSummaryPlot=TRUE, residFitPlot=TRUE){
-#   # Get data
-#   nData <- dim(residualMatrix)[1]
-#   geneNames <- rownames(residualMatrix)
-#   
-#   # Data structures
-#   residualMatrixOutlierSum <- matrix(ncol=iter, nrow=nData, dimnames=list("rownames"=rownames(residualMatrix)))
-#   residualMatrixOutlier <- matrix(ncol=dim(residualMatrix)[2], nrow=nData, dimnames=list("rownames"=rownames(residualMatrix), "colnames"=colnames(residualMatrix)))
-#   allSortScaleTrue <- allXs <- matrix(nrow=dim(residualMatrix)[2], ncol=nData)
-#   residualMatrixOutlierSumP <- rep(NA, iter)
-#   for(j in 1:iter){
-#     ##generate the random normally distributed data. 
-#     rnormMat <- matrix(data=rnorm(dim(residualMatrix)[2]*((1/confInt)-1)),
-#                        nrow=dim(residualMatrix)[2], ncol=((1/confInt)-1))
-#     
-#     ##Calculate the upper and lower limits of the data and scale
-#     rnormMat <- apply(scale(rnormMat),2,sort)
-#     env <- t(apply(rnormMat, 1, range))
-#     for(i in 1:nData){            
-#       ##Scale true data per gene sort and cbind to rnorm data set
-#       trueVec <- sort(scale(residualMatrix[i,]))
-#       sampMat <- cbind(trueVec, rnormMat)
-#       ##get real data set qq
-#       rs <- sampMat[,1]
-#       xs <- qqnorm(rs, plot=FALSE)$x
-#       ##get range of the sampled distribution sort position
-#       ##Calculate if obtained residuals falls outside expected from rnorm
-#       rsLog <- rs<env[,1] | rs>env[,2]
-#       residualMatrixOutlierSum[i,j] <- sum(rsLog)
-#       residualMatrixOutlier[i,] <- rsLog
-#       ##save true data
-#       allSortScaleTrue[,i] <- trueVec
-#       allXs[,i] <- xs
-#     }
-#     ##Collect data for single
-#     residualMatrixOutlierSumP[j] <- sum(residualMatrixOutlier>0)
-#   }
-#   message("\n\n")
-#   if(generateSingleGenePlots==1){
-#     dev.off()
-#   }
-#   ################################################
-#   ##calcaulte obtained expected
-#   ##only create full summary for last iteration
-#   residualMatrixOutlierLog <- residualMatrixOutlier>0
-#   residualMatrixOutlierSumP <- residualMatrixOutlierSumP/(nData*dim(residualMatrixOutlier)[2])
-#   obtVsExpected <- residualMatrixOutlierSumP[j]/confInt
-#   expected <- nData *dim(residualMatrixOutlier)[2] *confInt
-#   obtained <- sum(residualMatrixOutlierLog)
-#   ################################################
-#   outputList <- new("Anota2seqResidOutlierTest",
-#                     confInt = confInt,
-#                     inputResiduals = residualMatrix,
-#                     rnormIter = iter,
-#                     outlierMatrixLog = residualMatrixOutlierLog,
-#                     meanOutlierPerIteration = residualMatrixOutlierSumP,
-#                     obtainedComparedToExpected = obtVsExpected,
-#                     nExpected = expected,
-#                     nObtained = obtained)
-#   #################################################
-#   ##Plotting summary
-#   if(generateSummaryPlot==TRUE){
-#     jpeg("ANOTA2SEQ_residual_distribution_summary.jpeg", width=800, height=800, quality=100)
-#     anota2seqResidOutlierPlotAll(all=allSortScaleTrue, xsAll=allXs, env=env, obtained=obtained, expected=expected, obtRelExpected=obtVsExpected, confInt=confInt)
-#     dev.off()
-#   }
-#   ##plot fitted vs residuals
-#   if(residFitPlot==TRUE){
-#     jpeg("ANOTA2SEQ_residual_vs_fitted.jpeg", width=900, height=900, quality=100)
-#     par(mfrow=c(2,1))
-#     plot(x=as.vector(Anota2seqDataSet@qualityControl@fittedValues), y=as.vector(Anota2seqDataSet@qualityControl@residuals), ylab="residuals", xlab="Fitted values", main="Residual vs fitted values")
-#     dev.off()
-#   }
-#   
-#   Anota2seqDataSet@residOutlierTest <- outputList
-#   return(Anota2seqDataSet)   
-# }
-# 
-# 
-# #############
-# 
+OutlierTest <- function(residualMatrix, confInt=0.01, iter=5, nGraphs=200, #need testing
+                        generateSummaryPlot=TRUE, residFitPlot=TRUE){
+  
+  TEs.unf %>% dplyr::select(!c(Phomo, Pnorm, Outliers)) %>%
+    data.matrix() -> residualMatrix
+  
+  # Get data
+  nData <- dim(residualMatrix)[1]
+  geneNames <- rownames(residualMatrix)
+
+  # Data structures
+  residualMatrixOutlierSum <- matrix(ncol=iter,                                  # to save how many samples are outlier per gene
+                                     nrow=nData,
+                                     dimnames=list("rownames"=rownames(residualMatrix)))
+  
+  residualMatrixOutlier <- matrix(ncol=dim(residualMatrix)[2],                   # to save for each gene wether a sample was an outlier or not
+                                  nrow=nData,
+                                  dimnames=list("rownames"=rownames(residualMatrix), 
+                                                "colnames"=colnames(residualMatrix)))
+  allSortScaleTrue <- allXs <- matrix(nrow=dim(residualMatrix)[2], ncol=nData)
+  residualMatrixOutlierSumP <- rep(NA, iter)
+  for(j in 1:iter){                                                               # Now iter times this:
+    ##generate the random normally distributed data.                              ## sample 99(when confint == 0.01)*your n samples from a normal distribution.
+    rnormMat <- matrix(data=rnorm(dim(residualMatrix)[2]*((1/confInt)-1)),        ## samples as rows, 99 iter as cols
+                       nrow=dim(residualMatrix)[2], ncol=((1/confInt)-1)) 
+
+    ##Calculate the upper and lower limits of the data and scale
+    rnormMat <- apply(scale(rnormMat),2,sort)                                     ## this scales each "randomized" sample to mean 0 std 1
+    env <- t(apply(rnormMat, 1, range))                                           ## This gets the max and min of the rNorm once scaled (they call it envelope)
+    for(i in 1:nData){                                                            ## per gene i
+      ##Scale true data per gene sort and cbind to rnorm data set
+      trueVec <- sort(scale(residualMatrix[i,]))                                  ### scale and sort the gene i (order is kept as it is a named vector)
+      sampMat <- cbind(trueVec, rnormMat)                                         ### create a new mat with this vector as 1st column (genes as columns)
+      ##get real data set qq
+      rs <- sampMat[,1]
+      xs <- qqnorm(rs, plot=FALSE)$x                                              ### get the theoretical quantiles of your gene (x axis of a qqplot)
+      ##get range of the sampled distribution sort position
+      ##Calculate if obtained residuals falls outside expected from rnorm
+      rsLog <- rs<env[,1] | rs>env[,2]                                            ### Is the real sample between the envelopes of the simulated data?
+      residualMatrixOutlierSum[i,j] <- sum(rsLog)                                 ### retrieve the sum of samples where this is unfulfilled in this j iteration
+      residualMatrixOutlier[i,] <- rsLog                                          ### This saves in the matrix which samples did not fullfilled in this iteration
+      ##save true data
+      allSortScaleTrue[,i] <- trueVec                                             ### This saves the sorted scaled vector (loose sample and gene names)
+      allXs[,i] <- xs                                                             ### This saves the theoretical quantiles (loose sample and gene names)
+    }
+    ##Collect data for single
+    residualMatrixOutlierSumP[j] <- sum(residualMatrixOutlier>0)                  ## Save how many sample/genes are outliers in the iteration FROM DOWN HERE IT JUST DESCRIBES and compare with expected.
+  }                                                                               ##not usefull for filtering purposes
+  ################################################
+  ##calcaulte obtained expected
+  ##only create full summary for last iteration
+  residualMatrixOutlierLog <- residualMatrixOutlier>0                             # why this line if this is already boolean!
+  residualMatrixOutlierSumP <- residualMatrixOutlierSumP/(nData*dim(residualMatrixOutlier)[2]) # proportion of outliers of the total per iteration
+  obtVsExpected <- residualMatrixOutlierSumP[j]/confInt                           # ratio compared with the 1% expected
+  expected <- nData *dim(residualMatrixOutlier)[2] *confInt                       
+  obtained <- sum(residualMatrixOutlierLog)
+  ################################################
+  outputList <- new("Anota2seqResidOutlierTest",
+                    confInt = confInt,
+                    inputResiduals = residualMatrix,
+                    rnormIter = iter,
+                    outlierMatrixLog = residualMatrixOutlierLog,
+                    meanOutlierPerIteration = residualMatrixOutlierSumP,
+                    obtainedComparedToExpected = obtVsExpected,
+                    nExpected = expected,
+                    nObtained = obtained)
+  #################################################
+  ##Plotting summary
+  if(generateSummaryPlot==TRUE){
+    jpeg("ANOTA2SEQ_residual_distribution_summary.jpeg", width=800, height=800, quality=100)
+    anota2seqResidOutlierPlotAll(all=allSortScaleTrue, xsAll=allXs, env=env, obtained=obtained, expected=expected, obtRelExpected=obtVsExpected, confInt=confInt)
+    dev.off()
+  }
+  ##plot fitted vs residuals
+  if(residFitPlot==TRUE){
+    jpeg("ANOTA2SEQ_residual_vs_fitted.jpeg", width=900, height=900, quality=100)
+    par(mfrow=c(2,1))
+    plot(x=as.vector(Anota2seqDataSet@qualityControl@fittedValues), y=as.vector(Anota2seqDataSet@qualityControl@residuals), ylab="residuals", xlab="Fitted values", main="Residual vs fitted values")
+    dev.off()
+  }
+
+  Anota2seqDataSet@residOutlierTest <- outputList
+  return(Anota2seqDataSet)
+}
+
+
+#############
+
 
 
 all(normHost_cyt$EnsemblID == normHost_pol$EnsemblID) %>% stopifnot()
@@ -235,7 +241,14 @@ all(colnames(normHost_cyt)== colnames(normHost_pol)) %>% stopifnot()
 lapply(normHost_cyt$EnsemblID, calculaTE) %>% 
   as.data.frame(row.names = c(colnames(normHost_pol),
                               "Phomo", "Pnorm", "Outliers"))  %>% t() %>% as_tibble() -> TEs.unf
+
+TEs.unf %>% column_to_rownames("EnsemblID") %>%
+  mutate_all(function(x) as.numeric(as.character(x))) -> TEs.unf
+
 ### Filter out of non valid genes lm and add TEs to Multiassay.
 TEs.unf %>% filter(Phomo > 0.05 & Pnorm > 0.05) %>%
   dplyr::select(!c(Phomo, Pnorm, Outliers)) -> TEs
 
+
+### Export Translation Efficacies
+TEs %>% write_tsv("02_Output/TEs.tsv")
