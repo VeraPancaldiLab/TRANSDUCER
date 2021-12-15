@@ -134,7 +134,7 @@ calculaTE <- function(x)
 {
   dplyr::filter(normHost_cyt, EnsemblID == x)[-1] %>% unlist() -> cyt
   dplyr::filter(normHost_pol, EnsemblID == x)[-1] %>% unlist() -> pol
-  fit <- lm(cyt ~ pol)
+  fit <- lm(pol~cyt)
   
   residuals <- fit$residuals
   homoscedasticity <- bptest(fit,studentize = TRUE) # Koenker–Bassett test (homoscedasticity is H0)
