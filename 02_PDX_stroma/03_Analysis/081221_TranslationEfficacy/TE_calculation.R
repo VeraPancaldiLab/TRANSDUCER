@@ -5,6 +5,7 @@ library(lmtest)
 library(ggridges)
 library(Biobase)
 library(factoextra)
+library(anota2seq)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/081221_TranslationEfficacy/")
 
@@ -130,6 +131,9 @@ corrplot(corr = corr$r,
          main = paste(statistic, sep = ": "))
 
 # Translation efficacy analysis
+## To do:
+## - More efficient lm test, 
+## - retreieve a matrix with details about more than one outlier (give back more than one matrix)
 calculaTE <- function(x)
 {
   dplyr::filter(normHost_cyt, EnsemblID == x)[-1] %>% unlist() -> cyt
@@ -139,18 +143,39 @@ calculaTE <- function(x)
   residuals <- fit$residuals
   homoscedasticity <- bptest(fit,studentize = TRUE) # Koenker–Bassett test (homoscedasticity is H0)
   normality <- shapiro.test(residuals)
-  cooksd <- cooks.distance(fit)
-  #oultl <- any(cooksd > (3 * mean(cooksd, na.rm = TRUE)))
-  oultl <- any(cooksd > 4/21)
-  return(c(x, residuals, homoscedasticity$p.value, normality$p.value, oultl))
+  #cooksd <- cooks.distance(fit)
+  #outl <- any(cooksd > (3 * mean(cooksd, na.rm = TRUE)))
+  #outl <- any(cooksd > 4/21)
+  outl <- car::outlierTest(fit)
+  return(c(x, residuals, homoscedasticity$p.value[[1]], normality$p.value, outl$bonf.p[[1]], names(outl$bonf.p)[[1]]))
 }
 
+anota2seqResidOutlierPlotAll <- function(all=NULL, xsAll=xsAll,  env=env, obtained, expected, obtRelExpected, confInt){
+  allMax=max(all)
+  allMin=min(all)
+  xsMin=min(xsAll)
+  xsMax=max(xsAll)
+  ##Get number of outliers per rankposition
+  allLog <- all<env[,1] | all>env[,2]
+  allLogSum <- apply(allLog, 1, sum)
+  allLogSumP <- 100*(allLogSum / dim(allLog)[2])
+  allLogSumP <- round(allLogSumP, digits=3)
+  ##plot
+  plot(x=c(xsMin,xsMax), y=c(allMin-0.2, allMax+0.4), pch="", axes=TRUE, xlab="Quantiles of standard normal", ylab="R", main="Summary of all residuals")
+  for(i in 1:dim(all)[2]){
+    points(x=xsAll[,i], y=all[,i], pch=16, cex=0.2)
+  }
+  if(is.null(obtained)==FALSE){
+    text(x=xsMin+0.4, y=allMax-0.4-(0.05*allMax), labels=paste("Expected outliers: ", confInt*100, "%", sep=""))
+    text(x=xsMin+0.4, y=allMax-0.4-(0.1*allMax), labels=paste("Obtained outliers: ", round(obtRelExpected*confInt*100, digits=3), "%", sep=""))
+  }
+  segments(xsAll[,i]-0.05, env[,1], xsAll[,i]+0.05, env[,1], col=2, lwd=1.5)
+  segments(xsAll[,i]-0.05, env[,2], xsAll[,i]+0.05, env[,2], col=2, lwd=1.5)
+  text(x=xsAll[,1], y=env[,2]+0.2, labels=paste(allLogSumP, "%", sep=""))
+}
 
 OutlierTest <- function(residualMatrix, confInt=0.01, iter=5, nGraphs=200, #need testing
                         generateSummaryPlot=TRUE, residFitPlot=TRUE){
-  
-  TEs.unf %>% dplyr::select(!c(Phomo, Pnorm, Outliers)) %>%
-    data.matrix() -> residualMatrix
   
   # Get data
   nData <- dim(residualMatrix)[1]
@@ -203,32 +228,32 @@ OutlierTest <- function(residualMatrix, confInt=0.01, iter=5, nGraphs=200, #need
   expected <- nData *dim(residualMatrixOutlier)[2] *confInt                       
   obtained <- sum(residualMatrixOutlierLog)
   ################################################
-  outputList <- new("Anota2seqResidOutlierTest",
-                    confInt = confInt,
-                    inputResiduals = residualMatrix,
-                    rnormIter = iter,
-                    outlierMatrixLog = residualMatrixOutlierLog,
-                    meanOutlierPerIteration = residualMatrixOutlierSumP,
-                    obtainedComparedToExpected = obtVsExpected,
-                    nExpected = expected,
-                    nObtained = obtained)
+  # outputList <- new("Anota2seqResidOutlierTest",
+  #                   confInt = confInt,
+  #                   inputResiduals = residualMatrix,
+  #                   rnormIter = iter,
+  #                   outlierMatrixLog = residualMatrixOutlierLog,
+  #                   meanOutlierPerIteration = residualMatrixOutlierSumP,
+  #                   obtainedComparedToExpected = obtVsExpected,
+  #                   nExpected = expected,
+  #                   nObtained = obtained)
   #################################################
-  ##Plotting summary
+  #Plotting summary
   if(generateSummaryPlot==TRUE){
-    jpeg("ANOTA2SEQ_residual_distribution_summary.jpeg", width=800, height=800, quality=100)
+    # jpeg("ANOTA2SEQ_residual_distribution_summary.jpeg", width=800, height=800, quality=100)
     anota2seqResidOutlierPlotAll(all=allSortScaleTrue, xsAll=allXs, env=env, obtained=obtained, expected=expected, obtRelExpected=obtVsExpected, confInt=confInt)
-    dev.off()
+    # dev.off()
   }
   ##plot fitted vs residuals
-  if(residFitPlot==TRUE){
-    jpeg("ANOTA2SEQ_residual_vs_fitted.jpeg", width=900, height=900, quality=100)
-    par(mfrow=c(2,1))
-    plot(x=as.vector(Anota2seqDataSet@qualityControl@fittedValues), y=as.vector(Anota2seqDataSet@qualityControl@residuals), ylab="residuals", xlab="Fitted values", main="Residual vs fitted values")
-    dev.off()
-  }
-
-  Anota2seqDataSet@residOutlierTest <- outputList
-  return(Anota2seqDataSet)
+#   if(residFitPlot==TRUE){
+#     jpeg("ANOTA2SEQ_residual_vs_fitted.jpeg", width=900, height=900, quality=100)
+#     par(mfrow=c(2,1))
+#     plot(x=as.vector(Anota2seqDataSet@qualityControl@fittedValues), y=as.vector(Anota2seqDataSet@qualityControl@residuals), ylab="residuals", xlab="Fitted values", main="Residual vs fitted values")
+#     dev.off()
+#   }
+# # 
+#   Anota2seqDataSet@residOutlierTest <- outputList
+#   return(Anota2seqDataSet)
 }
 
 
@@ -238,17 +263,45 @@ OutlierTest <- function(residualMatrix, confInt=0.01, iter=5, nGraphs=200, #need
 
 all(normHost_cyt$EnsemblID == normHost_pol$EnsemblID) %>% stopifnot()
 all(colnames(normHost_cyt)== colnames(normHost_pol)) %>% stopifnot()
-lapply(normHost_cyt$EnsemblID, calculaTE) %>% 
-  as.data.frame(row.names = c(colnames(normHost_pol),
-                              "Phomo", "Pnorm", "Outliers"))  %>% t() %>% as_tibble() -> TEs.unf
+lapply(normHost_cyt$EnsemblID, calculaTE) %>% as.data.frame(row.names = c(colnames(normHost_pol),
+                              "Phomo", "Pnorm", "Outlier_P", "Outlier_s"))  %>% t() %>% as_tibble() -> TEs.unf
 
 TEs.unf %>% column_to_rownames("EnsemblID") %>%
-  mutate_all(function(x) as.numeric(as.character(x))) -> TEs.unf
+  mutate_at(vars(-Outlier_s),function(x) as.numeric(as.character(x))) -> TEs.unf
+
+### Test for outliers
+TEs.unf %>% dplyr::select(!c(Phomo, Pnorm, Outlier_P, Outlier_s)) %>%
+  data.matrix() %>% OutlierTest(residualMatrix =.)
+
+## Plots of outliers
+TEs.unf %>% dplyr::select(c(Outlier_P, Outlier_s)) %>%
+  ggplot(aes(x=Outlier_P)) + 
+  geom_density() + 
+  scale_x_continuous(trans='log2') +
+  theme_classic()
+
+TEs.unf %>% dplyr::select(c(Outlier_P, Outlier_s)) %>%
+  dplyr::filter(Outlier_P > 0.05) %>%
+  ggplot(aes(x=Outlier_s)) + 
+  geom_bar() +
+  ggtitle("most extreme, non significative data point") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+TEs.unf %>% dplyr::select(c(Outlier_P, Outlier_s)) %>%
+  dplyr::filter(Outlier_P < 0.05) %>%
+  ggplot(aes(x=Outlier_s)) + 
+  geom_bar() +
+  ggtitle("significative influential data points") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 ### Filter out of non valid genes lm and add TEs to Multiassay.
-TEs.unf %>% filter(Phomo > 0.05 & Pnorm > 0.05) %>%
-  dplyr::select(!c(Phomo, Pnorm, Outliers)) -> TEs
+TEs.unf %>% dplyr::filter(Phomo > 0.05 & Pnorm > 0.05 & Outlier_P > 0.05) %>%
+  dplyr::select(!c(Phomo, Pnorm, Outlier_P, Outlier_s)) -> TEs
 
+TEs %>% data.matrix() %>% OutlierTest(residualMatrix =.)
 
 ### Export Translation Efficacies
 TEs %>% write_tsv("02_Output/TEs.tsv")
+
