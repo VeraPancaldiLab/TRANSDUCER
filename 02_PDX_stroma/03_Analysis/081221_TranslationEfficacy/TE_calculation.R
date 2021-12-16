@@ -296,12 +296,12 @@ TEs.unf %>% dplyr::select(c(Outlier_P, Outlier_s)) %>%
   theme_classic() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
-### Filter out of non valid genes lm and add TEs to Multiassay.
+### Filter out of non valid genes lm and TEs
 TEs.unf %>% dplyr::filter(Phomo > 0.05 & Pnorm > 0.05 & Outlier_P > 0.05) %>%
   dplyr::select(!c(Phomo, Pnorm, Outlier_P, Outlier_s)) -> TEs
 
 TEs %>% data.matrix() %>% OutlierTest(residualMatrix =.)
 
 ### Export Translation Efficacies
-TEs %>% write_tsv("02_Output/TEs.tsv")
+TEs %>% rownames_to_column("EnsemblID") %>% write_tsv("02_Output/TEs.tsv")
 
