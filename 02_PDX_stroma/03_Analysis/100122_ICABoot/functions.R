@@ -134,7 +134,7 @@ get_metrics <- function(bootstrap_results) {
   return(metrics)
 }
 
-boot_plots <- function(s_boot, g_boot){
+boot_plots <- function(s_boot, g_boot, line_stat = "mean"){
   
   range.comp <- as.numeric(gsub("nc", "", names(s_boot)))
   
@@ -155,23 +155,25 @@ boot_plots <- function(s_boot, g_boot){
   )
   
   
-  #### Mean
-  probe_metrics <- get_metrics(g_boot)
+  #### line plot of a measure
+  gene_metrics <- get_metrics(g_boot)
   sample_metrics <- get_metrics(s_boot)
-
-  plot(probe_metrics[, "mean"],
+  corrlim <- min(c(min(gene_metrics[, line_stat]),
+                  min(sample_metrics[, line_stat])))
+  
+  plot(gene_metrics[, line_stat], ylim = c(corrlim, 1),
        type = "b", lty = 1, pch = 19, col = "red",
-       xaxt = "n", xlab = "components", ylab = "Absolute pearson correlation"
+       xaxt = "n", xlab = "n of components", ylab = "Absolute pearson correlation"
   )
 
-  lines(sample_metrics[, "mean"], type = "b", lty = 2, pch = 8, col = "blue")
+  lines(sample_metrics[, line_stat], type = "b", lty = 2, pch = 8, col = "blue")
 
   legend("bottomleft",
          legend = c("probe", "sample"),
          col = c("red", "blue"), lty = 1:2, cex = 0.8
   )
 
-  title("Mean distribution")
-  axis(side = 1, at = 1:nrow(probe_metrics), labels = probe_metrics[, "components"])
+  title(paste(line_stat, "distribution"))
+  axis(side = 1, at = 1:nrow(gene_metrics), labels = gene_metrics[, "components"])
 
 }
