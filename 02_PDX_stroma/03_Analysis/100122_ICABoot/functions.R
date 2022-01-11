@@ -145,13 +145,15 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean"){
   
   colnames(all_melt) <- c("correlation", "c", "iteration", "components", "bootstrap")
   all_melt$correlation <- abs(all_melt$corr)
+  level_order <- factor(all_melt$components, level = names(s_boot))
   
   print(
-    ggplot(all_melt, aes(x = components, y = correlation, fill = bootstrap)) +
+    ggplot(all_melt, aes(x = level_order, y = correlation, fill = bootstrap)) +
     geom_boxplot(width = 0.5) +
     #scale_x_discrete(limits = paste("nc", range.comp, sep = "")) +
     labs(y = "absolute pearson correlation", x = "number of components") +
-    coord_cartesian(ylim = c(0.9, 1))
+    coord_cartesian(ylim = c(0.8, 1)) +
+    theme_bw()
   )
   
   
