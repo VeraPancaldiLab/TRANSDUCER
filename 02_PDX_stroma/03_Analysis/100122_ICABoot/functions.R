@@ -73,10 +73,10 @@ bootstrap_df <- function(df,
 ### most correlating with each other
 jade_choosencom <- function(df,
                             base_res = base_res,
-                            range.comp = 2:12,
                             MARGIN = 1,
                             iterations = 1,
                             seed = 0) {
+  range.comp <- as.numeric(gsub("nc", "", names(base_res)))
   set.seed(seed)
   df <- bootstrap_df(df, MARGIN = MARGIN)
   listof_correlations <- list(list())
