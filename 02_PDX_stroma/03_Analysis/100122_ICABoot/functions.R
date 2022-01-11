@@ -4,7 +4,7 @@ library(tidyverse)
 
 ### Performn JADE ICA to get a list
 ###  of S matrixes of a range of components
-do_jade <- function(df, range.comp, MARGIN) {
+jade_range <- function(df, range.comp, MARGIN) {
   mats <- list()
   
   for (n.comp in range.comp) {
@@ -73,7 +73,7 @@ jade_choosencom <- function(df,
   
   for (i in 1:iterations) {
     # loop through iterations
-    res <- do_jade(df, range.comp, MARGIN)
+    res <- jade_range(df, range.comp, MARGIN)
     correlations_id <- list()
     
     for (nc in names(base_res)) {
@@ -121,4 +121,4 @@ get_metrics <- function(bootstrap_results) {
     metrics[nc, "median"] <- median(cor_values)
   }
   return(metrics)
-}git
+}
