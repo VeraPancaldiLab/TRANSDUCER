@@ -79,7 +79,7 @@ jade_choosencom <- function(df,
   range.comp <- as.numeric(gsub("nc", "", names(base_res)))
   set.seed(seed)
   df <- bootstrap_df(df, MARGIN = MARGIN)
-  listof_correlations <- list(list())
+  listof_correlations <- list()
   listof_correlations_id <- list()
 
   for (i in 1:iterations) {
@@ -124,7 +124,7 @@ jade_choosencom <- function(df,
 get_metrics <- function(bootstrap_results) {
   metrics <- data.frame()
 
-  for (nc in names(bootstrap_results[-1])) {
+  for (nc in names(bootstrap_results)) {
     cor_values <- abs(unlist(bootstrap_results[[nc]]))
     metrics[nc, "components"] <- nc
     metrics[nc, "mean"] <- mean(cor_values)
@@ -132,4 +132,46 @@ get_metrics <- function(bootstrap_results) {
     metrics[nc, "median"] <- median(cor_values)
   }
   return(metrics)
+}
+
+boot_plots <- function(s_boot, g_boot){
+  
+  range.comp <- as.numeric(gsub("nc", "", names(s_boot)))
+  
+  #### Boxplot
+  all_boot <- list(g_boot, s_boot)
+  names(all_boot) <- c("genes", "samples")
+  all_melt <- melt(all_boot)
+  
+  colnames(all_melt) <- c("correlation", "c", "iteration", "components", "bootstrap")
+  all_melt$correlation <- abs(all_melt$corr)
+  
+  print(
+    ggplot(all_melt, aes(x = components, y = correlation, fill = bootstrap)) +
+    geom_boxplot(width = 0.5) +
+    #scale_x_discrete(limits = paste("nc", range.comp, sep = "")) +
+    labs(y = "absolute pearson correlation", x = "number of components") +
+    coord_cartesian(ylim = c(0.9, 1))
+  )
+  
+  
+  #### Mean
+  probe_metrics <- get_metrics(g_boot)
+  sample_metrics <- get_metrics(s_boot)
+
+  plot(probe_metrics[, "mean"],
+       type = "b", lty = 1, pch = 19, col = "red",
+       xaxt = "n", xlab = "components", ylab = "Absolute pearson correlation"
+  )
+
+  lines(sample_metrics[, "mean"], type = "b", lty = 2, pch = 8, col = "blue")
+
+  legend("bottomleft",
+         legend = c("probe", "sample"),
+         col = c("red", "blue"), lty = 1:2, cex = 0.8
+  )
+
+  title("Mean distribution")
+  axis(side = 1, at = 1:nrow(probe_metrics), labels = probe_metrics[, "components"])
+
 }
