@@ -6,23 +6,34 @@ library(tidyverse)
 ###  of S matrixes of a range of components
 jade_range <- function(df, range.comp, MARGIN) {
   mats <- list()
-  
+
   for (n.comp in range.comp) {
-    jade_result <- JADE(df,
-                        n.comp = n.comp
-    )
     l_name <- paste(c("nc", n.comp), collapse = "")
+    jade_result <- tryCatch(
+      {
+        JADE(df, n.comp = n.comp)
+      },
+      error = function(cond) {
+        message(paste("JADE with ", n.comp, "did not converge, skipping iter"))
+        return(NA)
+      }
+    )
+    if (jade_result[1] %>% is.na()) {
+      print("Skipping iteration")
+      next
+    }
+
     if (MARGIN == 1) {
       mats[[l_name]] <- jade_result[["A"]]
       suffix <- 1:ncol(jade_result[["A"]])
-      colnames(mats[[l_name]]) <- paste("nc", suffix, sep = "")
+      colnames(mats[[l_name]]) <- paste("IC", suffix, sep = ".")
     }
-    
+
     if (MARGIN == 2) {
       mats[[l_name]] <- jade_result[["S"]]
     }
   }
-  
+
   return(mats)
 }
 
@@ -36,17 +47,17 @@ bootstrap_df <- function(df,
   if (MARGIN == 1) {
     # rows
     n <- round(nrow(df) * (1 - perc))
-    
+
     out <- sample(rownames(df), n)
     df_boot <- df[!(rownames(df) %in% out), ]
     boot <- sample(rownames(df_boot), n)
     df_boot[out, ] <- df_boot[boot, ]
   }
-  
+
   if (MARGIN == 2) {
     # cols
     n <- round(ncol(df) * (1 - perc))
-    
+
     out <- sample(colnames(df), n)
     df_boot <- df[, !(colnames(df) %in% out)]
     boot <- sample(colnames(df_boot), n)
@@ -70,12 +81,12 @@ jade_choosencom <- function(df,
   df <- bootstrap_df(df, MARGIN = MARGIN)
   listof_correlations <- list(list())
   listof_correlations_id <- list()
-  
+
   for (i in 1:iterations) {
     # loop through iterations
     res <- jade_range(df, range.comp, MARGIN)
     correlations_id <- list()
-    
+
     for (nc in names(base_res)) {
       # loop through ICA runs
       base_ic <- base_res[[nc]]
@@ -84,13 +95,13 @@ jade_choosencom <- function(df,
       cor_id_list <- as.list(rep(0, ncol(base_ic)))
       names(cor_list) <- colnames(base_ic)
       names(cor_id_list) <- colnames(base_ic)
-      
+
       for (b_ic in colnames(base_ic)) {
         # loop through boot ICA components
         for (r_ic in colnames(res_ic)) {
           # loop through base ICA components
           spearm_c <- cor(base_ic[, b_ic], res_ic[, r_ic])
-          
+
           if (abs(spearm_c) > abs(cor_list[[b_ic]])) {
             # save the highest correlation between each
             # base ICA component and every bootstrap ICA
@@ -112,7 +123,7 @@ jade_choosencom <- function(df,
 ### of the bootstrap results
 get_metrics <- function(bootstrap_results) {
   metrics <- data.frame()
-  
+
   for (nc in names(bootstrap_results[-1])) {
     cor_values <- abs(unlist(bootstrap_results[[nc]]))
     metrics[nc, "components"] <- nc
