@@ -1,6 +1,6 @@
 library(JADE)
 library(tidyverse)
-
+library(reshape2)
 
 ### Performn JADE ICA to get a list
 ###  of S matrixes of a range of components
