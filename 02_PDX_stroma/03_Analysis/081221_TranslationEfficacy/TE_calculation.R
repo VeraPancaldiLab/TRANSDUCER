@@ -147,6 +147,7 @@ calculaTE <- function(x)
   dplyr::filter(normHost_pol, EnsemblID == x)[-1] %>% unlist() -> pol
   fit <- lm(pol~cyt)
   
+  slope <- fit$coefficients[["cyt"]]
   residuals <- fit$residuals
   homoscedasticity <- bptest(fit,studentize = TRUE) # Koenker–Bassett test (homoscedasticity is H0)
   normality <- shapiro.test(residuals)
@@ -154,7 +155,7 @@ calculaTE <- function(x)
   #outl <- any(cooksd > (3 * mean(cooksd, na.rm = TRUE)))
   #outl <- any(cooksd > 4/21)
   outl <- car::outlierTest(fit)
-  return(c(x, residuals, homoscedasticity$p.value[[1]], normality$p.value, outl$bonf.p[[1]], names(outl$bonf.p)[[1]]))
+  return(c(x, residuals, slope, homoscedasticity$p.value[[1]], normality$p.value, outl$bonf.p[[1]], names(outl$bonf.p)[[1]]))
 }
 
 anota2seqResidOutlierPlotAll <- function(all=NULL, xsAll=xsAll,  env=env, obtained, expected, obtRelExpected, confInt){
@@ -266,19 +267,25 @@ OutlierTest <- function(residualMatrix, confInt=0.01, iter=5, nGraphs=200, #need
 
 #############
 
-
-
 all(normHost_cyt$EnsemblID == normHost_pol$EnsemblID) %>% stopifnot()
 all(colnames(normHost_cyt)== colnames(normHost_pol)) %>% stopifnot()
 lapply(normHost_cyt$EnsemblID, calculaTE) %>% as.data.frame(row.names = c(colnames(normHost_pol),
-                              "Phomo", "Pnorm", "Outlier_P", "Outlier_s"))  %>% t() %>% as_tibble() -> TEs.unf
+                              "slope", "Phomo", "Pnorm", "Outlier_P", "Outlier_s"))  %>% t() %>% as_tibble() -> TEs.unf
 
 TEs.unf %>% column_to_rownames("EnsemblID") %>%
   mutate_at(vars(-Outlier_s),function(x) as.numeric(as.character(x))) -> TEs.unf
 
 ### Test for outliers
-TEs.unf %>% dplyr::select(!c(Phomo, Pnorm, Outlier_P, Outlier_s)) %>%
+TEs.unf %>% dplyr::select(!c(slope, Phomo, Pnorm, Outlier_P, Outlier_s)) %>%
   data.matrix() %>% OutlierTest(residualMatrix =.)
+
+## Slope distribution
+TEs.unf$slope %>% between(-1,1) %>% sum()/nrow(TEs.unf)
+TEs.unf %>% dplyr::select(slope) %>%
+  ggplot(aes(x=slope)) + 
+  geom_density() + 
+  ggtitle("lm slope distribution before filtering") +
+  theme_classic()
 
 ## Plots of outliers
 TEs.unf %>% dplyr::select(c(Outlier_P, Outlier_s)) %>%
@@ -291,7 +298,7 @@ TEs.unf %>% dplyr::select(c(Outlier_P, Outlier_s)) %>%
   dplyr::filter(Outlier_P > 0.05) %>%
   ggplot(aes(x=Outlier_s)) + 
   geom_bar() +
-  ggtitle("most extreme, non significative data point") +
+  ggtitle("most extreme sample, non outlier gene") +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
@@ -299,15 +306,24 @@ TEs.unf %>% dplyr::select(c(Outlier_P, Outlier_s)) %>%
   dplyr::filter(Outlier_P < 0.05) %>%
   ggplot(aes(x=Outlier_s)) + 
   geom_bar() +
-  ggtitle("significative influential data points") +
+  ggtitle("most extreme sample, outlier genes") +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 ### Filter out of non valid genes lm and TEs
 TEs.unf %>% dplyr::filter(Phomo > 0.05 & Pnorm > 0.05 & Outlier_P > 0.05) %>%
-  dplyr::select(!c(Phomo, Pnorm, Outlier_P, Outlier_s)) -> TEs
+  dplyr::select(!c(slope, Phomo, Pnorm, Outlier_P, Outlier_s)) -> TEs
 
+#### Test for outliers
 TEs %>% data.matrix() %>% OutlierTest(residualMatrix =.)
+
+## Slope distribution
+TEs.unf[rownames(TEs),]$slope %>% between(-1,1) %>% sum()/nrow(TEs)
+TEs.unf[rownames(TEs),] %>% dplyr::select(slope) %>%
+  ggplot(aes(x=slope)) + 
+  geom_density() + 
+  ggtitle("lm slope distribution after filtering") +
+  theme_classic()
 
 ### Export Translation Efficacies
 TEs %>% rownames_to_column("EnsemblID") %>% write_tsv("02_Output/TEs.tsv")
