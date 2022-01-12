@@ -3,7 +3,7 @@ library(biomaRt)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
-
+range.comp <- 2:20
 
 # load TEs
 TEs <- read_tsv("../081221_TranslationEfficacy/02_Output/TEs.tsv")
@@ -34,8 +34,8 @@ TEs_ %>% dplyr::filter(EnsemblID %in% names(mostvar)) -> TEs_f
 # ICA
 TEs_f %>% column_to_rownames("EnsemblID") -> TEs_icaready
 ## Baseline before bootstrap
-TEs_icaready %>% jade_range( 17:19, MARGIN = 1) -> base_res_gene
-TEs_icaready %>% jade_range( 17:19, MARGIN = 2) -> base_res_sample
+TEs_icaready %>% jade_range(range.comp, MARGIN = 1) -> base_res_gene
+TEs_icaready %>% jade_range(range.comp, MARGIN = 2) -> base_res_sample
 
 ## Bootstrap
 gene_boot <- jade_choosencom(TEs_icaready, base_res_gene,
@@ -50,4 +50,4 @@ sample_boot <- jade_choosencom(TEs_icaready, base_res_sample,
                              seed = 0
 )
 
-boot_plots(s_boot = sample_boot, ggene_boot)
+boot_plots(s_boot = sample_boot, g_boot = gene_boot)
