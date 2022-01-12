@@ -57,9 +57,8 @@ cleanHost <- c(
   "PDAC026T",
   "PDAC019T",
   "PDAC015T",
-  "PDAC001T",
   "PDAC022T"
-) # 21
+) # 20
 
 # Separate reads by fraction and organism
 ## by species (ID)
