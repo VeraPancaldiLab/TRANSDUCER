@@ -6,6 +6,7 @@ library(ggridges)
 library(Biobase)
 library(factoextra)
 library(anota2seq)
+library(RColorBrewer)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/081221_TranslationEfficacy/")
 
@@ -61,7 +62,7 @@ norm_host %>%
   column_to_rownames("EnsemblID") %>% data.matrix() %>%
   t() %>% prcomp(scale=T) -> norm_pca
 
-# Var explained
+## Var explained
 var_explained <- norm_pca$sdev^2/sum(norm_pca$sdev^2)
 fviz_eig(norm_pca, barfill = "lightgrey",
          barcolor = "black", title = "PDX cyt/pol PCA",
@@ -109,6 +110,7 @@ plot_PCs <- function(pca_toplot, feat, ncomp, dotsize){
   legend(x = "center",fill = cols, legend = levels(col_factor), horiz = F)
 }
 
+## PCA plots
 plot_PCs(pca_toplot, "fraction", 10, 0.5)
 plot_PCs(pca_toplot, "diabetes", 10, 0.5)
 plot_PCs(pca_toplot, "sample", 10, 0.5)
@@ -119,6 +121,11 @@ plot_PCs(pca_toplot, "ICA3", 10, 0.5)
 plot_PCs(pca_toplot, "ICA4", 10, 0.5)
 plot_PCs(pca_toplot, "ICA5", 10, 0.5)
 plot_PCs(pca_toplot, "ICA6", 10, 0.5)
+
+## is PDAC001T an outlier?
+# pca_toplot["PDAC01Tout"] <- "other"
+# pca_toplot[pca_toplot["sample"] == "PDAC001T", "PDAC01Tout"] <- "PDAC001T"
+# plot_PCs(pca_toplot, "PDAC01Tout", 10, 0.5)
 
 # Similarity through whole genome correlation
 statistic = "pearson"
