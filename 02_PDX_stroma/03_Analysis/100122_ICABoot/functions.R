@@ -3,7 +3,7 @@ library(tidyverse)
 library(reshape2)
 
 ### Performn JADE ICA to get a list
-###  of S matrixes of a range of components
+###  of S or A matrices of a range of components
 jade_range <- function(df, range.comp, MARGIN) {
   mats <- list()
 
@@ -19,7 +19,6 @@ jade_range <- function(df, range.comp, MARGIN) {
       }
     )
     if (jade_result[1] %>% is.na()) {
-      print("Skipping iteration")
       next
     }
 
@@ -38,7 +37,7 @@ jade_range <- function(df, range.comp, MARGIN) {
 }
 
 ### Performn a bootstrap of a given df
-### in rows (MARGIN =1) or columns
+### in rows (MARGIN = 1) or columns
 ### (MARGIN = 2) keeping a speccified
 ### percentage of the data (perc)
 bootstrap_df <- function(df,
@@ -68,9 +67,9 @@ bootstrap_df <- function(df,
 
 ### Wrap up function of bootstrap analysis.
 ### Perform a bootstrap of the given df in
-### samples or genes and compute the
-### median correlation of the components
-### most correlating with each other
+### samples or genes and return the correlation
+### of each bootstrap ic with the most 
+### alike original ic
 jade_choosencom <- function(df,
                             base_res = base_res,
                             MARGIN = 1,
@@ -119,8 +118,8 @@ jade_choosencom <- function(df,
   return(listof_correlations)
 }
 
-### Generate metrics for the representation
-### of the bootstrap results
+### Generate metrics for the line
+### representation of the bootstrap results
 get_metrics <- function(bootstrap_results) {
   metrics <- data.frame()
 
@@ -134,6 +133,10 @@ get_metrics <- function(bootstrap_results) {
   return(metrics)
 }
 
+### Function to produce complete boxplot
+### of the correlations distribution outputted
+### by bootstrapping both samples and genes, and 
+### a simple lineplot of the choosen stat ("mean", "median")
 boot_plots <- function(s_boot, g_boot, line_stat = "mean"){
   
   range.comp <- as.numeric(gsub("nc", "", names(s_boot)))
