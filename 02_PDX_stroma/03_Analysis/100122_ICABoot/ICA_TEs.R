@@ -26,13 +26,19 @@ annot_ensembl75 %>% dplyr::filter(!chromosome_name %in% c("X", "Y")) %>%
 
 TEs %>% dplyr::filter(EnsemblID %in% non_sex) -> TEs_
 
+## mean centring gene wise
+TEs_ %>% column_to_rownames("EnsemblID") %>%
+  apply(1, function(x) x - mean(x)) %>% t() %>%
+  data.frame() -> TEs__
+
 ## Inter quartile range (measure variability)
-TEs_ %>% column_to_rownames("EnsemblID") %>% apply(1, IQR) -> iqrs
+TEs__ %>% apply(1, IQR) -> iqrs
 mostvar <- iqrs[iqrs > median(iqrs)]
-TEs_ %>% dplyr::filter(EnsemblID %in% names(mostvar)) -> TEs_f
+TEs__ %>% rownames_to_column("EnsemblID") %>%
+  dplyr::filter(EnsemblID %in% names(mostvar)) %>%
+  column_to_rownames("EnsemblID") -> TEs_icaready
 
 # ICA
-TEs_f %>% column_to_rownames("EnsemblID") -> TEs_icaready
 ## Baseline before bootstrap
 TEs_icaready %>% jade_range(range.comp, MARGIN = 1) -> base_res_gene
 TEs_icaready %>% jade_range(range.comp, MARGIN = 2) -> base_res_sample
