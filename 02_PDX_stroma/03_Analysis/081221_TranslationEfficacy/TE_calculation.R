@@ -2,7 +2,7 @@ library(tidyverse)
 library(Hmisc)
 library(corrplot)
 library(lmtest)
-library(ggridges)
+library(ggpubr)
 library(Biobase)
 library(factoextra)
 library(anota2seq)
@@ -325,6 +325,66 @@ TEs.unf[rownames(TEs),] %>% dplyr::select(slope) %>%
   ggtitle("lm slope distribution after filtering") +
   theme_classic()
 
+
+### Test filtering relation with expression bias
+#### one sample
+sample = "PDAC021T"
+
+stopifnot(normHost_cyt$EnsemblID == normHost_pol$EnsemblID)
+bind_cols(normHost_cyt[c("EnsemblID", sample)], normHost_pol[sample]) %>% 
+  rename(cyt = 2, pol = 3) %>%
+  mutate(filtered = if_else(EnsemblID %in% rownames(TEs), "No", "Yes")) %>%
+  ggplot(aes(x=cyt, y=pol, color = filtered)) + geom_point(alpha=0.5, size=2) +
+  geom_rug(alpha=0.1, size=1.5) +
+  theme_bw() + 
+  theme(legend.position="top") +
+  labs(title = sample) 
+
+#### all samples (density)
+metric_gene_distributions <- function(metric, title){
+  ### Cytosolic
+  normHost_cyt %>% column_to_rownames("EnsemblID") %>%
+    apply(1, metric) %>% as.list() %>% as_tibble() %>%
+    pivot_longer(cols = starts_with("ENS")) %>% mutate(filtered = if_else(name %in% rownames(TEs), "No", "Yes")) %>%
+    ggplot(aes(x = value, fill = filtered)) +
+    geom_density(alpha=0.4) + 
+    ggtitle("Cytosolic") +
+    theme_classic() -> bias_cyt
+  
+  ### Polysome
+  normHost_pol %>% column_to_rownames("EnsemblID") %>%
+    apply(1, metric) %>% as.list() %>% as_tibble() %>%
+    pivot_longer(cols = starts_with("ENS")) %>% mutate(filtered = if_else(name %in% rownames(TEs), "No", "Yes")) %>%
+    ggplot(aes(x = value, fill = filtered)) +
+    geom_density(alpha=0.4) + 
+    ggtitle("Polysome") +
+    theme_classic() -> bias_pol
+  
+  ### TEs
+  TEs.unf %>%
+    dplyr::select(!c(slope, Phomo, Pnorm, Outlier_P, Outlier_s)) %>%
+    apply(1, metric) %>% as.list() %>% as_tibble() %>%
+    pivot_longer(cols = starts_with("ENS")) %>% mutate(filtered = if_else(name %in% rownames(TEs), "No", "Yes")) %>%
+    ggplot(aes(x = value, fill = filtered)) +
+    geom_density(alpha=0.4) + 
+    ggtitle("TEs") +
+    theme_classic() -> bias_TE
+  
+  metric_densplots <-  ggarrange(bias_cyt, bias_pol, bias_TE + rremove("x.text"), 
+                                 labels = c("A", "B", "C"),
+                                 ncol = 2, nrow = 2)
+  
+  annotate_figure(metric_densplots,
+                  top = text_grob(title, color = "black", face = "bold", size = 14))
+}
+metric_gene_distributions(min, "Gene min counts")
+metric_gene_distributions(max, "Gene max counts")
+metric_gene_distributions(median, "Gene median counts")
+metric_gene_distributions(IQR, "Variability of expression (genes IQR distribution)")
+metric_gene_distributions(sum, "Gene sum of counts")
+
+# metric = IQR
+# metric_name = "Variability of expression (genes IQR distribution)"
 ### Export Translation Efficacies
 TEs %>% rownames_to_column("EnsemblID") %>% write_tsv("02_Output/TEs.tsv")
 
