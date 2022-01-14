@@ -137,8 +137,8 @@ get_metrics <- function(bootstrap_results) {
 ### of the correlations distribution outputted
 ### by bootstrapping both samples and genes, and 
 ### a simple lineplot of the choosen stat ("mean", "median")
-boot_plots <- function(s_boot, g_boot, line_stat = "mean"){
-  
+boot_plots <- function(s_boot, g_boot, line_stat = "mean", name = "analysis"){
+  plot_title <- paste("02_Output/", name, "_bootstrapICA", sep = "")
   range.comp <- as.numeric(gsub("nc", "", names(s_boot)))
   
   #### Boxplot
@@ -150,14 +150,15 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean"){
   all_melt$correlation <- abs(all_melt$corr)
   level_order <- factor(all_melt$components, level = names(s_boot))
   
-  print(
-    ggplot(all_melt, aes(x = level_order, y = correlation, fill = bootstrap)) +
+  
+  ggplot(all_melt, aes(x = level_order, y = correlation, fill = bootstrap)) +
     geom_boxplot(width = 0.5) +
     #scale_x_discrete(limits = paste("nc", range.comp, sep = "")) +
     labs(y = "absolute pearson correlation", x = "number of components") +
     coord_cartesian(ylim = c(0.8, 1)) +
     theme_bw()
-  )
+  ggsave(paste(plot_title, "boxplot.png", sep = "_"), height = 10, width = 12)
+  
   
   
   #### line plot of a measure
@@ -166,6 +167,7 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean"){
   corrlim <- min(c(min(gene_metrics[, line_stat]),
                   min(sample_metrics[, line_stat])))
   
+  png(paste(plot_title, "lineplot.png", sep = "_"))
   plot(gene_metrics[, line_stat], ylim = c(corrlim, 1),
        type = "b", lty = 1, pch = 19, col = "red",
        xaxt = "n", xlab = "n of components", ylab = "Absolute pearson correlation"
@@ -180,5 +182,5 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean"){
 
   title(paste(line_stat, "distribution"))
   axis(side = 1, at = 1:nrow(gene_metrics), labels = gene_metrics[, "components"])
-
+  dev.off()
 }

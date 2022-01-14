@@ -56,4 +56,4 @@ sample_boot <- jade_choosencom(TEs_icaready, base_res_sample,
                              seed = 0
 )
 
-boot_plots(s_boot = sample_boot, g_boot = gene_boot)
+boot_plots(s_boot = sample_boot, g_boot = gene_boot, name = "TE")
