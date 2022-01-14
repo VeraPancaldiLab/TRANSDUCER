@@ -1,3 +1,7 @@
+library(anota2seq)
+library(RColorBrewer)
+################################################################################
+################################################################################
 #' Plot PCA components in relation to a given factor
 #'@description
 #' this function does a parplot of the desired n of components and color 
@@ -33,7 +37,9 @@ plot_PCs <- function(pca_toplot, feat, ncomp, dotsize){
   legend(x = "center",fill = cols, legend = levels(col_factor), horiz = F)
 }
 
+################################################################################
 
+################################################################################
 # Translation efficacy analysis
 ## To do:
 ## - More efficient lm test, 
@@ -54,6 +60,11 @@ calculaTE <- function(x)
   outl <- car::outlierTest(fit)
   return(c(x, residuals, slope, homoscedasticity$p.value[[1]], normality$p.value, outl$bonf.p[[1]], names(outl$bonf.p)[[1]]))
 }
+################################################################################
+################################################################################
+## Anota2seq-like set of functions to
+## perform gene-wise outlier test
+## see https://rdrr.io/bioc/anota2seq/src/R/anota2seqResidOutlierTest.R
 
 anota2seqResidOutlierPlotAll <- function(all=NULL, xsAll=xsAll,  env=env, obtained, expected, obtRelExpected, confInt){
   allMax=max(all)
