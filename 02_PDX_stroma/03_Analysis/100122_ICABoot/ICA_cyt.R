@@ -5,7 +5,7 @@ library(biomaRt)
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
 range.comp <- 2:15 # when ncomp is =< df Warning: In sqrt(puiss[rangeW]) : NaNs produced
-boot.iter <- 10
+boot.iter <- 500
 
 # load cyt data
 cyt <- read_tsv("../../00_Data/Processed_data/normHost_Cyt.tsv")
