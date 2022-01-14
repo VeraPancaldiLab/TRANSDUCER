@@ -4,7 +4,8 @@ library(biomaRt)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
-range.comp <- 2:20
+range.comp <- 2:15 # when ncomp is =< df Warning: In sqrt(puiss[rangeW]) : NaNs produced
+boot.iter <- 500
 
 # load TEs
 TEs <- read_tsv("../081221_TranslationEfficacy/02_Output/TEs.tsv")
@@ -47,13 +48,13 @@ TEs_icaready %>% jade_range(range.comp, MARGIN = 2) -> base_res_sample
 ## Bootstrap
 gene_boot <- jade_choosencom(TEs_icaready, base_res_gene,
                               MARGIN = 1,
-                              iterations = 10,
+                              iterations = boot.iter,
                               seed = 0
 )
 
 sample_boot <- jade_choosencom(TEs_icaready, base_res_sample,
                              MARGIN = 2,
-                             iterations = 10,
+                             iterations = boot.iter,
                              seed = 0
 )
 
