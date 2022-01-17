@@ -1,9 +1,11 @@
 #!/usr/bin/env Rscript
 library(tidyverse)
 library(biomaRt)
+library(JADE)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
+run_boot <- FALSE
 range.comp <- 2:15 # when ncomp is =< df Warning: In sqrt(puiss[rangeW]) : NaNs produced
 boot.iter <- 500
 
@@ -42,21 +44,36 @@ cyt__ %>% rownames_to_column("EnsemblID") %>%
   column_to_rownames("EnsemblID") -> cyt_icaready
 
 # ICA
-## Baseline before bootstrap
-cyt_icaready %>% jade_range(range.comp, MARGIN = 1) -> base_res_gene
-cyt_icaready %>% jade_range(range.comp, MARGIN = 2) -> base_res_sample
+## Bootstrapping
+if (run_boot == TRUE){
+  ### Baseline before bootstrap
+  cyt_icaready %>% jade_range(range.comp, MARGIN = 1) -> base_res_gene
+  cyt_icaready %>% jade_range(range.comp, MARGIN = 2) -> base_res_sample
+  
+  ### Bootstrap
+  gene_boot <- jade_choosencom(cyt_icaready, base_res_gene,
+                               MARGIN = 1,
+                               iterations = boot.iter,
+                               seed = 0
+  )
+  
+  sample_boot <- jade_choosencom(cyt_icaready, base_res_sample,
+                                 MARGIN = 2,
+                                 iterations = boot.iter,
+                                 seed = 0
+  )
+  
+  boot_plots(s_boot = sample_boot, g_boot = gene_boot, name = "Cyt")
+} 
 
-## Bootstrap
-gene_boot <- jade_choosencom(cyt_icaready, base_res_gene,
-                              MARGIN = 1,
-                              iterations = boot.iter,
-                              seed = 0
-)
+## Most robust n.comp ICA
+elected_comps <- 7 
+#elected_comps <- 710
+### ICA
+jade_result <- JADE(cyt_icaready, n.comp = elected_comps)
+colnames(jade_result[["A"]]) <- paste("IC", 1:elected_comps, sep = ".")
+rownames(jade_result[["A"]]) <- names(jade_result$Xmu)
 
-sample_boot <- jade_choosencom(cyt_icaready, base_res_sample,
-                             MARGIN = 2,
-                             iterations = boot.iter,
-                             seed = 0
-)
+### Component distribution analysis
 
-boot_plots(s_boot = sample_boot, g_boot = gene_boot, name = "Cyt")
+
