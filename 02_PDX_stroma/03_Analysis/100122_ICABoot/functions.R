@@ -1,6 +1,8 @@
 library(JADE)
 library(tidyverse)
 library(reshape2)
+library(ggpubr)
+library(scico)
 
 ### Performn JADE ICA to get a list
 ###  of S or A matrices of a range of components
@@ -183,4 +185,47 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean", name = "analysis"){
   title(paste(line_stat, "distribution"))
   axis(side = 1, at = 1:nrow(gene_metrics), labels = gene_metrics[, "components"])
   dev.off()
+}
+
+### Gets an A matrix result from JADE (annotated with rownames/colnames)
+### and plots each component density with a rugplot. This function dos as 
+### many plots as columns the annotation df has. carefull. Sample order 
+### should be checked beforehand.
+
+plot_sample_weights <- function(A_mat, annotations){
+  for (ann in colnames(annotations)){
+
+    rug_aes <- annotations[[ann]]
+    rug_name <- ann
+    comps_plots <- lapply(colnames(A_mat), function(ic){
+      p <- 
+        ggplot(A_mat) +
+        aes_string(ic) +
+        geom_density() + 
+        geom_rug(aes(color = rug_aes), length = unit(0.1, "npc")) +
+        labs(color = ann) +
+        theme_classic() +
+        theme(axis.text.y = element_blank(),
+              axis.ticks.y = element_blank(),
+              axis.title.y = element_blank())
+      
+      if(is.integer(rug_aes)) {
+        p <- p  +
+          scale_color_discrete()
+        
+      } else if(is.double(rug_aes)){
+        p <- p  +
+          scico::scale_color_scico(palette = "berlin")
+      } 
+      
+      # if (!(ic %in% c("IC.1", paste("IC", 1+trunc(elected_ncomp/2), sep = ".")))) { # this is to control wich cells should have a ylabel
+      #   p <- p +
+      #     theme(axis.title.y = element_blank())
+      # }
+      p
+      
+    })
+    ggarrange(plotlist = comps_plots, common.legend = T,  legend = "bottom") %>% annotate_figure(
+      top = text_grob(ann, color = "black", face = "bold", size = 14), ) %>% print()
+  }
 }
