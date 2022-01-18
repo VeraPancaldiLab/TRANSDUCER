@@ -7,7 +7,7 @@ library(mMCPcounter)
 library(Hmisc)
 library(corrplot)
 library(ggrepel)
-setwd("/home/jacobo/Documents/03_Sauyeun_paper/01_PDX/270521_Stroma_IFNG/")
+setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/01_PDX/270521_Stroma_IFNG/")
 
 # Data loading
 ## Expression data
@@ -25,7 +25,7 @@ Mcpmallrna %>% rownames(.) %>% translate[.] -> rownames(Mcpmallrna_genenames)
 Mcpmallrna_genenames <- Mcpmallrna_genenames[!is.na(rownames(Mcpmallrna_genenames)),]
 
 ## IC3 weights
-ic3 <- read_csv2("../Remy_processed_data/samplesIC3.csv") %>%
+ic3 <- read_tsv("../Remy_processed_data/samplesIC3_custom.csv") %>%
   as.data.frame(.) %>%
   column_to_rownames(., var = "CITID") %>%
   .[colnames(Mcpmallrna),"ICA3SampleWeight", drop=FALSE]
