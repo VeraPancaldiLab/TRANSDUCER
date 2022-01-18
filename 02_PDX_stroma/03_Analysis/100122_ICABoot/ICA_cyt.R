@@ -2,6 +2,7 @@
 library(tidyverse)
 library(biomaRt)
 library(JADE)
+library(corrplot)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
@@ -45,6 +46,9 @@ cyt__ %>% rownames_to_column("EnsemblID") %>%
   dplyr::filter(EnsemblID %in% names(mostvar)) %>%
   column_to_rownames("EnsemblID") -> cyt_icaready
 
+# celltype deconvolution (unfiltered data)
+
+
 # ICA
 ## Bootstrapping
 if (run_boot == TRUE){
@@ -81,3 +85,16 @@ A_mat <- as.data.frame(jade_result[["A"]])
 annotations <- sample_info[-1]
 stopifnot(rownames(A_mat) == rownames(annotations))
 plot_sample_weights(A_mat, annotations)
+
+### Summary Corplot
+corr_continuous <- annotations %>% dplyr::select(!Diabetes) %>% bind_cols(A_mat)
+corr_continuous <- corr_continuous[rownames(A_mat),] # merge mess with the order
+
+
+continuous_rcorr <- rcorr(data.matrix(corr_continuous), type = "pearson")
+continuous_rcorr$r <- continuous_rcorr$r[colnames(annotations %>% dplyr::select(!Diabetes)),colnames(A_mat)]
+continuous_rcorr$P <- continuous_rcorr$P[colnames(annotations %>% dplyr::select(!Diabetes)),colnames(A_mat)]
+
+corrplot(continuous_rcorr$r,
+         p.mat = continuous_rcorr$P, sig.level = 0.01, insig = "blank")
+
