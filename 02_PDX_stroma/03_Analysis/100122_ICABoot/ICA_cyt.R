@@ -3,6 +3,8 @@ library(tidyverse)
 library(biomaRt)
 library(JADE)
 library(corrplot)
+library(Hmisc)
+library(pheatmap)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
@@ -72,10 +74,10 @@ if (run_boot == TRUE){
   boot_plots(s_boot = sample_boot, g_boot = gene_boot, name = "Cyt")
 } 
 
-## Most robust n.comp ICA
+## Most robust n.comp analysis
 elected_ncomp <- 7 
 #elected_ncomp <- 710
-### ICA
+### Run best n.comp ICA
 jade_result <- JADE(cyt_icaready, n.comp = elected_ncomp)
 colnames(jade_result[["A"]]) <- paste("IC", 1:elected_ncomp, sep = ".")
 rownames(jade_result[["A"]]) <- names(jade_result$Xmu)
@@ -86,7 +88,8 @@ annotations <- sample_info[-1]
 stopifnot(rownames(A_mat) == rownames(annotations))
 plot_sample_weights(A_mat, annotations)
 
-### Summary Corplot
+### metadata
+#### Corplot
 corr_continuous <- annotations %>% dplyr::select(!Diabetes) %>% bind_cols(A_mat)
 corr_continuous <- corr_continuous[rownames(A_mat),] # merge mess with the order
 
@@ -98,3 +101,29 @@ continuous_rcorr$P <- continuous_rcorr$P[colnames(annotations %>% dplyr::select(
 corrplot(continuous_rcorr$r,
          p.mat = continuous_rcorr$P, sig.level = 0.01, insig = "blank")
 
+### Supervised deconvolution
+mMCPcounter_res <-  read_tsv("../180122_Various/02_Output/mMCPcounter_results.tsv") %>% column_to_rownames("cell_types") %>% t() %>% as_tibble(rownames = "samples")
+ImmuCC_res <-  read_tsv("../180122_Various/02_Output/ImmuCC_results.tsv")
+
+deconv <- mMCPcounter_res %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
+decon_title <- "mMCPcounter"
+
+# deconv <- ImmuCC_res %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
+# decon_title <- "ImmuCC"
+
+
+#### Heatmap
+##### Full (with clustering)
+deconv %>% t() %>% pheatmap(main=decon_title, scale = "row", annotation_col = A_mat)
+
+#### Corplot
+stopifnot(rownames(A_mat)==rownames(deconv))
+corr_decon <- deconv %>% bind_cols(A_mat)
+corr_decon <- corr_decon[rownames(A_mat),] # merge mess with the order
+
+corr_decon <- rcorr(data.matrix(corr_decon), type = "pearson")
+corr_decon$r <- corr_decon$r[colnames(deconv),colnames(A_mat)]
+corr_decon$P <- corr_decon$P[colnames(deconv),colnames(A_mat)]
+
+corrplot(corr_decon$r,
+         p.mat = corr_decon$P, sig.level = 0.05, insig = "blank")
