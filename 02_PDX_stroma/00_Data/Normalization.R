@@ -121,6 +121,13 @@ countsHost$dataP %>%
   rownames_to_column("EnsemblID") %>%
   write_tsv("Processed_data/rawHost_Pol.tsv")
 
+## Get ncounts to test latter (just host samples)
+ncounts <- tibble(samples = cleanHost)
+countsHost$dataT %>% dplyr::select(cleanHost) %>% colSums() -> ncounts$cyt_host_counts
+countsHost$dataP %>% dplyr::select(cleanHost) %>% colSums() -> ncounts$pol_host_counts
+countsTumor$dataT %>% dplyr::select(cleanHost) %>% colSums() -> ncounts$cyt_tumor_counts
+countsTumor$dataP %>% dplyr::select(cleanHost) %>% colSums() -> ncounts$pol_tumor_counts
+ncounts %>% write_tsv("Processed_data/ncounts.tsv")
 
 ## Remove 0 genes and normalize
 Clean_and_Norm <- function(data, clean_samples) {
