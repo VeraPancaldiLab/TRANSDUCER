@@ -101,15 +101,15 @@ continuous_rcorr$P <- continuous_rcorr$P[colnames(annotations %>% dplyr::select(
 corrplot(continuous_rcorr$r,
          p.mat = continuous_rcorr$P, sig.level = 0.01, insig = "blank")
 
-### Supervised deconvolution
+### Supervised celltype deconvolution
 mMCPcounter_res <-  read_tsv("../180122_Various/02_Output/mMCPcounter_results.tsv") %>% column_to_rownames("cell_types") %>% t() %>% as_tibble(rownames = "samples")
 ImmuCC_res <-  read_tsv("../180122_Various/02_Output/ImmuCC_results.tsv")
 
-deconv <- mMCPcounter_res %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
-decon_title <- "mMCPcounter"
+# deconv <- mMCPcounter_res %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
+# decon_title <- "mMCPcounter"
 
-# deconv <- ImmuCC_res %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
-# decon_title <- "ImmuCC"
+deconv <- ImmuCC_res %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
+decon_title <- "ImmuCC"
 
 
 #### Heatmap
@@ -127,3 +127,37 @@ corr_decon$P <- corr_decon$P[colnames(deconv),colnames(A_mat)]
 
 corrplot(corr_decon$r,
          p.mat = corr_decon$P, sig.level = 0.05, insig = "blank")
+
+
+### TF activity
+tumour_tf <- read_tsv("../180122_Various/02_Output/TFact_tumor_PanCan.tsv")
+stroma_tf <- read_tsv("../180122_Various/02_Output/TFact_stroma_Gtex.tsv")
+
+# tf_activity <- tumour_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(A_mat))
+# tf_title <- "Tumour TF activity"
+
+tf_activity <- stroma_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(A_mat))
+tf_title <- "Stroma TF activity"
+
+mostvar_TF <- Get_mostvar(tf_activity, 50)
+#### Heatmap
+##### Full (with
+tf_activity %>%
+  pheatmap(main=tf_title, scale = "row", show_rownames = FALSE, annotation_col = A_mat)
+
+##### 50 most var
+mostvar_TF %>%
+  pheatmap(main=tf_title, scale = "row", annotation_col = A_mat)
+
+#### Corplot
+
+stopifnot(rownames(A_mat)==colnames(tf_activity))
+corr_tfs <- t(tf_activity) %>% bind_cols(A_mat)
+corr_tfs <- corr_tfs[rownames(A_mat),] # merge mess with the order
+
+corr_tfs <- rcorr(data.matrix(corr_tfs), type = "pearson")
+corr_tfs$r <- corr_tfs$r[colnames(tf_activity),colnames(A_mat)]
+corr_tfs$P <- corr_tfs$P[colnames(tf_activity),colnames(A_mat)]
+
+corrplot(corr_tfs$r,
+         p.mat = corr_tfs$P, sig.level = 0.05, insig = "blank")
