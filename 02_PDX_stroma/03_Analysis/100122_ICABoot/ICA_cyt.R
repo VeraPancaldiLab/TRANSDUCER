@@ -94,12 +94,14 @@ corr_continuous <- annotations %>% dplyr::select(!Diabetes) %>% bind_cols(A_mat)
 corr_continuous <- corr_continuous[rownames(A_mat),] # merge mess with the order
 
 
-continuous_rcorr <- rcorr(data.matrix(corr_continuous), type = "pearson")
+continuous_rcorr <- rcorr(data.matrix(corr_continuous), type = "spearman")
 continuous_rcorr$r <- continuous_rcorr$r[colnames(annotations %>% dplyr::select(!Diabetes)),colnames(A_mat)]
 continuous_rcorr$P <- continuous_rcorr$P[colnames(annotations %>% dplyr::select(!Diabetes)),colnames(A_mat)]
 
 corrplot(continuous_rcorr$r,
-         p.mat = continuous_rcorr$P, sig.level = 0.01, insig = "blank")
+         p.mat = continuous_rcorr$P, sig.level = 0.05, insig = "blank")
+stopifnot(rownames(A_mat) == rownames(annotations))
+bind_cols(A_mat, annotations[,c("ICA3", "PAMG")]) %>% rename(SerDep = ICA3) -> complete_annotation
 
 ### Supervised celltype deconvolution
 mMCPcounter_res <-  read_tsv("../180122_Various/02_Output/mMCPcounter_results.tsv") %>% column_to_rownames("cell_types") %>% t() %>% as_tibble(rownames = "samples")
@@ -114,16 +116,16 @@ decon_title <- "ImmuCC"
 
 #### Heatmap
 ##### Full (with clustering)
-deconv %>% t() %>% pheatmap(main=decon_title, scale = "row", annotation_col = A_mat)
+deconv %>% t() %>% pheatmap(main=decon_title, scale = "row", annotation_col = complete_annotation)
 
 #### Corplot
-stopifnot(rownames(A_mat)==rownames(deconv))
-corr_decon <- deconv %>% bind_cols(A_mat)
-corr_decon <- corr_decon[rownames(A_mat),] # merge mess with the order
+stopifnot(rownames(complete_annotation)==rownames(deconv))
+corr_decon <- deconv %>% bind_cols(complete_annotation)
+corr_decon <- corr_decon[rownames(complete_annotation),] # merge mess with the order
 
-corr_decon <- rcorr(data.matrix(corr_decon), type = "pearson")
-corr_decon$r <- corr_decon$r[colnames(deconv),colnames(A_mat)]
-corr_decon$P <- corr_decon$P[colnames(deconv),colnames(A_mat)]
+corr_decon <- rcorr(data.matrix(corr_decon), type = "spearman")
+corr_decon$r <- corr_decon$r[colnames(deconv),colnames(complete_annotation)]
+corr_decon$P <- corr_decon$P[colnames(deconv),colnames(complete_annotation)]
 
 corrplot(corr_decon$r,
          p.mat = corr_decon$P, sig.level = 0.05, insig = "blank")
@@ -133,31 +135,31 @@ corrplot(corr_decon$r,
 tumour_tf <- read_tsv("../180122_Various/02_Output/TFact_tumor_PanCan.tsv")
 stroma_tf <- read_tsv("../180122_Various/02_Output/TFact_stroma_Gtex.tsv")
 
-# tf_activity <- tumour_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(A_mat))
-# tf_title <- "Tumour TF activity"
+tf_activity <- tumour_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(A_mat))
+tf_title <- "Tumour TF activity"
 
-tf_activity <- stroma_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(A_mat))
-tf_title <- "Stroma TF activity"
+# tf_activity <- stroma_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
+# tf_title <- "Stroma TF activity"
 
 mostvar_TF <- Get_mostvar(tf_activity, 50)
 #### Heatmap
 ##### Full (with
 tf_activity %>%
-  pheatmap(main=tf_title, scale = "row", show_rownames = FALSE, annotation_col = A_mat)
+  pheatmap(main=tf_title, scale = "row", show_rownames = FALSE, annotation_col = complete_annotation)
 
 ##### 50 most var
 mostvar_TF %>%
-  pheatmap(main=tf_title, scale = "row", annotation_col = A_mat)
+  pheatmap(main=tf_title, scale = "row", annotation_col = complete_annotation)
 
 #### Corplot
 
 stopifnot(rownames(A_mat)==colnames(tf_activity))
-corr_tfs <- t(tf_activity) %>% bind_cols(A_mat)
-corr_tfs <- corr_tfs[rownames(A_mat),] # merge mess with the order
+corr_tfs <- t(tf_activity) %>% bind_cols(complete_annotation)
+corr_tfs <- corr_tfs[rownames(complete_annotation),] # merge mess with the order
 
-corr_tfs <- rcorr(data.matrix(corr_tfs), type = "pearson")
-corr_tfs$r <- corr_tfs$r[colnames(tf_activity),colnames(A_mat)]
-corr_tfs$P <- corr_tfs$P[colnames(tf_activity),colnames(A_mat)]
+corr_tfs <- rcorr(data.matrix(corr_tfs), type = "spearman")
+corr_tfs$r <- corr_tfs$r[colnames(tf_activity),colnames(complete_annotation)]
+corr_tfs$P <- corr_tfs$P[colnames(tf_activity),colnames(complete_annotation)]
 
 corrplot(corr_tfs$r,
          p.mat = corr_tfs$P, sig.level = 0.05, insig = "blank")
