@@ -101,12 +101,12 @@ jade_choosencom <- function(df,
         # loop through boot ICA components
         for (r_ic in colnames(res_ic)) {
           # loop through base ICA components
-          spearm_c <- cor(base_ic[, b_ic], res_ic[, r_ic])
+          pears_c <- cor(base_ic[, b_ic], res_ic[, r_ic])
 
-          if (abs(spearm_c) > abs(cor_list[[b_ic]])) {
+          if (abs(pears_c) > abs(cor_list[[b_ic]])) {
             # save the highest correlation between each
             # base ICA component and every bootstrap ICA
-            cor_list[[b_ic]] <- spearm_c
+            cor_list[[b_ic]] <- pears_c
             cor_id_list[[b_ic]] <- r_ic
           }
         }
@@ -255,4 +255,23 @@ Get_mostvar <- function(df, n){
   abdv %>% sort(decreasing = T) %>% .[th_abdv.i] -> th_abdv
   df.f <- df[abdv >= th_abdv, , drop=F]
   return(df.f)
+}
+
+#' Select the nTFs most absolutely correlated TFs with each factor 
+#' and do a heatmap of each of them.
+#'@description
+#'
+PlotBestCorr <- function(complete_annotation, tf_activity, nTFs, analysis_name = "analysis"){
+  for (comp in colnames(complete_annotation)){
+    
+    rcorr(t(tf_activity), complete_annotation[,comp,drop=T])$r[,"y"] %>%
+      abs() %>% sort(decreasing = T) %>%
+      .[2:(nTFs+1)] %>% names() -> best_tfs
+    
+    pdf(paste("02_Output/", analysis_name, comp, ".pdf", sep=""))
+    tf_activity %>% .[best_tfs,] %>%
+      pheatmap(main=paste("Best",tf_title, comp), scale = "row", annotation_col = complete_annotation)
+    
+    dev.off()
+  }
 }
