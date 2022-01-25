@@ -5,6 +5,8 @@ library(JADE)
 library(corrplot)
 library(Hmisc)
 library(pheatmap)
+library("ggpubr")
+library("ggplotify")
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
@@ -84,6 +86,7 @@ rownames(jade_result[["A"]]) <- names(jade_result$Xmu)
 
 ### Component distribution analysis
 A_mat <- as.data.frame(jade_result[["A"]])
+S_mat <- as.data.frame(jade_result[["S"]])
 annotations <- sample_info[-1]
 stopifnot(rownames(A_mat) == rownames(annotations))
 plot_sample_weights(A_mat, annotations)
@@ -136,11 +139,11 @@ corrplot(corr_decon$r,
 tumour_tf <- read_tsv("../180122_Various/02_Output/TFact_tumor_PanCan.tsv")
 stroma_tf <- read_tsv("../180122_Various/02_Output/TFact_stroma_Gtex.tsv")
 
-# tf_activity <- tumour_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
-# tf_title <- "tumour"
+tf_activity <- tumour_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
+tf_title <- "tumour"
 
-tf_activity <- stroma_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
-tf_title <- "stroma"
+# tf_activity <- stroma_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
+# tf_title <- "stroma"
 
 mostvar_TF <- Get_mostvar(tf_activity, 50)
 #### Heatmap
@@ -153,4 +156,23 @@ mostvar_TF %>%
   pheatmap(main=tf_title, scale = "row", annotation_col = complete_annotation)
 
 #### 50 best TFs by component
-PlotBestCorr(complete_annotation, tf_activity, 10, analysis_name = paste(tf_title, "_best_TFs_", sep = ""))
+PlotBestCorr(complete_annotation, tf_activity, 10, analysis_name = paste(tf_title, "_best_TFs_cyt", sep = ""))
+
+
+### Head and Tail genes
+#### translate to gene names
+S_mat %>% as_tibble(rownames = "EnsemblIDs") -> S_gn_
+translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
+S_mat %>% rownames() %>% translate[.] -> S_gn_$Genenames
+S_gn_ %>% dplyr::select(!EnsemblIDs) %>%
+  relocate(Genenames) -> S_gn
+
+#### load normalized expression data for representation
+genes_toplot_ <- read_tsv("../180122_Various/01_Input/HostCyt_foranalysis.tsv")
+genes_toplot_$EnsemblIDs %>% translate[.] -> genes_toplot_$Genenames
+genes_toplot_ %>% dplyr::select(!EnsemblIDs) %>%
+  relocate(Genenames) -> genes_toplot
+
+#### plot
+PlotGeneWeights(S_mat, genes_toplot, 25, complete_annotation, analysis_name = "gene_weights_cyt")
+

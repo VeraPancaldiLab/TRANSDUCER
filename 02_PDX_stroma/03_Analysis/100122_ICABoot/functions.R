@@ -275,3 +275,38 @@ PlotBestCorr <- function(complete_annotation, tf_activity, nTFs, analysis_name =
     dev.off()
   }
 }
+
+#' Select the nTFs most absolutely correlated TFs with each factor 
+#' and do a heatmap of each of them.
+#'@description
+#'
+PlotGeneWeights <- function(S_mat, genes_toplot, n_genes, complete_annotation, analysis_name = "analysis"){
+  for (comp in colnames(S_mat)){
+    S_gn %>% arrange(get(comp)) -> S_sort
+    S_sort %>% head(n_genes) -> S_mneg
+    S_sort %>% tail(n_genes) -> S_mpos
+    S_gn %>% ggplot() +
+      aes_string(y = comp) +
+      geom_density(alpha=.5, fill="#AED3FA") +
+      geom_hline(yintercept = 0, colour = "black") +
+      geom_hline(yintercept = max(S_mneg[comp]), colour = "#7DB0DD", linetype = "dashed") + 
+      geom_hline(yintercept = min(S_mpos[comp]), colour = "#EAAFBB", linetype = "dashed") + 
+      theme_classic() -> densplot
+    
+    annot_row_ <- tibble(name = S_mpos$Genenames, class = "most possitive")
+    tibble(name = S_mneg$Genenames, class = "most negative") %>% bind_rows(annot_row_) %>% column_to_rownames("name") -> annot_row
+    
+    genes_toplot %>% dplyr::filter(Genenames %in% c(S_mpos$Genenames, S_mneg$Genenames)) %>%
+      arrange(match(Genenames, c(S_mpos$Genenames, S_mneg$Genenames))) %>%
+      column_to_rownames("Genenames") %>% 
+      pheatmap(scale = "row", annotation_row = annot_row, cluster_rows = F, 
+               annotation_col = complete_annotation[c("PAMG", "SerDep", comp)]) %>% as.grob() -> heatmap
+    
+    fig <- ggarrange(densplot + rremove("xylab"), heatmap, heights = c(1.5, 10), widths = c(0.2,1),
+                     labels = c("A", "B"),
+                     ncol = 2, nrow = 1)
+    pdf(paste("02_Output/", analysis_name, comp, ".pdf", sep=""))
+    print(annotate_figure(fig, top = text_grob(paste(comp, "Gene weights"), face = "bold", size = 20)))
+    dev.off()
+  }
+}
