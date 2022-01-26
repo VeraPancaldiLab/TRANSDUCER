@@ -99,33 +99,11 @@ bind_cols(A_mat, annotations[,c("ICA3", "PAMG")]) %>%
   rename(SerDep = ICA3) -> complete_annotation
 
 ## RNAseq celltype deconvolution
-mMCPcounter_res <-  read_tsv("../180122_Various/02_Output/mMCPcounter_results.tsv") %>% column_to_rownames("cell_types") %>% t() %>% as_tibble(rownames = "samples")
-ImmuCC_res <-  read_tsv("../180122_Various/02_Output/ImmuCC_results.tsv")
+mMCPcounter_res <-  read_tsv("../180122_Various/02_Output/mMCPcounter_results.tsv") %>% column_to_rownames("cell_types") %>% t() %>% as_tibble(rownames = "samples") %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
+ImmuCC_res <-  read_tsv("../180122_Various/02_Output/ImmuCC_results.tsv") %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
 
-### Choose deconv
-#----------------
-# deconv <- mMCPcounter_res %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
-# decon_title <- "mMCPcounter"
-
-deconv <- ImmuCC_res %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
-decon_title <- "ImmuCC"
-#----------------
-
-### Heatmap
-deconv %>% t() %>% pheatmap(main=decon_title, scale = "row", annotation_col = complete_annotation)
-
-### Corplot
-stopifnot(rownames(complete_annotation)==rownames(deconv))
-corr_decon <- deconv %>% bind_cols(complete_annotation)
-corr_decon <- corr_decon[rownames(complete_annotation),] # merge mess with the order
-
-corr_decon <- rcorr(data.matrix(corr_decon), type = "spearman")
-corr_decon$r <- corr_decon$r[colnames(deconv),colnames(complete_annotation)]
-corr_decon$P <- corr_decon$P[colnames(deconv),colnames(complete_annotation)]
-
-corrplot(corr_decon$r,
-         p.mat = corr_decon$P, sig.level = 0.05, insig = "blank")
-
+Plot_deconv(ImmuCC_res, complete_annotation, "ImmuCC_cyt")
+Plot_deconv(mMCPcounter_res, complete_annotation, "mMCPcounter_cyt")
 
 ## TF activity
 tumour_tf <- read_tsv("../180122_Various/02_Output/TFact_tumor_PanCan.tsv")
@@ -144,7 +122,9 @@ mostvar_TF <- Get_mostvar(tf_activity, 50)
 ### Heatmaps
 
 tf_activity %>%
-  pheatmap(main=paste( "TF activity", tf_title), scale = "row", show_rownames = FALSE, annotation_col = complete_annotation)
+  pheatmap(main=paste( "TF activity", tf_title),
+           scale = "row", show_rownames = FALSE,
+           annotation_col = complete_annotation) 
 
 mostvar_TF %>%
   pheatmap(main=tf_title, scale = "row", annotation_col = complete_annotation)

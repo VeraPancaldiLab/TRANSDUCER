@@ -246,6 +246,34 @@ plot_sample_weights <- function(A_mat, annotations, cont_names, analysis_name){
   dev.off()
 }
 
+Plot_deconv <- function(deconv, complete_annotation, analysis_name){
+  # Heatmap
+  deconv %>% t() %>%
+    pheatmap(scale = "row",
+             annotation_col = complete_annotation) %>% as.grob() -> decon_heatmap
+  
+  # Corplot
+  stopifnot(rownames(complete_annotation)==rownames(deconv))
+  corr_decon <- deconv %>% bind_cols(complete_annotation)
+  corr_decon <- corr_decon[rownames(complete_annotation),] # merge mess with the order
+  
+  corr_decon <- rcorr(data.matrix(corr_decon), type = "spearman")
+  corr_decon$r <- corr_decon$r[colnames(complete_annotation), colnames(deconv)]
+  corr_decon$P <- corr_decon$P[colnames(complete_annotation), colnames(deconv)]
+  
+  ggcorrplot(corr_decon$r, p.mat = corr_decon$P, insig = "blank", ggtheme = ggplot2::theme_minimal,
+             colors = c("#7D0E29", "white", "#004376"), sig.level = 0.05) -> decon_corrplot
+  
+  fig <- ggarrange(decon_corrplot + rremove("xylab"), decon_heatmap, widths = c(0.6,1),
+                   labels = c("A", "B"),
+                   ncol = 2, nrow = 1)
+  
+  pdf(paste("02_Output/", analysis_name, ".pdf", sep=""), nrow(deconv), ncol(deconv))
+  print(annotate_figure(fig, top = text_grob(paste(analysis_name, "deconvolution results"), face = "bold", size = 20)))
+  dev.off()
+  
+}
+
 #' Filter a dataframe to keep just half the most variable genes
 #'@description
 #' `Get_half_mostvar` requires a data.frame with genes as rows,
