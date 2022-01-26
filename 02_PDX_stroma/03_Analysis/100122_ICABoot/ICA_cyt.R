@@ -87,19 +87,13 @@ A_mat <- as.data.frame(jade_result[["A"]])
 S_mat <- as.data.frame(jade_result[["S"]])
 annotations <- sample_info[-1]
 stopifnot(rownames(A_mat) == rownames(annotations))
-plot_sample_weights(A_mat, annotations, "sampleweights_cyt")
+annotations %>% dplyr::select(!Diabetes) %>%
+  names() -> cont_names
 
-corr_continuous <- annotations %>% dplyr::select(!Diabetes) %>% bind_cols(A_mat)
-corr_continuous <- corr_continuous[rownames(A_mat),] # merge mess with the order
+## plot
+plot_sample_weights(A_mat, annotations, cont_names, "sampleweights_cyt")
 
-continuous_rcorr <- rcorr(data.matrix(corr_continuous), type = "spearman")
-continuous_rcorr$r <- continuous_rcorr$r[colnames(annotations %>% dplyr::select(!Diabetes)),colnames(A_mat)]
-continuous_rcorr$P <- continuous_rcorr$P[colnames(annotations %>% dplyr::select(!Diabetes)),colnames(A_mat)]
-
-corrplot(continuous_rcorr$r,
-         p.mat = continuous_rcorr$P, sig.level = 0.05, insig = "blank")
-
-### Export for further correlations
+## Export for further correlations
 stopifnot(rownames(A_mat) == rownames(annotations))
 bind_cols(A_mat, annotations[,c("ICA3", "PAMG")]) %>%
   rename(SerDep = ICA3) -> complete_annotation

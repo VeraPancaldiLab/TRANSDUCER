@@ -160,7 +160,7 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean", name = "analysis"){
     labs(y = "absolute pearson correlation", x = "number of components") +
     coord_cartesian(ylim = c(0.8, 1)) +
     theme_bw()
-  ggsave(paste(plot_title, "boxplot.png", sep = "_"), height = 10, width = 12)
+  ggsave(paste(plot_title, "boxplot.pdf", sep = "_"), height = 10, width = 12)
   
   
   
@@ -170,7 +170,7 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean", name = "analysis"){
   corrlim <- min(c(min(gene_metrics[, line_stat]),
                   min(sample_metrics[, line_stat])))
   
-  png(paste(plot_title, "lineplot.png", sep = "_"))
+  pdf(paste(plot_title, "lineplot.png", sep = "_"))
   plot(gene_metrics[, line_stat], ylim = c(corrlim, 1),
        type = "b", lty = 1, pch = 19, col = "red",
        xaxt = "n", xlab = "n of components", ylab = "Absolute pearson correlation"
@@ -193,8 +193,21 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean", name = "analysis"){
 ### many plots as columns the annotation df has. carefull. Sample order 
 ### should be checked beforehand.
 
-plot_sample_weights <- function(A_mat, annotations, analysis_name){
+plot_sample_weights <- function(A_mat, annotations, cont_names, analysis_name){
   pdf(file=paste("02_Output/", analysis_name, ".pdf", sep=""))
+  
+  # Correlation plot
+  corr_continuous <- annotations %>% dplyr::select(all_of(cont_names)) %>% bind_cols(A_mat)
+  corr_continuous <- corr_continuous[rownames(A_mat),] # merge mess with the order
+  
+  continuous_rcorr <- rcorr(data.matrix(corr_continuous), type = "spearman")
+  continuous_rcorr$r <- continuous_rcorr$r[cont_names,colnames(A_mat)]
+  continuous_rcorr$P <- continuous_rcorr$P[cont_names,colnames(A_mat)]
+  
+  corrplot(continuous_rcorr$r, method = "color",
+           p.mat = continuous_rcorr$P, sig.level = 0.05, insig = "label_sig")
+  
+  # Sample weights
   for (ann in colnames(annotations)){
 
     rug_aes <- annotations[[ann]]
