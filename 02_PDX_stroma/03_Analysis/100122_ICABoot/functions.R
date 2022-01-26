@@ -193,7 +193,8 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean", name = "analysis"){
 ### many plots as columns the annotation df has. carefull. Sample order 
 ### should be checked beforehand.
 
-plot_sample_weights <- function(A_mat, annotations){
+plot_sample_weights <- function(A_mat, annotations, analysis_name){
+  pdf(file=paste("02_Output/", analysis_name, ".pdf", sep=""))
   for (ann in colnames(annotations)){
 
     rug_aes <- annotations[[ann]]
@@ -229,6 +230,7 @@ plot_sample_weights <- function(A_mat, annotations){
     ggarrange(plotlist = comps_plots, common.legend = T,  legend = "bottom") %>% annotate_figure(
       top = text_grob(ann, color = "black", face = "bold", size = 14), ) %>% print()
   }
+  dev.off()
 }
 
 #' Filter a dataframe to keep just half the most variable genes

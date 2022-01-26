@@ -87,7 +87,7 @@ A_mat <- as.data.frame(jade_result[["A"]])
 S_mat <- as.data.frame(jade_result[["S"]])
 annotations <- sample_info[-1]
 stopifnot(rownames(A_mat) == rownames(annotations))
-plot_sample_weights(A_mat, annotations)
+plot_sample_weights(A_mat, annotations, "sampleweights_cyt")
 
 corr_continuous <- annotations %>% dplyr::select(!Diabetes) %>% bind_cols(A_mat)
 corr_continuous <- corr_continuous[rownames(A_mat),] # merge mess with the order
