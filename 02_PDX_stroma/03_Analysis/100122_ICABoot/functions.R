@@ -3,6 +3,7 @@ library(tidyverse)
 library(reshape2)
 library(ggpubr)
 library(scico)
+library(ggpubr)
 
 ### Performn JADE ICA to get a list
 ###  of S or A matrices of a range of components
@@ -280,12 +281,12 @@ PlotBestCorr <- function(complete_annotation, tf_activity, nTFs, analysis_name =
 #' and do a heatmap of each of them.
 #'@description
 #'
-PlotGeneWeights <- function(S_mat, genes_toplot, n_genes, complete_annotation, analysis_name = "analysis"){
-  for (comp in colnames(S_mat)){
-    S_gn %>% arrange(get(comp)) -> S_sort
+PlotGeneWeights <- function(S_mat, ensembl_toplot, n_genes, translate, complete_annotation, analysis_name = "analysis"){
+  for (comp in colnames(S_mat)[-1]){
+    S_mat %>% arrange(get(comp)) -> S_sort
     S_sort %>% head(n_genes) -> S_mneg
     S_sort %>% tail(n_genes) -> S_mpos
-    S_gn %>% ggplot() +
+    S_mat %>% ggplot() +
       aes_string(y = comp) +
       geom_density(alpha=.5, fill="#AED3FA") +
       geom_hline(yintercept = 0, colour = "black") +
@@ -293,12 +294,20 @@ PlotGeneWeights <- function(S_mat, genes_toplot, n_genes, complete_annotation, a
       geom_hline(yintercept = min(S_mpos[comp]), colour = "#EAAFBB", linetype = "dashed") + 
       theme_classic() -> densplot
     
-    annot_row_ <- tibble(name = S_mpos$Genenames, class = "most possitive")
-    tibble(name = S_mneg$Genenames, class = "most negative") %>% bind_rows(annot_row_) %>% column_to_rownames("name") -> annot_row
+    annot_row_ <- tibble(name = rownames(S_mpos), class = "most possitive")
+    tibble(name = rownames(S_mneg), class = "most negative") %>% bind_rows(annot_row_) %>% column_to_rownames("name") -> annot_row__
+    annot_row <- annot_row__
+    rownames(annot_row__) %>% translate[.] %>% make.names(unique = TRUE)  -> rownames(annot_row)
     
-    genes_toplot %>% dplyr::filter(Genenames %in% c(S_mpos$Genenames, S_mneg$Genenames)) %>%
-      arrange(match(Genenames, c(S_mpos$Genenames, S_mneg$Genenames))) %>%
-      column_to_rownames("Genenames") %>% 
+    ensembl_toplot %>% dplyr::filter(EnsemblID %in% c(rownames(S_mpos), rownames(S_mneg))) %>%
+      arrange(match(EnsemblID, c(rownames(S_mpos), rownames(S_mneg)))) -> ensembl_toplot_
+    
+    genes_toplot <- ensembl_toplot_
+    ensembl_toplot_$EnsemblID %>% translate[.] %>%
+      make.names(unique = TRUE) -> genes_toplot$Genenames
+    
+    genes_toplot %>% dplyr::select(!EnsemblID) %>%
+      relocate(Genenames) %>% column_to_rownames("Genenames") %>% 
       pheatmap(scale = "row", annotation_row = annot_row, cluster_rows = F, 
                annotation_col = complete_annotation[c("PAMG", "SerDep", comp)]) %>% as.grob() -> heatmap
     

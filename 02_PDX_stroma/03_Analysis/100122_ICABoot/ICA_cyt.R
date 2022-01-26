@@ -5,10 +5,9 @@ library(JADE)
 library(corrplot)
 library(Hmisc)
 library(pheatmap)
-library(ggpubr)
-library(ggplotify)
-library("msigdbr")
+library(msigdbr)
 library(GSVA)
+library(ggplotify)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
@@ -161,20 +160,10 @@ PlotBestCorr(complete_annotation, tf_activity, 10, analysis_name = paste(tf_titl
 
 # Gene weight analysis
 ## translate to gene names
-S_mat %>% as_tibble(rownames = "EnsemblIDs") -> S_gn_
 translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
-S_mat %>% rownames() %>% translate[.] -> S_gn_$Genenames
-S_gn_ %>% dplyr::select(!EnsemblIDs) %>%
-  relocate(Genenames) -> S_gn
-
-## load normalized expression data for representation
-genes_toplot_ <- cyt
-genes_toplot_$EnsemblID %>% translate[.] -> genes_toplot_$Genenames
-genes_toplot_ %>% dplyr::select(!EnsemblID) %>%
-  relocate(Genenames) -> genes_toplot
 
 ## plot
-PlotGeneWeights(S_mat, genes_toplot, 25, complete_annotation, analysis_name = "gene_weights_cyt")
+PlotGeneWeights(S_mat, cyt, 25, translate, complete_annotation, analysis_name = "gene_weights_cyt")
 
 
 ## GSVA of best genes
