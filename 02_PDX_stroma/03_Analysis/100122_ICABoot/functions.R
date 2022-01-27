@@ -3,7 +3,7 @@ library(tidyverse)
 library(reshape2)
 library(ggpubr)
 library(scico)
-library(ggpubr)
+library(ggcorrplot)
 
 ### Performn JADE ICA to get a list
 ###  of S or A matrices of a range of components
@@ -350,7 +350,7 @@ PlotBestCorr <- function(complete_annotation, tf_activity, nTFs, analysis_name =
     
     pdf(paste("02_Output/", analysis_name, comp, ".pdf", sep=""))
     tf_activity %>% .[best_tfs,] %>%
-      pheatmap(main=paste("Best",tf_title, comp), scale = "row", annotation_col = complete_annotation)
+      pheatmap(main=paste("Best",analysis_name, comp), scale = "row", annotation_col = complete_annotation)
     
     dev.off()
   }
