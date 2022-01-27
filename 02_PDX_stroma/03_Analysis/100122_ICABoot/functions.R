@@ -362,7 +362,7 @@ PlotBestCorr <- function(complete_annotation, tf_activity, nTFs, analysis_name =
 #'@description
 #'
 PlotGeneWeights <- function(S_mat, ensembl_toplot, n_genes, translate, complete_annotation, analysis_name = "analysis"){
-  for (comp in colnames(S_mat)[-1]){
+  for (comp in colnames(S_mat)){
     S_mat %>% arrange(get(comp)) -> S_sort
     S_sort %>% head(n_genes) -> S_mneg
     S_sort %>% tail(n_genes) -> S_mpos
