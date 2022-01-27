@@ -170,7 +170,7 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean", name = "analysis"){
   corrlim <- min(c(min(gene_metrics[, line_stat]),
                   min(sample_metrics[, line_stat])))
   
-  pdf(paste(plot_title, "lineplot.png", sep = "_"))
+  pdf(paste(plot_title, "lineplot.pdf", sep = "_"))
   plot(gene_metrics[, line_stat], ylim = c(corrlim, 1),
        type = "b", lty = 1, pch = 19, col = "red",
        xaxt = "n", xlab = "n of components", ylab = "Absolute pearson correlation"
@@ -301,6 +301,42 @@ Get_mostvar <- function(df, n){
   return(df.f)
 }
 
+
+Plot_general_TFs <- function(tf_activity, analysis_name, n_mostvar, complete_annotation){
+  
+  tf_activity %>%
+    pheatmap(main=paste( "TF activity", analysis_name),
+             scale = "row", show_rownames = FALSE,
+             annotation_col = complete_annotation) -> full_heatmap
+  
+  mostvar_TF <- Get_mostvar(tf_activity, n_mostvar)
+  
+  mostvar_TF %>%
+    pheatmap(scale = "row", annotation_col = complete_annotation) %>% as.grob() -> mostvar_heatmap
+  
+  # Corplot
+  stopifnot(rownames(complete_annotation)==colnames(mostvar_TF))
+  corr_TF <- mostvar_TF %>% t() %>% as_tibble() %>% bind_cols(complete_annotation)
+  corr_TF <- corr_TF[rownames(complete_annotation),] # merge mess with the order
+  
+  corr_TF <- rcorr(data.matrix(corr_TF), type = "spearman")
+  corr_TF$r <- corr_TF$r[colnames(complete_annotation), rownames(mostvar_TF)]
+  corr_TF$P <- corr_TF$P[colnames(complete_annotation), rownames(mostvar_TF)]
+  
+  ggcorrplot(corr_TF$r, p.mat = corr_TF$P, insig = "blank", ggtheme = ggplot2::theme_minimal,
+             colors = c("#7D0E29", "white", "#004376"), sig.level = 0.05) -> mostvar_corrplot
+  
+  fig <- ggarrange(mostvar_corrplot, mostvar_heatmap, widths = c(0.6,1),
+                   labels = c("A", "B"),
+                   ncol = 2, nrow = 1)
+  
+  pdf(paste("02_Output/TF_analysis_", analysis_name, ".pdf", sep=""), nrow(mostvar_TF)/2, ncol(mostvar_TF)/2)
+  print(full_heatmap)
+  print(annotate_figure(fig, top = text_grob(paste(analysis_name, "vs the most variable TF activities"), face = "bold", size = 20)))
+  dev.off()
+}
+
+
 #' Select the nTFs most absolutely correlated TFs with each factor 
 #' and do a heatmap of each of them.
 #'@description
@@ -319,6 +355,7 @@ PlotBestCorr <- function(complete_annotation, tf_activity, nTFs, analysis_name =
     dev.off()
   }
 }
+
 
 #' Select the nTFs most absolutely correlated TFs with each factor 
 #' and do a heatmap of each of them.
@@ -362,3 +399,4 @@ PlotGeneWeights <- function(S_mat, ensembl_toplot, n_genes, translate, complete_
     dev.off()
   }
 }
+

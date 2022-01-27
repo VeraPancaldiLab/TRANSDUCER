@@ -11,7 +11,7 @@ library(ggplotify)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
-run_boot <- FALSE
+run_boot <- TRUE
 range.comp <- 2:15 # when ncomp is =< df Warning: In sqrt(puiss[rangeW]) : NaNs produced
 boot.iter <- 500
 
@@ -106,30 +106,13 @@ Plot_deconv(ImmuCC_res, complete_annotation, "ImmuCC_cyt")
 Plot_deconv(mMCPcounter_res, complete_annotation, "mMCPcounter_cyt")
 
 ## TF activity
-tumour_tf <- read_tsv("../180122_Various/02_Output/TFact_tumor_PanCan.tsv")
-stroma_tf <- read_tsv("../180122_Various/02_Output/TFact_stroma_Gtex.tsv")
+tumour_tf <- read_tsv("../180122_Various/02_Output/TFact_tumor_PanCan.tsv") %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
+stroma_tf <- read_tsv("../180122_Various/02_Output/TFact_stroma_Gtex.tsv") %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
 
-### Choose tumor/stroma
-#----------------
-tf_activity <- tumour_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
-tf_title <- "tumour"
-
-# tf_activity <- stroma_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
-# tf_title <- "stroma"
-#----------------
-
-mostvar_TF <- Get_mostvar(tf_activity, 50)
-### Heatmaps
-
-tf_activity %>%
-  pheatmap(main=paste( "TF activity", tf_title),
-           scale = "row", show_rownames = FALSE,
-           annotation_col = complete_annotation) 
-
-mostvar_TF %>%
-  pheatmap(main=tf_title, scale = "row", annotation_col = complete_annotation)
-
-PlotBestCorr(complete_annotation, tf_activity, 10, analysis_name = paste(tf_title, "_best_TFs_cyt", sep = ""))
+Plot_general_TFs(tumour_tf, "TF_tumor_vs_cyt_ICA", 25, complete_annotation)
+Plot_general_TFs(stroma_tf, "TF_stroma_vs_cyt_ICA", 25, complete_annotation)
+PlotBestCorr(complete_annotation, tumour_tf, 10, "best_TF_tumor_vs_cyt")
+PlotBestCorr(complete_annotation, stroma_tf, 10, "best_TF_stroma_vs_cyt")
 
 
 # Gene weight analysis
@@ -138,7 +121,6 @@ translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
 
 ## plot
 PlotGeneWeights(S_mat, cyt, 25, translate, complete_annotation, analysis_name = "gene_weights_cyt")
-
 
 ## GSVA of best genes
 ### gene set preparation
@@ -164,3 +146,4 @@ for (comp in colnames(S_mat)){
   # gsvaTop  %>% rownames() %>% msigdb_descriptions[.,] %>% 
   #   cbind(gsvaTop[comp], .) %>% rownames_to_column("msigdb") %>% write_tsv("02_Output/gsvaRes_IC11nc13.tsv") #to write
 }
+
