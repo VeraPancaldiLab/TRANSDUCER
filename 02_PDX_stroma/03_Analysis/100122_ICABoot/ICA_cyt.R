@@ -147,3 +147,21 @@ for (comp in colnames(S_mat)){
   #   cbind(gsvaTop[comp], .) %>% rownames_to_column("msigdb") %>% write_tsv("02_Output/gsvaRes_IC11nc13.tsv") #to write
 }
 
+
+concat_pdf <- c("Cyt_bootstrapICA_lineplot.pdf",
+                "Cyt_bootstrapICA_boxplot.pdf",
+                "sampleweights_cyt.pdf",
+                "ImmuCC_cyt.pdf",
+                "mMCPcounter_cyt.pdf",
+                "TF_analysis_TF_stroma_vs_cyt_ICA.pdf",
+                "TF_analysis_TF_tumor_vs_cyt_ICA.pdf")
+
+for (comp in 1:elected_ncomp){
+  c(concat_pdf, paste("best_TF_stroma_vs_cytIC.", comp, ".pdf", sep = "")) -> concat_pdf
+  c(concat_pdf, paste("best_TF_tumor_vs_cytIC.", comp, ".pdf", sep = "")) -> concat_pdf
+  c(concat_pdf, paste("gene_weights_cytIC.", comp, ".pdf", sep = "")) -> concat_pdf
+  c(concat_pdf, paste("gsva_cytIC.", comp, ".pdf", sep = "")) -> concat_pdf
+}
+
+#system(paste(c("cd 02_Output/ \n pdfunite", concat_pdf, "ICA_cyt.pdf"), collapse = " "))
+system(paste(c("cd 02_Output/ \n convert", concat_pdf, "ICA_cyt.pdf"), collapse = " "))
