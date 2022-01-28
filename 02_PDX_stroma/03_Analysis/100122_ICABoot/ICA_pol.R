@@ -52,13 +52,13 @@ pol__ %>% rownames_to_column("EnsemblID") %>%
   dplyr::filter(EnsemblID %in% names(mostvar)) %>%
   column_to_rownames("EnsemblID") -> pol_icaready
 
-# ICA
-## Baseline before bootstrap
-pol_icaready %>% jade_range(range.comp, MARGIN = 1) -> base_res_gene
-pol_icaready %>% jade_range(range.comp, MARGIN = 2) -> base_res_sample
-
 # ICA Bootstrapping
 if (run_boot == TRUE){
+  ## Baseline
+  pol_icaready %>% jade_range(range.comp, MARGIN = 1) -> base_res_gene
+  pol_icaready %>% jade_range(range.comp, MARGIN = 2) -> base_res_sample
+  
+  ## Bootstrap
   gene_boot <- jade_choosencom(pol_icaready, base_res_gene,
                                MARGIN = 1,
                                iterations = boot.iter,
@@ -87,76 +87,32 @@ A_mat <- as.data.frame(jade_result[["A"]])
 S_mat <- as.data.frame(jade_result[["S"]])
 annotations <- sample_info[-1]
 stopifnot(rownames(A_mat) == rownames(annotations))
-plot_sample_weights(A_mat, annotations, "sampleweights_pol")
+annotations %>% dplyr::select(!Diabetes) %>%
+  names() -> cont_names
 
-corr_continuous <- annotations %>% dplyr::select(!Diabetes) %>% bind_cols(A_mat)
-corr_continuous <- corr_continuous[rownames(A_mat),] # merge mess with the order
+## plot
+plot_sample_weights(A_mat, annotations, cont_names, "sampleweights_pol")
 
-continuous_rcorr <- rcorr(data.matrix(corr_continuous), type = "spearman")
-continuous_rcorr$r <- continuous_rcorr$r[colnames(annotations %>% dplyr::select(!Diabetes)),colnames(A_mat)]
-continuous_rcorr$P <- continuous_rcorr$P[colnames(annotations %>% dplyr::select(!Diabetes)),colnames(A_mat)]
-
-corrplot(continuous_rcorr$r,
-         p.mat = continuous_rcorr$P, sig.level = 0.05, insig = "blank")
-
-### Export for further correlations
+## Export for further correlations
 stopifnot(rownames(A_mat) == rownames(annotations))
 bind_cols(A_mat, annotations[,c("ICA3", "PAMG")]) %>%
   rename(SerDep = ICA3) -> complete_annotation
 
 ## RNAseq celltype deconvolution
-mMCPcounter_res <-  read_tsv("../180122_Various/02_Output/mMCPcounter_results.tsv") %>% column_to_rownames("cell_types") %>% t() %>% as_tibble(rownames = "samples")
-ImmuCC_res <-  read_tsv("../180122_Various/02_Output/ImmuCC_results.tsv")
+mMCPcounter_res <-  read_tsv("../180122_Various/02_Output/mMCPcounter_results.tsv") %>% column_to_rownames("cell_types") %>% t() %>% as_tibble(rownames = "samples") %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
+ImmuCC_res <-  read_tsv("../180122_Various/02_Output/ImmuCC_results.tsv") %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
 
-### Choose deconv
-#----------------
-deconv <- mMCPcounter_res %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
-decon_title <- "mMCPcounter"
-
-# deconv <- ImmuCC_res %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
-# decon_title <- "ImmuCC"
-#----------------
-
-### Heatmap
-deconv %>% t() %>% pheatmap(main=decon_title, scale = "row", annotation_col = complete_annotation)
-
-### Corplot
-stopifnot(rownames(complete_annotation)==rownames(deconv))
-corr_decon <- deconv %>% bind_cols(complete_annotation)
-corr_decon <- corr_decon[rownames(complete_annotation),] # merge mess with the order
-
-corr_decon <- rcorr(data.matrix(corr_decon), type = "spearman")
-corr_decon$r <- corr_decon$r[colnames(deconv),colnames(complete_annotation)]
-corr_decon$P <- corr_decon$P[colnames(deconv),colnames(complete_annotation)]
-
-corrplot(corr_decon$r,
-         p.mat = corr_decon$P, sig.level = 0.05, insig = "blank")
-
+Plot_deconv(ImmuCC_res, complete_annotation, "ImmuCC_pol")
+Plot_deconv(mMCPcounter_res, complete_annotation, "mMCPcounter_pol")
 
 ## TF activity
-tumour_tf <- read_tsv("../180122_Various/02_Output/TFact_tumor_PanCan.tsv")
-stroma_tf <- read_tsv("../180122_Various/02_Output/TFact_stroma_Gtex.tsv")
+tumour_tf <- read_tsv("../180122_Various/02_Output/TFact_tumor_PanCan.tsv") %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
+stroma_tf <- read_tsv("../180122_Various/02_Output/TFact_stroma_Gtex.tsv") %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
 
-### Choose tumor/stroma
-#----------------
-# tf_activity <- tumour_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
-# tf_title <- "tumour"
-
-tf_activity <- stroma_tf %>% column_to_rownames("TF") %>% dplyr::select(rownames(complete_annotation))
-tf_title <- "stroma"
-#----------------
-
-mostvar_TF <- Get_mostvar(tf_activity, 50)
-### Heatmaps
-
-tf_activity %>%
-  pheatmap(main=paste( "TF activity", tf_title), scale = "row", show_rownames = FALSE, annotation_col = complete_annotation)
-
-mostvar_TF %>%
-  pheatmap(main=tf_title, scale = "row", annotation_col = complete_annotation)
-
-PlotBestCorr(complete_annotation, tf_activity, 10, analysis_name = paste(tf_title, "_best_TFs_pol", sep = ""))
-
+Plot_general_TFs(tumour_tf, "TF_tumor_vs_pol_ICA", 25, complete_annotation)
+Plot_general_TFs(stroma_tf, "TF_stroma_vs_pol_ICA", 25, complete_annotation)
+PlotBestCorr(complete_annotation, tumour_tf, 10, "best_TF_tumor_vs_pol")
+PlotBestCorr(complete_annotation, stroma_tf, 10, "best_TF_stroma_vs_pol")
 
 # Gene weight analysis
 ## translate to gene names
@@ -164,7 +120,6 @@ translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
 
 ## plot
 PlotGeneWeights(S_mat, pol, 25, translate, complete_annotation, analysis_name = "gene_weights_pol")
-
 
 ## GSVA of best genes
 ### gene set preparation
@@ -190,3 +145,22 @@ for (comp in colnames(S_mat)){
   # gsvaTop  %>% rownames() %>% msigdb_descriptions[.,] %>% 
   #   cbind(gsvaTop[comp], .) %>% rownames_to_column("msigdb") %>% write_tsv("02_Output/gsvaRes_IC11nc13.tsv") #to write
 }
+
+
+concat_pdf <- c("Pol_bootstrapICA_lineplot.pdf",
+                "Pol_bootstrapICA_boxplot.pdf",
+                "sampleweights_pol.pdf",
+                "ImmuCC_pol.pdf",
+                "mMCPcounter_pol.pdf",
+                "TF_analysis_TF_stroma_vs_pol_ICA.pdf",
+                "TF_analysis_TF_tumor_vs_pol_ICA.pdf")
+
+for (comp in 1:elected_ncomp){
+  c(concat_pdf, paste("best_TF_stroma_vs_polIC.", comp, ".pdf", sep = "")) -> concat_pdf
+  c(concat_pdf, paste("best_TF_tumor_vs_polIC.", comp, ".pdf", sep = "")) -> concat_pdf
+  c(concat_pdf, paste("gene_weights_polIC.", comp, ".pdf", sep = "")) -> concat_pdf
+  c(concat_pdf, paste("gsva_polIC.", comp, ".pdf", sep = "")) -> concat_pdf
+}
+
+#system(paste(c("cd 02_Output/ \n pdfunite", concat_pdf, "ICA_pol.pdf"), collapse = " "))
+system(paste(c("cd 02_Output/ \n convert", concat_pdf, "ICA_pol.pdf"), collapse = " "))

@@ -11,7 +11,7 @@ library(ggplotify)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
-run_boot <- TRUE
+run_boot <- FALSE
 range.comp <- 2:15 # when ncomp is =< df Warning: In sqrt(puiss[rangeW]) : NaNs produced
 boot.iter <- 500
 
@@ -21,6 +21,7 @@ sample_info <- read_tsv("../../00_Data/Processed_data/sample_info.tsv") %>%
   column_to_rownames("sample") %>% .[colnames(cyt)[-1],]
 
 sample_info$Diabetes <- as_factor(sample_info$Diabetes)
+
 # load annotation with Biomart
 ensembl75 <- useEnsembl(biomart = "genes",
                         dataset = "mmusculus_gene_ensembl",
@@ -53,11 +54,11 @@ cyt__ %>% rownames_to_column("EnsemblID") %>%
 
 # ICA Bootstrapping
 if (run_boot == TRUE){
-  ### Baseline before bootstrap
+  ## Baseline
   cyt_icaready %>% jade_range(range.comp, MARGIN = 1) -> base_res_gene
   cyt_icaready %>% jade_range(range.comp, MARGIN = 2) -> base_res_sample
   
-  ### Bootstrap
+  ## Bootstrap
   gene_boot <- jade_choosencom(cyt_icaready, base_res_gene,
                                MARGIN = 1,
                                iterations = boot.iter,
@@ -74,8 +75,7 @@ if (run_boot == TRUE){
 } 
 
 # Most robust ICA analysis
-elected_ncomp <- 7 
-#elected_ncomp <- 10
+elected_ncomp <- 7 # In this case 10 is also appropiate
 
 jade_result <- JADE(cyt_icaready, n.comp = elected_ncomp)
 colnames(jade_result[["A"]]) <- paste("IC", 1:elected_ncomp, sep = ".")
@@ -113,7 +113,6 @@ Plot_general_TFs(tumour_tf, "TF_tumor_vs_cyt_ICA", 25, complete_annotation)
 Plot_general_TFs(stroma_tf, "TF_stroma_vs_cyt_ICA", 25, complete_annotation)
 PlotBestCorr(complete_annotation, tumour_tf, 10, "best_TF_tumor_vs_cyt")
 PlotBestCorr(complete_annotation, stroma_tf, 10, "best_TF_stroma_vs_cyt")
-
 
 # Gene weight analysis
 ## translate to gene names
