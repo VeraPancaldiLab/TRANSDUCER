@@ -246,6 +246,20 @@ plot_sample_weights <- function(A_mat, annotations, cont_names, analysis_name){
   dev.off()
 }
 
+dfs_corrplot <- function(df_x, df_y, cmap = c("#7D0E29", "white", "#004376")) {
+  
+  stopifnot(rownames(df_x)==rownames(df_y))
+  joint_df <- df_y %>% bind_cols(df_x)
+  
+  df_corr <- rcorr(data.matrix(joint_df), type = "spearman")
+  df_corr$r <- df_corr$r[colnames(df_x), colnames(df_y)]
+  df_corr$P <- df_corr$P[colnames(df_x), colnames(df_y)]
+  
+  ggcorrplot(df_corr$r, p.mat = df_corr$P, insig = "pch", ggtheme = ggplot2::theme_minimal,
+             colors = cmap, sig.level = 0.05, pch.col = "white")
+}
+
+
 Plot_deconv <- function(deconv, complete_annotation, analysis_name){
   # Heatmap
   deconv %>% t() %>%

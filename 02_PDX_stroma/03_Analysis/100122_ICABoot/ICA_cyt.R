@@ -90,6 +90,22 @@ stopifnot(rownames(A_mat) == rownames(annotations))
 annotations %>% dplyr::select(!Diabetes) %>%
   names() -> cont_names
 
+## QC and alignment info
+multiqc <- read_tsv("../../00_Data/Processed_data/multiQC_summary.tsv") %>%
+  dplyr::filter(CITID %in% names(cyt)[-1], Fraction == "Cytosolic") %>%
+  dplyr::select(-c(fastq_name, Fraction)) %>% 
+  column_to_rownames("CITID")
+
+dfs_corrplot(A_mat, multiqc, cmap = c("black", "white", "black"))
+
+seq_info <- read_tsv("../../00_Data/Processed_data/sequencing_info.tsv") %>%
+  dplyr::filter(CITID %in% names(cyt)[-1], Fraction == "Cytosolic") %>%
+  mutate(input2maped_length_diff = Average_input_read_length - Average_mapped_length) %>%
+  dplyr::select(-c(fastq_id, Fraction, Average_input_read_length, Average_mapped_length)) %>% 
+  column_to_rownames("CITID")
+
+dfs_corrplot(A_mat, seq_info, cmap = c("black", "white", "black"))
+
 ## plot
 plot_sample_weights(A_mat, annotations, cont_names, "sampleweights_cyt")
 
