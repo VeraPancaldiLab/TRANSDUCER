@@ -8,10 +8,11 @@ library(pheatmap)
 library(msigdbr)
 library(GSVA)
 library(ggplotify)
+library(ggpubr)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
-run_boot <- TRUE
+run_boot <- FALSE
 range.comp <- 2:15 # when ncomp is =< df Warning: In sqrt(puiss[rangeW]) : NaNs produced
 boot.iter <- 500
 
@@ -96,7 +97,119 @@ plot_sample_weights(A_mat, annotations, cont_names, "sampleweights_TEs")
 ## Export for further correlations
 stopifnot(rownames(A_mat) == rownames(annotations))
 bind_cols(A_mat, annotations[,c("ICA3", "PAMG")]) %>%
-  rename(SerDep = ICA3) -> complete_annotation
+  dplyr::rename(ISRact = ICA3) -> complete_annotation
+
+## QC and alignment info
+multiqc <- read_tsv("../../00_Data/Processed_data/multiQC_summary.tsv") %>%
+  dplyr::filter(CITID %in% names(TEs)[-1])
+
+
+seq_info <- read_tsv("../../00_Data/Processed_data/sequencing_info.tsv") %>%
+  dplyr::filter(CITID %in% names(TEs)[-1])
+
+## Cyt read info
+multiqc_cyt <- dplyr::filter(multiqc, Fraction == "Cytosolic") %>%
+  dplyr::select(-c(fastq_name, Fraction))
+
+multiqc_cyt_corr <- A_mat %>% 
+  as_tibble(rownames = "CITID") %>%
+  inner_join(multiqc_cyt) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% names(multiqc_cyt), measure2 %in% names(A_mat)) %>% #not square corr
+  mutate(r = abs(r)) %>% #abscorr
+  ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICATEs ~ multiqc",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(0,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0)) +
+  scale_y_discrete(expand=c(0,0)) + 
+  ggpubr::rotate_x_text(angle = 90)
+
+
+seq_info_cyt <- dplyr::filter(seq_info, Fraction == "Cytosolic") %>%
+  mutate(input2maped_length_diff = Average_input_read_length - Average_mapped_length) %>%
+  dplyr::select(-c(fastq_id, Fraction, Average_input_read_length, Average_mapped_length))
+
+star_cyt_corr <- A_mat %>% 
+  as_tibble(rownames = "CITID") %>%
+  inner_join(seq_info_cyt) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% names(seq_info_cyt), measure2 %in% names(A_mat)) %>% #not square corr
+  mutate(r = abs(r)) %>% #abscorr
+  ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICATEs ~ STAR metadata",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(0,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0)) +
+  scale_y_discrete(expand=c(0,0)) + 
+  ggpubr::rotate_x_text(angle = 90)
+
+techi_plots_cyt <- ggarrange(multiqc_cyt_corr, star_cyt_corr, align = "h", common.legend = T, legend = "right")
+
+## Polysome (F8-9) read info
+multiqc_pol <- dplyr::filter(multiqc, Fraction == "Polysome") %>%
+  dplyr::select(-c(fastq_name, Fraction))
+
+multiqc_pol_corr <- A_mat %>% 
+  as_tibble(rownames = "CITID") %>%
+  inner_join(multiqc_pol) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% names(multiqc_pol), measure2 %in% names(A_mat)) %>% #not square corr
+  mutate(r = abs(r)) %>% #abscorr
+  ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICATEs ~ multiqc",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(0,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0)) +
+  scale_y_discrete(expand=c(0,0)) + 
+  ggpubr::rotate_x_text(angle = 90)
+
+seq_info_pol <- dplyr::filter(seq_info, Fraction == "Polysome") %>%
+  mutate(input2maped_length_diff = Average_input_read_length - Average_mapped_length) %>%
+  dplyr::select(-c(fastq_id, Fraction, Average_input_read_length, Average_mapped_length))
+
+star_pol_corr <- A_mat %>% 
+  as_tibble(rownames = "CITID") %>%
+  inner_join(seq_info_pol) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% names(seq_info_pol), measure2 %in% names(A_mat)) %>% #not square corr
+  mutate(r = abs(r)) %>% #abscorr
+  ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICATEs ~ STAR metadata",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(0,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0)) +
+  scale_y_discrete(expand=c(0,0)) + 
+  ggpubr::rotate_x_text(angle = 90)
+
+techi_plots_pol <- ggarrange(multiqc_pol_corr, star_pol_corr, align = "h", common.legend = T, legend = "right")
+
+## Export
+techi_plots <- ggarrange(techi_plots_cyt, techi_plots_pol,
+                         labels = c("Cytosolic", "Polysome"),
+                         font.label = list(face = "bold", color = "black", size = 20),
+                         vjust=-1,  nrow = 2, align = "v")
+
+annotate_figure(techi_plots,
+                top = text_grob("", size = 40))
+
+ggsave("02_Output/techdata_corr_TEs.pdf", dpi = "print", width = 210, height = 300, units = "mm", scale = 1.25)
 
 ## RNAseq celltype deconvolution
 mMCPcounter_res <-  read_tsv("../180122_Various/02_Output/mMCPcounter_results.tsv") %>% column_to_rownames("cell_types") %>% t() %>% as_tibble(rownames = "samples") %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
@@ -139,7 +252,6 @@ for (comp in colnames(S_mat)){
     dplyr::filter(the_rank < 25 | the_rank > (nrow(gsvaRes)-25)) %>% arrange(the_rank) %>%
     dplyr::select(!c(the_rank)) -> gsvaTop
   
-  
   gsvaTop %>% pheatmap(filename = paste("02_Output/gsva_TEs", comp, ".pdf", sep=""), height = 10 , width = 15,
                        cluster_rows = F, main = paste(comp, "\n Best gene sets")) # to have a pheatmap
   # gsvaTop  %>% rownames() %>% msigdb_descriptions[.,] %>% 
@@ -149,6 +261,7 @@ for (comp in colnames(S_mat)){
 
 concat_pdf <- c("TEs_bootstrapICA_lineplot.pdf",
                 "TEs_bootstrapICA_boxplot.pdf",
+                "techdata_corr_TEs.pdf",
                 "sampleweights_TEs.pdf",
                 "ImmuCC_TEs.pdf",
                 "mMCPcounter_TEs.pdf",

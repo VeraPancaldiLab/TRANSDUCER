@@ -8,6 +8,7 @@ library(pheatmap)
 library(msigdbr)
 library(GSVA)
 library(ggplotify)
+library(ggpubr)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
@@ -96,7 +97,58 @@ plot_sample_weights(A_mat, annotations, cont_names, "sampleweights_pol")
 ## Export for further correlations
 stopifnot(rownames(A_mat) == rownames(annotations))
 bind_cols(A_mat, annotations[,c("ICA3", "PAMG")]) %>%
-  rename(SerDep = ICA3) -> complete_annotation
+  dplyr::rename(ISRact = ICA3) -> complete_annotation
+
+## QC and alignment info
+multiqc <- read_tsv("../../00_Data/Processed_data/multiQC_summary.tsv") %>%
+  dplyr::filter(CITID %in% names(pol)[-1], Fraction == "Polysome") %>%
+  dplyr::select(-c(fastq_name, Fraction))
+
+multiqc_corr <- A_mat %>% 
+  as_tibble(rownames = "CITID") %>%
+  inner_join(multiqc) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% names(multiqc), measure2 %in% names(A_mat)) %>% #not square corr
+  mutate(r = abs(r)) %>% #abscorr
+  ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICApol ~ multiqc",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(0,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0)) +
+  scale_y_discrete(expand=c(0,0)) + 
+  ggpubr::rotate_x_text(angle = 90)
+
+
+seq_info <- read_tsv("../../00_Data/Processed_data/sequencing_info.tsv") %>%
+  dplyr::filter(CITID %in% names(pol)[-1], Fraction == "Polysome") %>%
+  mutate(input2maped_length_diff = Average_input_read_length - Average_mapped_length) %>%
+  dplyr::select(-c(fastq_id, Fraction, Average_input_read_length, Average_mapped_length))
+
+star_corr <- A_mat %>% 
+  as_tibble(rownames = "CITID") %>%
+  inner_join(seq_info) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% names(seq_info), measure2 %in% names(A_mat)) %>% #not square corr
+  mutate(r = abs(r)) %>% #abscorr
+  ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICApol ~ STAR metadata",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(0,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0)) +
+  scale_y_discrete(expand=c(0,0)) + 
+  ggpubr::rotate_x_text(angle = 90)
+
+techi_plots <- ggarrange(multiqc_corr, star_corr, align = "h", common.legend = T, legend = "right")
+annotate_figure(techi_plots, top = text_grob("Polysome info",face = "bold", color = "black", size = 20))
+ggsave("02_Output/techdata_corr_pol.pdf", dpi = "print", width = 210, height = 150, units = "mm", scale = 1.25)
 
 ## RNAseq celltype deconvolution
 mMCPcounter_res <-  read_tsv("../180122_Various/02_Output/mMCPcounter_results.tsv") %>% column_to_rownames("cell_types") %>% t() %>% as_tibble(rownames = "samples") %>% column_to_rownames("samples") %>% .[rownames(A_mat),]
@@ -149,6 +201,7 @@ for (comp in colnames(S_mat)){
 
 concat_pdf <- c("Pol_bootstrapICA_lineplot.pdf",
                 "Pol_bootstrapICA_boxplot.pdf",
+                "techdata_corr_pol.pdf",
                 "sampleweights_pol.pdf",
                 "ImmuCC_pol.pdf",
                 "mMCPcounter_pol.pdf",
