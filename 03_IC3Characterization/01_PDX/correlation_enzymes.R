@@ -2,26 +2,29 @@ library(tidyverse)
 library(reshape2)
 library(Hmisc)
 library(corrplot)
+################################################################################
+setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/01_PDX/")
+# Load data
+load("Remy_processed_data/all_RNA/Tumeur/Hcpmallrna.RData") # the same as Alexia confirmed as the normalized one 
+Hcpmallrna %>% as_tibble(rownames = "EnsemblID") %>%
+  column_to_rownames("EnsemblID") -> allrna
 
-setwd("/home/jacobo/Documents/sauyeun_paper")
+load("TranslatomeDataForShiny.RData") # shiny app data (Tumour residuals included)
+resi %>% as_tibble(rownames = "EnsemblID") %>%
+  column_to_rownames("EnsemblID") -> TEs
 
-load("data/all_RNA/Tumeur/Hcpmallrna.RData") # the same as Alexia confirmed as the normalized one 
-allrna <- as.data.frame(Hcpmallrna)
+read_tsv("Remy_processed_data/samplesIC3_custom.csv") %>%
+  dplyr::select(CITID,ICA3SampleWeight) %>% dplyr::rename(SerDep = ICA3SampleWeight) %>%
+  column_to_rownames("CITID") -> ic3
 
-
-
-ic3 <- read_csv2("data/samplesIC3.csv")
-ic3 <- as.data.frame(ic3)
-row.names(ic3) <- ic3$CITID
-ic3 <- ic3["ICA3SampleWeight"]
-colnames(ic3) <- c("IC3 weight")
-
+# select the names of the genes to check
 enzymes <- c("ENSG00000092621", "ENSG00000160200", "ENSG00000135069") # PHGDH, CBS, PSAT1
 enzymes_l <- c("PHGDH", "CBS", "PSAT1")
 names(enzymes) <- enzymes_l
 
 # Distribution check
 boxplot(allrna, xaxt = "n")
+boxplot(TEs, xaxt = "n")
 
 # Linearity check
 assay.data <- allrna[enzymes,]
@@ -47,7 +50,7 @@ corrplot(res_p$r, order="hclust",p.mat = res_p$P,
 # Binarization in ISR+ and ISR-
 bin.enzyme = "CBS"
 #-
-ic3_order <- order(ic3[,"IC3 weight"])
+ic3_order <- order(ic3[,"SerDep"])
 ic3_plus <- tail(rownames(ic3)[ic3_order],5)
 ic3_minus <- head(rownames(ic3)[ic3_order],5)
 
@@ -73,12 +76,12 @@ t.test(CBS ~ ISR, data = bin.data)
 
 # The PHGDH correlation outlier
 ## zoom in PHGDH to find PDAC024T as the outlier
-scatter.smooth(assay.data$`IC3 weight`, assay.data$PHGDH)
-text(assay.data$`IC3 weight`, assay.data$PHGDH, labels=rownames(assay.data), cex=0.9, font=2)
+scatter.smooth(assay.data$SerDep, assay.data$PHGDH)
+text(assay.data$SerDep, assay.data$PHGDH, labels=rownames(assay.data), cex=0.9, font=2)
 
 assay.no024T <- assay.data[row.names(assay.data)!=c("PDAC024T"),]
-scatter.smooth(assay.no024T$`IC3 weight`, assay.no024T$PHGDH)
-text(assay.no024T$`IC3 weight`, assay.no024T$PHGDH, labels=rownames(assay.no024T), cex=0.9, font=2)
+scatter.smooth(assay.no024T$SerDep, assay.no024T$PHGDH)
+text(assay.no024T$SerDep, assay.no024T$PHGDH, labels=rownames(assay.no024T), cex=0.9, font=2)
 
 ## correlation
 resno024T_s <- rcorr(as.matrix(assay.no024T), type = "spearman")
