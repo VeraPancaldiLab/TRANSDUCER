@@ -81,6 +81,7 @@ elected_ncomp <- 9
 jade_result <- JADE(TEs_icaready, n.comp = elected_ncomp)
 colnames(jade_result[["A"]]) <- paste("IC", 1:elected_ncomp, sep = ".")
 rownames(jade_result[["A"]]) <- names(jade_result$Xmu)
+write_rds(jade_result, "02_Output/ICA_TEs.RDS")
 
 # Sample weight analysis
 ## Metadata

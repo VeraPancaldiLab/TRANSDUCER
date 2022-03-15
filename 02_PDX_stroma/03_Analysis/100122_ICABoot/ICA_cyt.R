@@ -81,6 +81,7 @@ elected_ncomp <- 7 # In this case 10 is also appropiate
 jade_result <- JADE(cyt_icaready, n.comp = elected_ncomp)
 colnames(jade_result[["A"]]) <- paste("IC", 1:elected_ncomp, sep = ".")
 rownames(jade_result[["A"]]) <- names(jade_result$Xmu)
+write_rds(jade_result, "02_Output/ICA_cyt.RDS")
 
 # Sample weight analysis
 ## Metadata
