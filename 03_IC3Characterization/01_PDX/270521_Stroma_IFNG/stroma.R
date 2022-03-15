@@ -198,3 +198,35 @@ stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
 
 ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Cd274, label = rownames(gene_plots))) + geom_point() + 
   geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+#### CD73 AKA NT5E (immunomodulator)
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Nt5e, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Nt5e, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+
+
+### NSG vs Nude
+#### Il2rg expression
+stopifnot(colnames(Mcpmallrna_genenames) == rownames(mcp_plots))
+micetype_plots <- cbind(t(Mcpmallrna_genenames), as.data.frame(mcp_plots))
+micetype_plots <- micetype_plots[,!duplicated(colnames(micetype_plots))]
+
+##### vs ICA3
+micetype_plots.cor <-rcorr(micetype_plots$ICA3SampleWeight, micetype_plots$Il2rg, type = "spearman")
+stats <- paste("Spearman: R = ", round(micetype_plots.cor$r["x","y"], 2),
+               ", pval = ", round(micetype_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(micetype_plots, aes(x=ICA3SampleWeight, y=Il2rg, label = rownames(micetype_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+##### vs T Cells
+micetype_plots.cor <-rcorr(micetype_plots$`T cells`, micetype_plots$Il2rg, type = "spearman")
+stats <- paste("Spearman: R = ", round(micetype_plots.cor$r["x","y"], 2),
+               ", pval = ", round(micetype_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(micetype_plots, aes(x=`T cells`, y=Il2rg, label = rownames(micetype_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
