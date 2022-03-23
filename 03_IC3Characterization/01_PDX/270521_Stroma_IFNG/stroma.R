@@ -239,3 +239,12 @@ stats <- paste("Spearman: R = ", round(micetype_plots.cor$r["x","y"], 2),
 
 ggplot(micetype_plots, aes(x=ICA3SampleWeight, y=Foxn1, label = rownames(micetype_plots))) + geom_point() + 
   geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+#### Prkdc
+##### vs ICA3
+micetype_plots.cor <-rcorr(micetype_plots$ICA3SampleWeight, micetype_plots$Prkdc, type = "spearman")
+stats <- paste("Spearman: R = ", round(micetype_plots.cor$r["x","y"], 2),
+               ", pval = ", round(micetype_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(micetype_plots, aes(x=ICA3SampleWeight, y=Prkdc, label = rownames(micetype_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
