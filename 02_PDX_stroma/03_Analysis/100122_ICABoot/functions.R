@@ -21,7 +21,7 @@ jade_range <- function(df, range.comp, MARGIN) {
         return(NA)
       }
     )
-    if (jade_result[1] %>% is.na()) {
+    if (jade_result[[1]] %>% is.na() %>% all()) {
       next
     }
 
