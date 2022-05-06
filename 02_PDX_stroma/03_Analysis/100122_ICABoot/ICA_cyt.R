@@ -2,7 +2,7 @@
 library(tidyverse)
 library(biomaRt)
 library(JADE)
-library(corrplot)
+#library(corrplot)
 library(Hmisc)
 library(pheatmap)
 library(msigdbr)
@@ -15,6 +15,7 @@ source("functions.R")
 run_boot <- FALSE
 range.comp <- 2:15 # when ncomp is =< df Warning: In sqrt(puiss[rangeW]) : NaNs produced
 boot.iter <- 500
+boot.perc <- 0.95
 
 # load cyt data
 cyt <- read_tsv("../../00_Data/Processed_data/normHost_Cyt.tsv")
@@ -63,20 +64,22 @@ if (run_boot == TRUE){
   gene_boot <- jade_choosencom(cyt_icaready, base_res_gene,
                                MARGIN = 1,
                                iterations = boot.iter,
-                               seed = 0
+                               seed = 0,
+                               perc = boot.perc
   )
   
   sample_boot <- jade_choosencom(cyt_icaready, base_res_sample,
                                  MARGIN = 2,
                                  iterations = boot.iter,
-                                 seed = 0
+                                 seed = 0,
+                                 perc = boot.perc
   )
   
   boot_plots(s_boot = sample_boot, g_boot = gene_boot, name = "Cyt")
 } 
 
 # Most robust ICA analysis
-elected_ncomp <- 7 # In this case 10 is also appropiate
+elected_ncomp <- 6 # 4 if looking at distribution, 6 for standar, like in tumour way
 
 jade_result <- JADE(cyt_icaready, n.comp = elected_ncomp)
 colnames(jade_result[["A"]]) <- paste("IC", 1:elected_ncomp, sep = ".")
@@ -93,7 +96,7 @@ annotations %>% dplyr::select(!Diabetes) %>%
   names() -> cont_names
 
 ## plot
-plot_sample_weights(A_mat, annotations, cont_names, "sampleweights_cyt")
+plot_sample_weights(A_mat = A_mat, annotations = annotations, cont_names = cont_names, analysis_name = "sampleweights_cyt")
 
 ## Export for further correlations
 stopifnot(rownames(A_mat) == rownames(annotations))
@@ -105,7 +108,7 @@ multiqc <- read_tsv("../../00_Data/Processed_data/multiQC_summary.tsv") %>%
   dplyr::filter(CITID %in% names(cyt)[-1], Fraction == "Cytosolic") %>%
   dplyr::select(-c(fastq_name, Fraction))
 
-multiqc_corr <- A_mat %>% 
+multiqc_corr <- A_mat %>%
   as_tibble(rownames = "CITID") %>%
   inner_join(multiqc) %>%
   column_to_rownames("CITID") %>%
@@ -120,7 +123,7 @@ multiqc_corr <- A_mat %>%
   geom_text() +
   theme_classic() +
   scale_x_discrete(expand=c(0,0)) +
-  scale_y_discrete(expand=c(0,0)) + 
+  scale_y_discrete(expand=c(0,0)) +
   ggpubr::rotate_x_text(angle = 90)
 
 
@@ -129,7 +132,7 @@ seq_info <- read_tsv("../../00_Data/Processed_data/sequencing_info.tsv") %>%
   mutate(input2maped_length_diff = Average_input_read_length - Average_mapped_length) %>%
   dplyr::select(-c(fastq_id, Fraction, Average_input_read_length, Average_mapped_length))
 
-star_corr <- A_mat %>% 
+star_corr <- A_mat %>%
   as_tibble(rownames = "CITID") %>%
   inner_join(seq_info) %>%
   column_to_rownames("CITID") %>%
@@ -144,7 +147,7 @@ star_corr <- A_mat %>%
   geom_text() +
   theme_classic() +
   scale_x_discrete(expand=c(0,0)) +
-  scale_y_discrete(expand=c(0,0)) + 
+  scale_y_discrete(expand=c(0,0)) +
   ggpubr::rotate_x_text(angle = 90)
 
 techi_plots <- ggarrange(multiqc_corr, star_corr, align = "h", common.legend = T, legend = "right")
@@ -187,15 +190,15 @@ gsvaRes <- gsva(data.matrix(S_mat), msigdbr_list, min.sz = 15)
 ### Plot
 for (comp in colnames(S_mat)){
   gsvaRes[order(gsvaRes[,comp]),]
-  
-  gsvaRes %>% as.data.frame() %>%  mutate(the_rank = rank(-get(comp), ties.method = "random")) %>% 
+
+  gsvaRes %>% as.data.frame() %>%  mutate(the_rank = rank(-get(comp), ties.method = "random")) %>%
     dplyr::filter(the_rank < 25 | the_rank > (nrow(gsvaRes)-25)) %>% arrange(the_rank) %>%
     dplyr::select(!c(the_rank)) -> gsvaTop
-  
-  
+
+
   gsvaTop %>% pheatmap(filename = paste("02_Output/gsva_cyt", comp, ".pdf", sep=""), height = 10 , width = 15,
                        cluster_rows = F, main = paste(comp, "\n Best gene sets")) # to have a pheatmap
-  # gsvaTop  %>% rownames() %>% msigdb_descriptions[.,] %>% 
+  # gsvaTop  %>% rownames() %>% msigdb_descriptions[.,] %>%
   #   cbind(gsvaTop[comp], .) %>% rownames_to_column("msigdb") %>% write_tsv("02_Output/gsvaRes_IC11nc13.tsv") #to write
 }
 

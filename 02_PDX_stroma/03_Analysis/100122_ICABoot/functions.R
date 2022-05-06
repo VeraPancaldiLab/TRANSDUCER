@@ -3,7 +3,7 @@ library(tidyverse)
 library(reshape2)
 library(ggpubr)
 library(scico)
-library(ggcorrplot)
+#library(ggcorrplot)
 
 ### Performn JADE ICA to get a list
 ###  of S or A matrices of a range of components
@@ -77,7 +77,8 @@ jade_choosencom <- function(df,
                             base_res = base_res,
                             MARGIN = 1,
                             iterations = 1,
-                            seed = 0) {
+                            seed = 0,
+                            perc = 0.9) {
   range.comp <- as.numeric(gsub("nc", "", names(base_res)))
   set.seed(seed)
   listof_correlations <- list()
@@ -85,7 +86,7 @@ jade_choosencom <- function(df,
 
   for (i in 1:iterations) {
     # loop through iterations
-    df <- bootstrap_df(df, MARGIN = MARGIN)
+    df <- bootstrap_df(df, MARGIN = MARGIN, perc = perc)
     res <- jade_range(df, range.comp, MARGIN)
     correlations_id <- list()
 
@@ -158,7 +159,7 @@ boot_plots <- function(s_boot, g_boot, line_stat = "mean", name = "analysis"){
     geom_boxplot(width = 0.5) +
     #scale_x_discrete(limits = paste("nc", range.comp, sep = "")) +
     labs(y = "absolute pearson correlation", x = "number of components") +
-    coord_cartesian(ylim = c(0.8, 1)) +
+    #coord_cartesian(ylim = c(0.8, 1)) +
     theme_bw()
   ggsave(paste(plot_title, "boxplot.pdf", sep = "_"), height = 10, width = 12)
   
@@ -198,15 +199,24 @@ plot_sample_weights <- function(A_mat, annotations, cont_names, analysis_name){
   pdf(file=paste("02_Output/", analysis_name, ".pdf", sep=""))
   
   # Correlation plot
-  corr_continuous <- annotations %>% dplyr::select(all_of(cont_names)) %>% bind_cols(A_mat)
-  corr_continuous <- corr_continuous[rownames(A_mat),] # merge mess with the order
+  corrplot <-annotations %>%
+    dplyr::select(all_of(cont_names)) %>%
+    bind_cols(A_mat) %>%
+    formatted_cors(cor.stat = "spearman") %>%
+    filter(measure1 %in% names(annotations), measure2 %in% names(A_mat)) %>% #not square corr
+    mutate(r = abs(r)) %>% #abscorr
+    ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+    geom_tile() +
+    labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations continuous vars",
+         subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+    scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(0,1)) +
+    geom_text() +
+    theme_classic() +
+    scale_x_discrete(expand=c(0,0)) +
+    scale_y_discrete(expand=c(0,0)) +
+    ggpubr::rotate_x_text(angle = 90)
   
-  continuous_rcorr <- rcorr(data.matrix(corr_continuous), type = "spearman")
-  continuous_rcorr$r <- continuous_rcorr$r[cont_names,colnames(A_mat)]
-  continuous_rcorr$P <- continuous_rcorr$P[cont_names,colnames(A_mat)]
-  
-  corrplot(continuous_rcorr$r, method = "color",
-           p.mat = continuous_rcorr$P, sig.level = 0.05, insig = "label_sig")
+  print(corrplot)
   
   # Sample weights
   for (ann in colnames(annotations)){
