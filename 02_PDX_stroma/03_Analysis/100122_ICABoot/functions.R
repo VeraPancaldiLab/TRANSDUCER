@@ -199,7 +199,7 @@ plot_sample_weights <- function(A_mat, annotations, cont_names, analysis_name){
   pdf(file=paste("02_Output/", analysis_name, ".pdf", sep=""))
   
   # Correlation plot
-  corrplot <-annotations %>%
+  corrplot <- annotations %>%
     dplyr::select(all_of(cont_names)) %>%
     bind_cols(A_mat) %>%
     formatted_cors(cor.stat = "spearman") %>%
@@ -301,6 +301,10 @@ dfs_corrplot <- function(df_x, df_y, abscorr = FALSE) {
 
 
 Plot_deconv <- function(deconv, complete_annotation, analysis_name){
+  # Formating possible blanks in colnames
+  deconv <- deconv %>%
+    rename_with(~str_replace_all(.," ", "."))
+  
   # Heatmap
   deconv %>% t() %>%
     pheatmap(scale = "row",
@@ -308,15 +312,22 @@ Plot_deconv <- function(deconv, complete_annotation, analysis_name){
   
   # Corplot
   stopifnot(rownames(complete_annotation)==rownames(deconv))
-  corr_decon <- deconv %>% bind_cols(complete_annotation)
-  corr_decon <- corr_decon[rownames(complete_annotation),] # merge mess with the order
+  decon_corrplot <- deconv %>%
+    bind_cols(complete_annotation) %>% 
+    formatted_cors(cor.stat = "spearman") %>%
+    filter(measure1 %in% names(complete_annotation), measure2 %in% names(deconv)) %>% #not square corr
+    #mutate(r = abs(r)) %>% #abscorr
+    ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+    geom_tile() +
+    labs(x = NULL, y = NULL, fill = "Spearman's\nCorrelation", title="",
+         subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+    scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+    geom_text() +
+    theme_classic() +
+    scale_x_discrete(expand=c(0,0)) +
+    scale_y_discrete(expand=c(0,0)) +
+    ggpubr::rotate_x_text(angle = 90)
   
-  corr_decon <- rcorr(data.matrix(corr_decon), type = "spearman")
-  corr_decon$r <- corr_decon$r[colnames(complete_annotation), colnames(deconv)]
-  corr_decon$P <- corr_decon$P[colnames(complete_annotation), colnames(deconv)]
-  
-  ggcorrplot(corr_decon$r, p.mat = corr_decon$P, insig = "blank", ggtheme = ggplot2::theme_minimal,
-             colors = c("#7D0E29", "white", "#004376"), sig.level = 0.05) -> decon_corrplot
   
   fig <- ggarrange(decon_corrplot + rremove("xylab"), decon_heatmap, widths = c(0.6,1),
                    labels = c("A", "B"),
