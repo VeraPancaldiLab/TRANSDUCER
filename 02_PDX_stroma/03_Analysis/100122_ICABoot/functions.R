@@ -381,15 +381,24 @@ Plot_general_TFs <- function(tf_activity, analysis_name, n_mostvar, complete_ann
   
   # Corplot
   stopifnot(rownames(complete_annotation)==colnames(mostvar_TF))
-  corr_TF <- mostvar_TF %>% t() %>% as_tibble() %>% bind_cols(complete_annotation)
-  corr_TF <- corr_TF[rownames(complete_annotation),] # merge mess with the order
+  mostvar_corrplot <- mostvar_TF %>%
+    t() %>%
+    as_tibble() %>%
+    bind_cols(complete_annotation) %>%
+    formatted_cors(cor.stat = "spearman") %>%
+    filter(measure1 %in% names(complete_annotation), measure2 %in% rownames(mostvar_TF)) %>% #not square corr
+    #mutate(r = abs(r)) %>% #abscorr
+    ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+    geom_tile() +
+    labs(x = NULL, y = NULL, fill = "Spearman's\nCorrelation", title="",
+         subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+    scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+    geom_text() +
+    theme_classic() +
+    scale_x_discrete(expand=c(0,0)) +
+    scale_y_discrete(expand=c(0,0)) +
+    ggpubr::rotate_x_text(angle = 90)
   
-  corr_TF <- rcorr(data.matrix(corr_TF), type = "spearman")
-  corr_TF$r <- corr_TF$r[colnames(complete_annotation), rownames(mostvar_TF)]
-  corr_TF$P <- corr_TF$P[colnames(complete_annotation), rownames(mostvar_TF)]
-  
-  ggcorrplot(corr_TF$r, p.mat = corr_TF$P, insig = "blank", ggtheme = ggplot2::theme_minimal,
-             colors = c("#7D0E29", "white", "#004376"), sig.level = 0.05) -> mostvar_corrplot
   
   fig <- ggarrange(mostvar_corrplot, mostvar_heatmap, widths = c(0.6,1),
                    labels = c("A", "B"),
