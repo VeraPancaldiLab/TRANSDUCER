@@ -3,6 +3,8 @@ library(tidyverse)
 library(reshape2)
 library(ggpubr)
 library(scico)
+library(ggVennDiagram)
+library(RCy3)
 #library(ggcorrplot)
 
 ### Performn JADE ICA to get a list
@@ -473,4 +475,28 @@ PlotGeneWeights <- function(S_mat, ensembl_toplot, n_genes, translate, complete_
     dev.off()
   }
 }
+
+# Generate a subnetwork of the s
+# based in the X% of most extreme gene weights of the valid_comps.
+
+PlotNetwork <- function(nodes, edges, S_mat, valid_comp, main_name){
+  thresholds <- apply(S_mat, 2, function(x) quantile(abs(x), 0.95))
+  bestgenes <- lapply(names(thresholds), function(x)
+    rownames(dplyr::filter(S_mat, abs(get(x)) > thresholds[x])))
+  names(bestgenes) <- names(thresholds)
+  ggVennDiagram(bestgenes, label = "count", label_alpha = 0) +
+    scale_fill_gradient(low="grey", high = "red",  trans = "log2")
+
+  is_bestgene <- lapply(names(bestgenes), function(x) nodes$id %in% bestgenes[[x]]) %>% 
+    as_tibble(.name_repair= "universal" ) %>% 
+    rename_all(~paste0("best_IC.",valid_comp)) %>%
+    mutate(best_any = rowSums(.), 
+           best_for = ifelse(best_any == 1, apply(., 1, function(x) colnames(.)[as.logical(x)][1]), ifelse(best_any == 0, 0, "many")))
+  
+  nodes_ <- bind_cols(nodes, is_bestgene)
+  network <- createNetworkFromDataFrames(nodes_, edges, title = main_name)
+  createColumnFilter(filter.name='best_IC_filter', column='best_any', 0, 'IS_NOT', network = network)
+  createSubnetwork(subnetwork.name = paste0(main_name,'_5%'))
+}
+
 

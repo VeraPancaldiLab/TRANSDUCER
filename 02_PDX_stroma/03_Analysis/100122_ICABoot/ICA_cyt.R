@@ -221,3 +221,34 @@ for (comp in 1:elected_ncomp){
 
 #system(paste(c("cd 02_Output/ \n pdfunite", concat_pdf, "ICA_cyt.pdf"), collapse = " "))
 system(paste(c("cd 02_Output/ \n convert", concat_pdf, "ICA_cyt.pdf"), collapse = " "))
+
+
+# Network analysis (BETA)
+MID <- read_csv("01_Input/MID2022.csv")
+
+ensembl <- useEnsembl(biomart = "genes", dataset = "mmusculus_gene_ensembl", version = 75)
+
+annot_ensembl <- getBM(attributes = c('ensembl_gene_id',
+                                      'external_gene_id',
+                                      'mgi_id'), mart = ensembl) %>%
+  dplyr::filter(mgi_id %in% unique(c(MID$gene1, MID$gene2))) %>% 
+  distinct(ensembl_gene_id, .keep_all = T)
+
+trans_mgi_ensembl <- deframe(annot_ensembl[c("mgi_id", "ensembl_gene_id")])
+trans_ensembl_name <- deframe(annot_ensembl[c("ensembl_gene_id", "external_gene_id")])
+
+nodes <- as_tibble(S_mat, rownames = "id") %>%
+  mutate(gene_name = trans_ensembl_name[id]) %>%
+  relocate(gene_name, .after = "id")
+
+edges <- mutate(MID,
+                gene1 = trans_mgi_ensembl[gene1],
+                gene2 = trans_mgi_ensembl[gene2]) %>%
+  dplyr::filter(gene1 %in% nodes$id, 
+                gene2 %in% nodes$id) %>%
+  dplyr::rename(source = gene1,
+                target = gene2,
+                interaction = type) %>%
+  dplyr::select(source, target, interaction)
+
+PlotNetwork(nodes, edges, S_mat,valid_comp = 1:6, main_name = "MID_ICA")
