@@ -32,6 +32,7 @@ ensembl75 <- useEnsembl(biomart = "genes",
 annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
                           'external_gene_id',
                           'entrezgene',
+                          'mgi_id',
                           'chromosome_name'), mart = ensembl75)
 
 # filtering
@@ -284,16 +285,8 @@ system(paste(c("cd 02_Output/ \n convert", concat_pdf, "ICA_TEs.pdf"), collapse 
 # Network analysis
 MID <- read_csv("01_Input/MID2022.csv")
 
-ensembl <- useEnsembl(biomart = "genes", dataset = "mmusculus_gene_ensembl", version = 75)
-
-annot_ensembl <- getBM(attributes = c('ensembl_gene_id',
-                                      'external_gene_id',
-                                      'mgi_id'), mart = ensembl) %>%
-  dplyr::filter(mgi_id %in% unique(c(MID$gene1, MID$gene2))) %>% 
-  distinct(ensembl_gene_id, .keep_all = T)
-
-trans_mgi_ensembl <- deframe(annot_ensembl[c("mgi_id", "ensembl_gene_id")])
-trans_ensembl_name <- deframe(annot_ensembl[c("ensembl_gene_id", "external_gene_id")])
+trans_mgi_ensembl <- deframe(annot_ensembl75[c("mgi_id", "ensembl_gene_id")])
+trans_ensembl_name <- deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
 
 nodes <- as_tibble(S_mat, rownames = "id") %>%
   mutate(gene_name = trans_ensembl_name[id]) %>%
