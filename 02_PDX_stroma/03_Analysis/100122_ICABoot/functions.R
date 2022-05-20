@@ -495,8 +495,10 @@ PlotNetwork <- function(nodes, edges, S_mat, valid_comp, main_name){
   
   nodes_ <- bind_cols(nodes, is_bestgene)
   network <- createNetworkFromDataFrames(nodes_, edges, title = main_name)
+  setNodeLabelMapping("gene_name")
   createColumnFilter(filter.name='best_IC_filter', column='best_any', 0, 'IS_NOT', network = network)
   createSubnetwork(subnetwork.name = paste0(main_name,'_5%'))
+  
 }
 
 

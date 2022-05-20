@@ -2,7 +2,6 @@
 library(tidyverse)
 library(biomaRt)
 library(JADE)
-#library(corrplot)
 library(Hmisc)
 library(pheatmap)
 library(msigdbr)
@@ -223,7 +222,7 @@ for (comp in 1:elected_ncomp){
 system(paste(c("cd 02_Output/ \n convert", concat_pdf, "ICA_cyt.pdf"), collapse = " "))
 
 
-# Network analysis (BETA)
+# Network analysis
 MID <- read_csv("01_Input/MID2022.csv")
 
 ensembl <- useEnsembl(biomart = "genes", dataset = "mmusculus_gene_ensembl", version = 75)
@@ -251,4 +250,4 @@ edges <- mutate(MID,
                 interaction = type) %>%
   dplyr::select(source, target, interaction)
 
-PlotNetwork(nodes, edges, S_mat,valid_comp = 1:6, main_name = "MID_ICA")
+PlotNetwork(nodes, edges, S_mat,valid_comp = 1:6, main_name = "MID_ICAcyt")
