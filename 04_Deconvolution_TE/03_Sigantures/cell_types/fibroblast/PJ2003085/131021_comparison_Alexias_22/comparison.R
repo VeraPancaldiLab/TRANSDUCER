@@ -1,13 +1,13 @@
 library(tidyverse)
 library(edgeR)
-library(Combat)
 library(sva)
 library(factoextra)
 library(pheatmap)
 library(org.Hs.eg.db)
 library(ggvenn) # devtools::install_github("yanlinlin82/ggvenn")
 library(RColorBrewer)
-
+library(msigdbr)
+library(GSVA)
 ################################################################################
 ################################PARAMETERS######################################
 joint = F # include the last set of CAFs sequenced asideAn innervated, vascularized and immunocompetent human skin model to study cutaneous neuroimmune interactions
@@ -187,7 +187,18 @@ dev.off()
 cafs.choose.sym %>% Get_mostvar(n = 50) %>% pheatmap(main=title_res,scale = "row",  cellwidth=15, cellheight=10, filename = "02_Output/plots/50_mostvar.png",
                                                    cluster_cols = T, cluster_rows = T, show_rownames = T, annotation_col = cafs.info[full_colanot])
 dev.off()
-## GSVA of stromal subtypes
+## GSVA 
+### General
+all_genesets <- msigdbr("human")
+reactome <- dplyr::filter(all_genesets, gs_subcat == "CP:REACTOME") %>% dplyr::mutate(gs_name = str_remove(gs_name,"REACTOME_")) %>% split(x = .$gene_symbol, f = .$gs_name)
+column_annot <- dplyr::select(cafs.info, passes, proliferation)
+
+gsvaRes <- gsva(cafs.choose.sym %>% data.matrix(), reactome, min.sz = 15) 
+gsvaRes %>% Get_mostvar(50) %>% pheatmap(main=title_res,  cellwidth=10, cellheight=10, annotation_col = cafs.info[c("proliferation", "passes", "Inmortalized", "tissue_origin")],
+                                         filename = "02_Output/plots/Reactomemostvar.png")
+
+
+### stromal subtypes
 #Elayada et al signatures
 if (signatures_magali == F){
   
@@ -197,7 +208,7 @@ if (signatures_magali == F){
   
   caf.labs <- c("myCAFsc", "iCAFsc") # this ones are newest and most reliable
 } else
-  # Magali richards signatures
+  #Magali richards signatures
   if (signatures_magali == T){
 
     pdac_signatures <- read_rds("01_Input/CellTypes_Markers_By_level.rds")
@@ -238,7 +249,6 @@ cafs.choose.sym[rownames(subtype_genes),] %>% pheatmap(main=title_res,  cellwidt
                                                        cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = F, annotation_col = cafs.info[caf.labs],
                                                        annotation_row = subtype_genes)
 dev.off()
-
 
 ## PCA analysis
 cafs.choose %>% prcomp() -> pca_res
