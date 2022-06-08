@@ -409,7 +409,7 @@ Plot_general_TFs <- function(tf_activity, analysis_name, n_mostvar, complete_ann
   pdf(paste("02_Output/TF_analysis_", analysis_name, ".pdf", sep=""), nrow(mostvar_TF)/2, ncol(mostvar_TF)/2)
   print(full_heatmap)
   print(annotate_figure(fig, top = text_grob(paste(analysis_name, "vs the most variable TF activities"), face = "bold", size = 20)))
-  dev.off()
+  graphics.off() 
 }
 
 
