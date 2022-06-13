@@ -196,7 +196,7 @@ for (comp in colnames(S_mat)){
     mutate(the_rank = rank(-get(comp), ties.method = "random"),
            gene_set = if_else(str_count(gene_set, "_") < 10, gene_set, signature_dict[gene_set]),
            gene_set = str_remove(gene_set, "REACTOME_"),
-           gene_set = fct_reorder(gene_set, the_rank)) %>%
+           gene_set = fct_reorder(gene_set, the_rank,.desc = T)) %>%
     pivot_longer(cols = -c(gene_set, the_rank), names_to = "component", values_to = "ES") %>% 
     dplyr::filter(the_rank < 25 | the_rank > (nrow(gsvaRes)-25)) %>% 
     mutate(component = if_else(component == comp, comp, "Other")) %>% 
@@ -204,7 +204,7 @@ for (comp in colnames(S_mat)){
 
   ggplot(gsvaTop, aes(x = ES, y = gene_set)) + 
     geom_point(aes(alpha = if_else(component == comp, 0.9, 0.3),
-                   color = if_else(ES > 0, "red", "blue"))) +
+                   color = if_else(ES > 0, "blue", "red"))) +
     theme_bw() +
     labs(title = comp, subtitle = "Best Reactome gene sets") +
     rremove("legend") +

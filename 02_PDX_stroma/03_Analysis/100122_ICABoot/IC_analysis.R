@@ -105,7 +105,7 @@ dplyr::select(Scomparison, ends_with(c("cyt", "pol"))) %>%
 # Reactome pathways cyt/pol vs. ICA.TEs
 all_genesets <- msigdbr("Mus musculus")
 reactome <- dplyr::filter(all_genesets, gs_subcat == "CP:REACTOME")
-column_annot <- dplyr::select(A_TEs, sample, IC.3.TEs, IC.4.TEs, IC.7.TEs) %>%
+column_annot <- dplyr::select(A_TEs, sample, IC.3.TEs, IC.4.TEs, IC.6.TEs) %>%
   inner_join(cancer_info, by = "sample") %>% column_to_rownames("sample")
 
 order_by <- arrange(column_annot, ISRact) %>% rownames()
@@ -118,7 +118,7 @@ ensembl_genesym <- dplyr::select(translation_initiation , c(ensembl_gene, gene_s
 dplyr::filter(cyt_m, EnsemblID %in% translation_initiation$ensembl_gene) %>%
   mutate(gene_symbol = ensembl_genesym[EnsemblID]) %>%
   dplyr::select(gene_symbol, A_cyt$sample) %>% 
-  relocate(gene_symbol, order_by) %>%
+  relocate(gene_symbol, all_of(order_by)) %>%
   column_to_rownames("gene_symbol") %>% 
   pheatmap(scale = "row", annotation_col = column_annot,
            cluster_cols = clust,

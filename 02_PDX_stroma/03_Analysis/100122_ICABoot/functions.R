@@ -206,7 +206,8 @@ plot_sample_weights <- function(A_mat, annotations, cont_names, analysis_name){
     bind_cols(A_mat) %>%
     formatted_cors(cor.stat = "spearman") %>%
     filter(measure1 %in% names(annotations), measure2 %in% names(A_mat)) %>% #not square corr
-    mutate(r = abs(r)) %>% #abscorr
+    mutate(r = abs(r), #abscorr
+           measure1 = fct_inorder(measure1)) %>% # column order as original
     ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
     geom_tile() +
     labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations continuous vars",
