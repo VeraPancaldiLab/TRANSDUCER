@@ -7,7 +7,7 @@ library(mMCPcounter)
 library(Hmisc)
 library(corrplot)
 library(ggrepel)
-setwd("/home/jacobo/Documents/03_Sauyeun_paper/01_PDX/270521_Stroma_IFNG/")
+setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/01_PDX/270521_Stroma_IFNG/")
 
 # Data loading
 ## Expression data
@@ -25,10 +25,11 @@ Mcpmallrna %>% rownames(.) %>% translate[.] -> rownames(Mcpmallrna_genenames)
 Mcpmallrna_genenames <- Mcpmallrna_genenames[!is.na(rownames(Mcpmallrna_genenames)),]
 
 ## IC3 weights
-ic3 <- read_csv2("../Remy_processed_data/samplesIC3.csv") %>%
+ic3 <- read_tsv("../Remy_processed_data/samplesIC3_custom.csv") %>%
   as.data.frame(.) %>%
   column_to_rownames(., var = "CITID") %>%
-  .[colnames(Mcpmallrna),"ICA3SampleWeight", drop=FALSE]
+  .[colnames(Mcpmallrna),"ICA3SampleWeight", drop = FALSE]
+
 
 ic3
 
@@ -197,4 +198,84 @@ stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
                ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
 
 ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Cd274, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+
+#### TGFB
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Tgfb1, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Tgfb1, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Tgfb2, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Tgfb2, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Tgfb3, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Tgfb3, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+##### Il1
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Il1a, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Il1a, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Il1b, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Il1b, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+##### Col1
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Col1a1, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Col1a1, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Col1a2, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Col1a2, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+##### ACTA2 (alphaSMA)
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Acta2, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Acta2, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+
+##### SHMT
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Shmt1, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Shmt1, label = rownames(gene_plots))) + geom_point() + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
+gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Shmt2, type = "spearman")
+stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
+               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
+
+ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Shmt2, label = rownames(gene_plots))) + geom_point() + 
   geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
