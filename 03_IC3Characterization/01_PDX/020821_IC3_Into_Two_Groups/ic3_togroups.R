@@ -1,9 +1,9 @@
 # Package loading
 library(tidyverse)
 library(ggplot2)
-setwd("/home/jacobo/Documents/03_Sauyeun_paper/01_PDX/020821_IC3_Into_Two_Groups/")
+setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/01_PDX/020821_IC3_Into_Two_Groups/")
 
-group_type <- "4vs4noPDAC024T" #4vs4noPDAC024T | 5vs5
+group_type <- "5vs5" #4vs4noPDAC024T | 5vs5
 
 # MAIN
 ic3 <- read_tsv("../Remy_processed_data/samplesIC3_custom.csv") %>% mutate(as.double(ICA3SampleWeight)) %>%

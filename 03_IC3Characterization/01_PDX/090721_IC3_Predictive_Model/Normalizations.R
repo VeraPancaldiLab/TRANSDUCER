@@ -1,4 +1,4 @@
-setwd("~/Documents/03_Sauyeun_paper/01_PDX/090721_IC3_Predictive_Model/")
+setwd("~/Documents/02_TRANSDUCER/03_IC3Characterization/01_PDX/090721_IC3_Predictive_Model/")
 source("~/Documents/01_General_tools/00_Other_peoples/RNAseq/counts_to_tpm/counts_to_tpm.R")
 library(tidyverse)
 library(edgeR)
@@ -17,9 +17,9 @@ GRCh38_genelegths <- read_tsv("01_Input/GRCh38.genelengths") %>% column_to_rowna
 
 
 # Normalize
-## TPM
+## TPM (fix)
 sauyeun_tpm <- simple_tpm(sauyeun_rc, lengths = GRCh38_genelegths[rownames(sauyeun_rc), "mean", drop=F])
-sauyeun_tpm <- simple_tpm(sauyeun_rc, lengths = gene_lengths[rownames(sauyeun_rc), "mean"])
+pacaomics_tpm <- simple_tpm(pacaomics_rc, lengths = GRCh38_genelegths[rownames(pacaomics_rc), "mean"])
 
 ## TMM
 ### 
