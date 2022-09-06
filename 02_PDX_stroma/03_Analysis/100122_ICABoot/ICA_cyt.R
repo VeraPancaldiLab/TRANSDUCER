@@ -11,10 +11,20 @@ library(ggpubr)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
+
+# Parameters
+#-------------------------------------------------------------------------------
+## Bootstrap
 run_boot <- FALSE
 range.comp <- 2:15 # when ncomp is =< df Warning: In sqrt(puiss[rangeW]) : NaNs produced
 boot.iter <- 500
 boot.perc <- 0.95
+
+## Analysis
+elected_ncomp <- 6 # 4 if looking at distribution, 6 for standar, like in tumour way
+component_reorientation = TRUE
+reorient <- c(1, 1, 1, -1, 1, 1)
+#-------------------------------------------------------------------------------
 
 # load cyt data
 cyt <- read_tsv("../../00_Data/Processed_data/normHost_Cyt.tsv")
@@ -79,17 +89,22 @@ if (run_boot == TRUE){
 } 
 
 # Most robust ICA analysis
-elected_ncomp <- 6 # 4 if looking at distribution, 6 for standar, like in tumour way
-
 jade_result <- JADE(cyt_icaready, n.comp = elected_ncomp)
 colnames(jade_result[["A"]]) <- paste("IC", 1:elected_ncomp, sep = ".")
 rownames(jade_result[["A"]]) <- names(jade_result$Xmu)
-write_rds(jade_result, "02_Output/ICA_cyt.RDS")
+write_rds(jade_result, "02_Output/ICA_cyt.RDS") # never save a reoriented ICA analysis
+
+## component reorientation
+if (component_reorientation == TRUE){
+  stopifnot("vector of reorientation should have the same length as number of components" = length(reorient)==elected_ncomp)
+  jade_result[["A"]] <- t(t(jade_result[["A"]]) * reorient)
+  jade_result[["S"]] <- t(t(jade_result[["S"]]) * reorient)
+}
+A_mat <- as.data.frame(jade_result[["A"]])
+S_mat <- as.data.frame(jade_result[["S"]])
 
 # Sample weight analysis
 ## Metadata
-A_mat <- as.data.frame(jade_result[["A"]])
-S_mat <- as.data.frame(jade_result[["S"]])
 annotations <- sample_info[-1]
 stopifnot(rownames(A_mat) == rownames(annotations))
 annotations %>% dplyr::select(!Diabetes) %>%
