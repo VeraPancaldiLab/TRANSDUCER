@@ -371,3 +371,10 @@ stroma_tf_corrplot <- ggplot(stroma_tf_corr, aes(measure1, measure2, fill=r, lab
 
 ggsave(file="02_Output/Figures/stroma_tf_corrplot.svg", plot=stroma_tf_corrplot, width=10, height=6)
 
+#-------------------------------------------------------------------------------
+
+# FIGURE SPECIFIC PLOTS: all the correlation plots of above together
+#-------------------------------------------------------------------------------
+sampleweight_corrplots <- ggarrange(plotlist = list(clinical_technical_corrplot, deconvolution_corrplot, stroma_tf_corrplot), ncol = 3, common.legend = T, align = "h", widths = c(0.12, 0.4, 0.5), legend = "right")
+ggsave(file="02_Output/Figures/sampleweight_corrplots.svg", plot=sampleweight_corrplots, width=20, height=6)
+
