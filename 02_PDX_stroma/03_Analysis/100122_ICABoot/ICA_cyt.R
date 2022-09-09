@@ -304,7 +304,7 @@ clinical_technical_corrplot <- complete_annotation %>%
   ggpubr::rotate_x_text(angle = 90)
 
 ggsave(file="02_Output/Figures/clinical_technical_corrplot.svg", plot=clinical_technical_corrplot, width=4, height=6)
-
+sed -i "s/ textLength='[^']*'//" file.svg
 #-------------------------------------------------------------------------------
 
 # FIGURE SPECIFIC PLOTS: MCPCounter deconvolution
@@ -378,3 +378,85 @@ ggsave(file="02_Output/Figures/stroma_tf_corrplot.svg", plot=stroma_tf_corrplot,
 sampleweight_corrplots <- ggarrange(plotlist = list(clinical_technical_corrplot, deconvolution_corrplot, stroma_tf_corrplot), ncol = 3, common.legend = T, align = "h", widths = c(0.12, 0.4, 0.5), legend = "right")
 ggsave(file="02_Output/Figures/sampleweight_corrplots.svg", plot=sampleweight_corrplots, width=20, height=6)
 
+#-------------------------------------------------------------------------------
+
+# FIGURE SPECIFIC PLOTS: IC.4 Gene weights bottom and top genes
+#-------------------------------------------------------------------------------
+# Get best genes
+n_genes = 10
+S_mat %>% arrange(desc(IC.4)) -> S_sort
+S_sort %>% tail(10) -> IC4_mneg
+S_sort %>% head(10) -> IC4_mpos
+
+# Density plot
+S_mat %>% ggplot() +
+  aes_string(y = "IC.4") +
+  geom_density(alpha=.5, fill="lightgrey") +
+  scale_x_reverse() +
+  scale_y_continuous(expand = c(0,0))+
+  geom_hline(yintercept = 0, colour = "black") +
+  annotate("rect",xmin = -Inf, xmax = Inf,   ymin = min(IC4_mneg["IC.4"]), ymax = max(IC4_mneg["IC.4"]),   fill = "blue", alpha = 0.5) +
+  annotate("rect",xmin = -Inf, xmax = Inf,   ymin =  min(IC4_mpos["IC.4"]), ymax = max(IC4_mpos["IC.4"]),   fill = "red", alpha = 0.5) +
+  theme_classic() -> densplot
+
+# Heatmap
+## Annotation
+annot_row_ <- tibble(name = rownames(IC4_mpos), class = "most possitive")
+tibble(name = rownames(IC4_mneg), class = "most negative") %>% bind_rows(annot_row_) %>% column_to_rownames("name") -> annot_row__
+annot_row <- annot_row__
+rownames(annot_row) <- rownames(annot_row__) %>% translate[.] %>% make.names(unique = TRUE)
+  
+annot_col <- complete_annotation[c("PAMG", "ISRact", "IC.4")]
+
+annot_colors <- list(class = c(`most possitive` = "red", `most negative` = "blue"),
+                     PAMG = c("#FF7F00", "white", "#377DB8"),
+                     ISRact = c("#FFFFCC", "#006837"),
+                     IC.4 = c("#FFFFCC", "#5b0066")) 
+
+## Get gene names
+ensembl_toplot_ <- cyt %>% dplyr::filter(EnsemblID %in% c(rownames(IC4_mpos), rownames(IC4_mneg))) %>%
+  arrange(match(EnsemblID, c(rownames(IC4_mpos), rownames(IC4_mneg))))
+
+genes_toplot <- ensembl_toplot_
+genes_toplot$Genenames <- ensembl_toplot_$EnsemblID %>% translate[.] %>%
+  make.names(unique = TRUE)
+
+## Plot
+heatmap <- genes_toplot %>% dplyr::select(!EnsemblID) %>%
+  relocate(Genenames) %>% column_to_rownames("Genenames") %>% 
+  pheatmap(scale = "row", color = colorRampPalette(c("#0C6291", "#FBFEF9", "#A63446"))(100),
+           annotation_row = annot_row, annotation_col = annot_col, annotation_colors = annot_colors,
+           cluster_rows = F, show_colnames = TRUE) %>%
+  as.grob()
+
+# Export joint figure
+density_heatmap_IC4 <- ggarrange(densplot + rremove("xylab"), heatmap, heights = c(1.5, 10), widths = c(0.2,1),
+                                 ncol = 2, nrow = 1)
+
+ggsave(file="02_Output/Figures/density_heatmap_IC4.svg", plot=density_heatmap_IC4, width=10, height=6)
+
+#-------------------------------------------------------------------------------
+
+# FIGURE SPECIFIC PLOTS: IC.4 GSVA bottom and top genes
+#-------------------------------------------------------------------------------
+gsvaRes[order(gsvaRes[,"IC.4"]),]
+
+gsvaTop <- as_tibble(gsvaRes, rownames = "gene_set") %>% 
+  mutate(the_rank = rank(-IC.4, ties.method = "random"),
+         #gene_set = if_else(str_count(gene_set, "_") < 10, gene_set, signature_dict[gene_set]),
+         gene_set = str_remove(gene_set, "REACTOME_"),
+         gene_set = fct_reorder(gene_set, the_rank,.desc = T)) %>%
+  pivot_longer(cols = -c(gene_set, the_rank), names_to = "component", values_to = "ES") %>% 
+  dplyr::filter(the_rank < 15 | the_rank > (nrow(gsvaRes)-15)) %>% 
+  mutate(component = if_else(component == "IC.4", "IC.4", "Other")) %>% 
+  dplyr::select(!c(the_rank))
+
+gsva_IC4 <- ggplot(gsvaTop, aes(x = ES, y = gene_set)) + 
+  geom_point(aes(alpha = if_else(component == "IC.4", 0.9, 0.3),
+                 color = if_else(ES > 0, "blue", "red"))) +
+  theme_bw() +
+  labs(title = "IC.4", subtitle = "Best Reactome gene sets") +
+  rremove("legend") +
+  rremove("ylab")
+
+ggsave(file="02_Output/Figures/gsva_IC4.svg", plot=gsva_IC4, width=10, height=6)
