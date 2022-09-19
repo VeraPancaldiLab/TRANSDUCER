@@ -5,12 +5,22 @@ source("functions.R")
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 
-#Data loading
+# PARAMETERS
+#-------------------------------------------------------------------------------
+component_reorientation = TRUE
+reorient_cyt <- c(1, 1, 1, -1, 1, 1)
+#-------------------------------------------------------------------------------
 
+#Data loading
 ## ICs
 ICA_cyt <- read_rds("02_Output/ICA_cyt.RDS")
 ICA_pol <- read_rds("02_Output/ICA_pol.RDS")
 ICA_TEs <- read_rds("02_Output/ICA_TEs.RDS")
+
+if (component_reorientation == TRUE){
+  ICA_cyt[["A"]] <- t(t(ICA_cyt[["A"]]) * reorient_cyt)
+  ICA_cyt[["S"]] <- t(t(ICA_cyt[["S"]]) * reorient_cyt)
+}
 
 ## Norm_data
 cyt_m <- read_tsv("../../00_Data/Processed_data/normHost_Cyt.tsv")
@@ -167,3 +177,4 @@ dplyr::filter(cyt_m, EnsemblID %in% mtor$ensembl_gene) %>%
            cluster_cols = clust, 
            cluster_rows = T, fontsize = 5, 
            treeheight_col = 10, main = "MTOR signaling cyt vs ICA.TEs", cellheight = 5, filename = "02_Output/reactome_mTOR.png")
+
