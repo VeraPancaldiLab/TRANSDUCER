@@ -23,7 +23,9 @@ annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
                                         'mgi_id',
                                         'chromosome_name'), mart = ensembl75)
 
-translate = deframe(annot_ensembl75[c( "external_gene_id", "ensembl_gene_id")])
+gene_to_ensembl = deframe(annot_ensembl75[c( "external_gene_id", "ensembl_gene_id")])
+ensembl_to_gene = setNames(names(gene_to_ensembl), gene_to_ensembl)
+
 #Data loading
 ## ICs
 ICA_cyt <- read_rds("02_Output/ICA_cyt.RDS")
@@ -40,7 +42,7 @@ cyt_m <- read_tsv("../../00_Data/Processed_data/normHost_Cyt.tsv")
 pol_m <- read_tsv("../../00_Data/Processed_data/normHost_Pol.tsv")
 
 ## Metadata 
-cancer_info <- read_tsv("../../00_Data/Processed_data/sample_info.tsv") %>%
+annotations <- read_tsv("../../00_Data/Processed_data/sample_info.tsv") %>%
   dplyr::select(sample, PAMG, ICA1, ICA3) %>%
   dplyr::rename(ISRact = ICA3)
   
@@ -52,7 +54,7 @@ A_TEs <- as_tibble(ICA_TEs$A, rownames = "sample") %>% rename_with( ~paste0(.,".
 
 Acomparison <- inner_join(A_cyt, A_pol, by = "sample") %>%
   inner_join(A_TEs, by = "sample") %>%
-  inner_join(cancer_info, by = "sample") %>%
+  inner_join(annotations, by = "sample") %>%
   column_to_rownames("sample")
 
 ### cyt ~ pol
@@ -129,7 +131,7 @@ dplyr::select(Scomparison, ends_with(c("cyt", "pol"))) %>%
 all_genesets <- msigdbr("Mus musculus")
 reactome <- dplyr::filter(all_genesets, gs_subcat == "CP:REACTOME")
 column_annot <- dplyr::select(A_TEs, sample, IC.3.TEs, IC.4.TEs, IC.6.TEs) %>%
-  inner_join(cancer_info, by = "sample") %>% column_to_rownames("sample")
+  inner_join(annotations, by = "sample") %>% column_to_rownames("sample")
 
 order_by <- arrange(column_annot, ISRact) %>% rownames()
 clust = F
@@ -193,12 +195,13 @@ dplyr::filter(cyt_m, EnsemblID %in% mtor$ensembl_gene) %>%
 
 # CAF subtype markers
 ## Verginadis
+### gene weight check
 Verginadis <- read_tsv("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/01_Input/CAF_Verginadis_markers.tsv")
-S_cyt_CAFs <- dplyr::filter(S_cyt, EnsemblID %in%  translate[Verginadis$CAF])
-S_cyt_vCAFs <- dplyr::filter(S_cyt, EnsemblID %in%  translate[Verginadis$vCAF])
-S_cyt_mCAFs <- dplyr::filter(S_cyt, EnsemblID %in%  translate[Verginadis$mCAFs])
-S_cyt_cCAFs <- dplyr::filter(S_cyt, EnsemblID %in%  translate[Verginadis$cCAFs])
-S_cyt_melCAFs <- dplyr::filter(S_cyt, EnsemblID %in%  translate[Verginadis$melCAFs])
+S_cyt_CAFs <- dplyr::filter(S_cyt, EnsemblID %in% gene_to_ensembl[Verginadis$CAFs])
+S_cyt_vCAFs <- dplyr::filter(S_cyt, EnsemblID %in% gene_to_ensembl[Verginadis$vCAFs])
+S_cyt_mCAFs <- dplyr::filter(S_cyt, EnsemblID %in% gene_to_ensembl[Verginadis$mCAFs])
+S_cyt_cCAFs <- dplyr::filter(S_cyt, EnsemblID %in% gene_to_ensembl[Verginadis$cCAFs])
+S_cyt_melCAFs <- dplyr::filter(S_cyt, EnsemblID %in% gene_to_ensembl[Verginadis$melCAFs])
 
 
 ggplot(S_cyt) +
@@ -212,3 +215,4 @@ ggplot(S_cyt) +
   geom_rug(data = S_cyt_CAFs, aes(IC.4.cyt, color = "CAFs"), sides = "t") +
   coord_cartesian(clip = 'off') +
   theme_classic()
+
