@@ -216,3 +216,29 @@ ggplot(S_cyt) +
   coord_cartesian(clip = 'off') +
   theme_classic()
 
+### heatmap of gene expression
+annot_row <- pivot_longer(Verginadis,  cols = tidyselect::everything(), names_to = "signature", values_to = "genes") %>%
+  dplyr::filter(!is.na(genes)) %>%
+  dplyr::arrange(genes) %>%
+  mutate(value = 1) %>% 
+  pivot_wider(names_from = "signature", id_cols = "genes") %>%
+  replace(is.na(.), 0) %>% column_to_rownames("genes")
+
+annot_col <- inner_join(A_cyt, annotations, "sample") %>% 
+  dplyr::select(sample, PAMG, ISRact, IC.4.cyt) %>% column_to_rownames("sample")
+
+annot_colors <- list(PAMG = c("#FF7F00", "white", "#377DB8"),
+                     ISRact = c("#FFFFCC", "#006837"),
+                     IC.4.cyt = c("#FFFFCC", "#5b0066")) 
+
+stopifnot(names(cyt_m)[-1] == annot_col$sample)
+mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
+  dplyr::filter(Genenames %in% flatten_chr(Verginadis), !is.na(Genenames)) %>%
+  dplyr::select(!EnsemblID) %>%
+  relocate(Genenames) %>% column_to_rownames("Genenames") %>% 
+  pheatmap(scale = "row", color = colorRampPalette(c("#0C6291", "#FBFEF9", "#A63446"))(100),
+           annotation_row = annot_row,
+           annotation_col = annot_col,
+           annotation_colors = annot_colors,
+           cluster_rows = T, show_rownames = TRUE,
+           show_colnames= TRUE, main = "Stromal transcription of Verginadis et al. 2022 CAF markers")
