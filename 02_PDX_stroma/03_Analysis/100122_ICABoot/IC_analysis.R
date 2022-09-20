@@ -11,6 +11,19 @@ component_reorientation = TRUE
 reorient_cyt <- c(1, 1, 1, -1, 1, 1)
 #-------------------------------------------------------------------------------
 
+# load annotation with Biomart
+ensembl75 <- useEnsembl(biomart = "genes",
+                        dataset = "mmusculus_gene_ensembl",
+                        version = 75)
+
+#listAttributes(ensembl75, page="feature_page")
+annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_id',
+                                        'entrezgene',
+                                        'mgi_id',
+                                        'chromosome_name'), mart = ensembl75)
+
+translate = deframe(annot_ensembl75[c( "external_gene_id", "ensembl_gene_id")])
 #Data loading
 ## ICs
 ICA_cyt <- read_rds("02_Output/ICA_cyt.RDS")
@@ -178,3 +191,24 @@ dplyr::filter(cyt_m, EnsemblID %in% mtor$ensembl_gene) %>%
            cluster_rows = T, fontsize = 5, 
            treeheight_col = 10, main = "MTOR signaling cyt vs ICA.TEs", cellheight = 5, filename = "02_Output/reactome_mTOR.png")
 
+# CAF subtype markers
+## Verginadis
+Verginadis <- read_tsv("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/01_Input/CAF_Verginadis_markers.tsv")
+S_cyt_CAFs <- dplyr::filter(S_cyt, EnsemblID %in%  translate[Verginadis$CAF])
+S_cyt_vCAFs <- dplyr::filter(S_cyt, EnsemblID %in%  translate[Verginadis$vCAF])
+S_cyt_mCAFs <- dplyr::filter(S_cyt, EnsemblID %in%  translate[Verginadis$mCAFs])
+S_cyt_cCAFs <- dplyr::filter(S_cyt, EnsemblID %in%  translate[Verginadis$cCAFs])
+S_cyt_melCAFs <- dplyr::filter(S_cyt, EnsemblID %in%  translate[Verginadis$melCAFs])
+
+
+ggplot(S_cyt) +
+  aes_string("IC.4.cyt") +
+  geom_density() +
+  geom_vline(xintercept = 0) +
+  geom_rug(data = S_cyt_vCAFs, aes(IC.4.cyt, color = "vCAFs"), outside = T) +
+  geom_rug(data = S_cyt_mCAFs, aes(IC.4.cyt, color = "mCAFs")) +
+  geom_rug(data = S_cyt_cCAFs, aes(IC.4.cyt, color = "cCAFs")) +
+  geom_rug(data = S_cyt_melCAFs, aes(IC.4.cyt, color = "melCAFs"), outside = T) +
+  geom_rug(data = S_cyt_CAFs, aes(IC.4.cyt, color = "CAFs"), sides = "t") +
+  coord_cartesian(clip = 'off') +
+  theme_classic()
