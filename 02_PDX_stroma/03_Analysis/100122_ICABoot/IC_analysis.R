@@ -194,7 +194,54 @@ dplyr::filter(cyt_m, EnsemblID %in% mtor$ensembl_gene) %>%
            treeheight_col = 10, main = "MTOR signaling cyt vs ICA.TEs", cellheight = 5, filename = "02_Output/reactome_mTOR.png")
 
 # CAF subtype markers
-## Verginadis
+
+## Elayada et al 2019
+### gene weight check
+Elayada <- read_tsv("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/01_Input/CAF_Elayada_markers.tsv")
+S_cyt_iCAFs <- dplyr::filter(S_cyt, EnsemblID %in% gene_to_ensembl[Elayada$iCAFs])
+S_cyt_apCAFs <- dplyr::filter(S_cyt, EnsemblID %in% gene_to_ensembl[Elayada$apCAFs])
+S_cyt_myCAFs <- dplyr::filter(S_cyt, EnsemblID %in% gene_to_ensembl[Elayada$myCAFs])
+
+
+
+ggplot(S_cyt) +
+  aes_string("IC.4.cyt") +
+  geom_density() +
+  geom_vline(xintercept = 0) +
+  geom_rug(data = S_cyt_iCAFs, aes(IC.4.cyt, color = "iCAFs"), outside = T) +
+  geom_rug(data = S_cyt_apCAFs, aes(IC.4.cyt, color = "apCAFs")) +
+  geom_rug(data = S_cyt_myCAFs, aes(IC.4.cyt, color = "myCAFs"), sides = "t") +
+  coord_cartesian(clip = 'off') +
+  theme_classic()
+
+### heatmap of gene expression
+annot_row <- pivot_longer(Elayada,  cols = tidyselect::everything(), names_to = "signature", values_to = "genes") %>%
+  dplyr::filter(!is.na(genes)) %>%
+  dplyr::arrange(genes) %>%
+  mutate(value = 1) %>% 
+  pivot_wider(names_from = "signature", id_cols = "genes") %>%
+  replace(is.na(.), 0) %>% column_to_rownames("genes")
+
+annot_col <- inner_join(A_cyt, annotations, "sample") %>% 
+  dplyr::select(sample, PAMG, ISRact, IC.4.cyt) %>% column_to_rownames("sample")
+
+annot_colors <- list(PAMG = c("#FF7F00", "white", "#377DB8"),
+                     ISRact = c("#FFFFCC", "#006837"),
+                     IC.4.cyt = c("#FFFFCC", "#5b0066")) 
+
+stopifnot(names(cyt_m)[-1] == annot_col$sample)
+mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
+  dplyr::filter(Genenames %in% flatten_chr(Elayada), !is.na(Genenames)) %>%
+  dplyr::select(!EnsemblID) %>%
+  relocate(Genenames) %>% column_to_rownames("Genenames") %>% 
+  pheatmap(scale = "row", color = colorRampPalette(c("#0C6291", "#FBFEF9", "#A63446"))(100),
+           annotation_row = annot_row,
+           annotation_col = annot_col,
+           annotation_colors = annot_colors,
+           cluster_rows = T, show_rownames = TRUE,
+           show_colnames= FALSE, main = "Stromal transcription of Elayada et al. 2019 murine CAF markers")
+
+## Verginadis et al 2022
 ### gene weight check
 Verginadis <- read_tsv("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/01_Input/CAF_Verginadis_markers.tsv")
 S_cyt_CAFs <- dplyr::filter(S_cyt, EnsemblID %in% gene_to_ensembl[Verginadis$CAFs])
@@ -241,4 +288,4 @@ mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
            annotation_col = annot_col,
            annotation_colors = annot_colors,
            cluster_rows = T, show_rownames = TRUE,
-           show_colnames= TRUE, main = "Stromal transcription of Verginadis et al. 2022 CAF markers")
+           show_colnames= False, main = "Stromal transcription of Verginadis et al. 2022 murine CAF markers")
