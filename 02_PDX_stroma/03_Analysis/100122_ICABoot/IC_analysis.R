@@ -58,12 +58,12 @@ Acomparison <- inner_join(A_cyt, A_pol, by = "sample") %>%
   column_to_rownames("sample")
 
 ### cyt ~ pol
-dplyr::select(Acomparison, ends_with(c("cyt", "pol"))) %>%
+dplyr::select(Acomparison, ends_with(c("cyt", "pol", "ISRact", "PAMG"))) %>%
   formatted_cors(cor.stat = "pearson") %>%
-  dplyr::filter(str_detect(measure1, ".cyt"), str_detect(measure2, ".pol")) %>%
+  dplyr::filter(str_detect(measure1, ".pol", negate = TRUE), str_detect(measure2, ".cyt", negate = TRUE)) %>%
   ggplot(aes(measure2, measure1, fill=r, label=round(r_if_sig,2))) +
   geom_tile() +
-  labs(x = NULL, y = NULL, fill = "Pearson's\nCorrelation", title= "cyt vs pol", 
+  labs(x = NULL, y = NULL, fill = "Pearson's\nCorrelation", title= "Cytosolic vs Polysome", 
        subtitle="Only significant correlation coefficients shown (95% I.C.)") +
   scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
   geom_text() +
@@ -73,12 +73,12 @@ dplyr::select(Acomparison, ends_with(c("cyt", "pol"))) %>%
   rotate_x_text(angle = 45)
 
 ### cyt ~ TEs
-dplyr::select(Acomparison, ends_with(c("cyt", "TEs"))) %>%
+dplyr::select(Acomparison, ends_with(c("cyt", "TEs", "ISRact", "PAMG"))) %>%
     formatted_cors(cor.stat = "pearson") %>%
-  dplyr::filter(str_detect(measure1, ".cyt"), str_detect(measure2, ".TEs")) %>%
+  dplyr::filter(str_detect(measure1, ".TEs", negate = TRUE), str_detect(measure2, ".cyt", negate = TRUE)) %>%
   ggplot(aes(measure2, measure1, fill=r, label=round(r_if_sig,2))) +
   geom_tile() +
-  labs(x = NULL, y = NULL, fill = "Pearson's\nCorrelation", title= "cyt vs TEs", 
+  labs(x = NULL, y = NULL, fill = "Pearson's\nCorrelation", title= "Cytosolic vs Translation Efficacies", 
        subtitle="Only significant correlation coefficients shown (95% I.C.)") +
   scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
   geom_text() +
@@ -93,7 +93,7 @@ dplyr::select(Acomparison, ends_with(c("pol", "TEs"))) %>%
   dplyr::filter(str_detect(measure1, ".pol"), str_detect(measure2, ".TEs")) %>%
   ggplot(aes(measure2, measure1, fill=r, label=round(r_if_sig,2))) +
   geom_tile() +
-  labs(x = NULL, y = NULL, fill = "Pearson's\nCorrelation", title= "pol vs TEs", 
+  labs(x = NULL, y = NULL, fill = "Pearson's\nCorrelation", title= "Polysome vs Translation Efficacies", 
        subtitle="Only significant correlation coefficients shown (95% I.C.)") +
   scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
   geom_text() +
@@ -117,7 +117,7 @@ dplyr::select(Scomparison, ends_with(c("cyt", "pol"))) %>%
   dplyr::filter(str_detect(measure1, ".cyt"), str_detect(measure2, ".pol")) %>%
   ggplot(aes(measure2, measure1, fill=r, label=round(r_if_sig,2))) +
   geom_tile() +
-  labs(x = NULL, y = NULL, fill = "Pearson's\nCorrelation", title= "cyt vs pol (gene weights)", 
+  labs(x = NULL, y = NULL, fill = "Pearson's\nCorrelation", title= "Cytosolic vs Polysome (gene weights)", 
        subtitle="Only significant correlation coefficients shown (95% I.C.)") +
   scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
   geom_text() +
