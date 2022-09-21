@@ -5,19 +5,13 @@ library(org.Hs.eg.db)
 library(AnnotationDbi)
 library(readxl)
 
-setwd("~/Desktop/Internship/human_cohort_analysis/Data/")
-source(file = "~/Desktop/Internship/human_cohort_analysis/ICA_Toolkit-main/R/functions.R")
+setwd("~/Documents/02_TRANSDUCER/06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/")
+source(file = "../The-Molecular-Signature-Generator/R/functions.R")
 
 
 #Load data
-cptac_raw <- read_delim("CPTAC-PDAC-raw-RSEM-expected-counts-gene-level.txt", 
-                        delim = "\t", escape_double = FALSE, 
-                        trim_ws = TRUE) %>%
-  column_to_rownames("idx")%>%
-  dplyr::select(contains("tumor")) %>% 
-  rename_all(funs(str_replace_all(., "_tumor", ""))) %>%
-  rename_all(~str_replace_all(.,"-", ".")) %>%
-  rownames_to_column("gene")
+PDX_tumor_cyt <- read_tsv("~/Documents/02_TRANSDUCER/02_PDX_stroma/00_Data/Processed_data/normTumor_Cyt.tsv")
+
 
 #Import PC weight for human and pdx samples
 human_PC1 <- read_csv("human_PC1.csv")
