@@ -289,3 +289,26 @@ mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
            annotation_colors = annot_colors,
            cluster_rows = T, show_rownames = TRUE,
            show_colnames= False, main = "Stromal transcription of Verginadis et al. 2022 murine CAF markers")
+
+# Samain et al 2021 and Csf1 expression
+## Csf1 correlation with ISRact/IC.4.cyt
+to_corr <- pivot_longer(cyt_m, cols = !EnsemblID ,names_to = "sample") %>%
+  pivot_wider(names_from = EnsemblID, id_cols = sample) %>% 
+  dplyr::select(sample, ENSMUSG00000014599) %>%
+  inner_join(annotations) %>%
+  inner_join(A_cyt)
+
+scatterplot_with_stats <- function(data, varx, vary, label, type, title){
+  correlation <- rcorr(data[[varx]], data[[vary]], type = type)
+  correlation_txt <- paste0(type, ": R = ", round(correlation$r["x","y"], 2),
+                            ", pval = ", round(correlation$P["x","y"], 4))
+  ggplot(data) +
+    aes_string(x = varx, y = vary, label = label) +
+    geom_point() +
+    geom_smooth(method=lm) +
+    theme_bw() +
+    geom_text_repel() +
+    labs(title=title, subtitle = correlation_txt)
+}
+
+scatterplot_with_stats(to_corr, "ISRact", "ENSMUSG00000014599", "sample", "spearman", "Csf1 mRNA levels as Samain et al. 2021 activation marker")
