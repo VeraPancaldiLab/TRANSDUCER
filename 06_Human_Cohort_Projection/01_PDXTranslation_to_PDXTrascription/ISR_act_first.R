@@ -13,189 +13,132 @@ source(file = "../The-Molecular-Signature-Generator/R/functions.R")
 PDX_tumor_cyt <- read_tsv("~/Documents/02_TRANSDUCER/02_PDX_stroma/00_Data/Processed_data/normTumor_Cyt.tsv")
 
 
-#Import PC weight for human and pdx samples
-human_PC1 <- read_csv("human_PC1.csv")
+sample_info <- read_tsv("~/Documents/02_TRANSDUCER/02_PDX_stroma/00_Data/Processed_data/sample_info.tsv") %>%
+  dplyr::select(!MarseilleID) %>%
+  dplyr::mutate(Diabetes = as_factor(Diabetes)) %>%
+  dplyr::rename(ISRact = ICA3) %>% 
+  arrange(factor(sample, levels = names(PDX_tumor_cyt)[-1]))
 
-#Clinical data sheet for human cohort data
-clinical_data <- read_excel("mmc1.xlsx", 
-                            sheet = "Clinical_data") %>%
-  mutate(follow_up_days = as.numeric(follow_up_days)) %>%
-  mutate(status = ifelse(vital_status == "Deceased", 2, 1))
+# load annotation with Biomart
+ensembl75 <- useEnsembl(biomart = "genes",
+                        dataset = "hsapiens_gene_ensembl",
+                        version = 75)
 
-#Molecular phenotype data sheet for human cohort data
-Molecular_phenotype_data <- read_excel("mmc1.xlsx", 
-                                       sheet = "Molecular_phenotype_data") %>% 
-  mutate_at(vars(immune_deconv:`necrosis_(%OF_TUMOR_WITH_NECROSIS)_histology_estimate`, KRAS_VAF), as.numeric) %>%
-  mutate_at(vars(Bailey:Moffitt), as.factor) #change type to avoid errors
+#listAttributes(ensembl75, page="feature_page")
+annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_id',
+                                        'entrezgene',
+                                        'chromosome_name'), mart = ensembl75)
 
-#load sample information for annotations
-metadata <- dplyr::rename(human_PC1, case_id = sample) %>%
-  inner_join(clinical_data, by = "case_id") %>%
-  inner_join(Molecular_phenotype_data, by = "case_id") %>%
-  mutate(Diabetes = ifelse(str_detect(medical_condition, "Diabetes"), "yes", "no")) %>%
-  dplyr::rename(bcr_patient_barcode = case_id) %>%
-  mutate(bcr_patient_barcode = str_replace_all(bcr_patient_barcode, "-", "."))
+gene_to_ensembl = deframe(annot_ensembl75[c( "external_gene_id", "ensembl_gene_id")])
+ensembl_to_gene = setNames(names(gene_to_ensembl), gene_to_ensembl)
+# filtering
+## XY
+annot_ensembl75 %>% dplyr::filter(!chromosome_name %in% c("X", "Y")) %>%
+  pull(ensembl_gene_id) -> non_sex
 
-#Remove low tumor purity sample
-cptac <- cptac_raw %>% 
-  dplyr::select(gene, metadata$bcr_patient_barcode)
+PDX_tumor_cyt %>% dplyr::filter(EnsemblID %in% non_sex) -> PDX_tumor_cyt_
 
-##1 Filter the sexual chromosomes genes to avoid getting a sex component
-annot <- AnnotationDbi::select(org.Hs.eg.db, keys=cptac$gene, columns=c("ENSEMBL", "MAP"), keytype="SYMBOL")
-to_keep <- dplyr::filter(annot, !grepl('X|Y', MAP)) %>%
-  drop_na(MAP) %>%
-  dplyr::select("SYMBOL") %>%
-  distinct()
+## mean centring gene wise
+PDX_tumor_cyt_ %>% column_to_rownames("EnsemblID") %>%
+  apply(1, function(x) x - mean(x)) %>% t() %>%
+  data.frame() -> PDX_tumor_cyt__
 
-cptac_gn <- dplyr::filter(cptac, gene %in% to_keep$SYMBOL)
+## Inter quartile range (measure variability)
+PDX_tumor_cyt__ %>% apply(1, IQR) -> iqrs
+mostvar <- iqrs[iqrs > median(iqrs)]
+PDX_tumor_cyt__ %>% as_tibble(rownames = "EnsemblID") %>%
+  dplyr::filter(EnsemblID %in% names(mostvar)) -> PDX_tumor_cyt_icaready
 
-#2 Mean center genewise and selection of half most variable genes. Finally save an .RDS object as a checkpoint
-cptac__ <- cptac_gn %>% pivot_longer(-gene, 'variable', 'value') %>%
-  pivot_wider(id_cols = variable, names_from = gene) %>%
-  mutate(across(where(is.numeric), ~ . - mean(.))) %>%
-  pivot_longer(-variable, "gene",  "value") %>% 
-  pivot_wider(id_cols = gene, names_from = variable)
+# Check distribution variability and number of genes of the different steps
 
-abdv <- apply(cptac__ %>% dplyr::select(-gene), 1, function(x) { #! could be piped with  add_row(variable = "mean", !!! colMeans(.[-1])) when transposed
-  sum(
-    abs(
-      x - mean(x)
-    )
-  ) / length(x)
-})
-
-median_abdv <- median(abdv)
-cptac_p <- cptac__[abdv > median_abdv, ]
-
-# plots with A1CF as example gene
-pivot_longer(cptac_gn, -gene) %>% 
-  dplyr::filter(gene == "A1CF") %>% 
-  ggplot(aes(x = value)) + geom_density()
-
-pivot_longer(cptac_p, -gene) %>% 
-  dplyr::filter(gene == "A1CF") %>% 
-  ggplot(aes(x = value)) + geom_density()
-
-write_rds(cptac_p, file = "cptac_icaready.RDS")
-
-#Find the most robust number of components
-boot_res <- Boot_ICA(expression = cptac_p, df_id  =  "gene", range.comp = 2:20, iterations = 20, seed = 0)
-
-ggplot(boot_res) + aes(x = nc, y = correlation, fill = bootstrap) +
-  geom_boxplot(width = 0.5) +
-  labs(y = "absolute pearson correlation", x = "number of components") +
-  coord_cartesian(ylim = c(0.8, 1)) +
-  theme_bw() +
-  rotate_x_text(45)
 
 #Find Molecular signature
-icas_list <- Range_ICA(cptac_p, "gene", 2:20)
+icas_list <- Range_ICA(PDX_tumor_cyt_icaready, "EnsemblID", 2:20)
 
 Best_nc(icas_list,
         range.comp = 2:20,
-        metadata = metadata,
-        metadata_id = "bcr_patient_barcode",
-        vars = c("PC1"),
+        metadata = sample_info,
+        metadata_id = "sample",
+        vars = c("ISRact"),
         is.categorical = F)
 
 #Exploration of the component space
-best_ica <- Range_ICA(cptac_p, "gene", 19)
-
-annotations <- metadata %>%
-  dplyr::select("bcr_patient_barcode", "PC1", "sex")
+best_ica <- Range_ICA(PDX_tumor_cyt_icaready, "EnsemblID", 14)
 
 Sampleweights_distribution(ica = best_ica,
-                           df = annotations,
-                           df_id = "bcr_patient_barcode")
+                           df = dplyr::select(sample_info, "sample", "ISRact", "PAMG", "Diabetes"),
+                           df_id = "sample")
 
-## clinical data
-metadata_cont <- colnames(dplyr::select(metadata, where(is.numeric)))
-
-metadata_disc <- c("tumor_stage_pathological", 'PC1status', "sex", "participant_country", 
-                   "Bailey", "Collisson", "Moffitt", "Diabetes")
-
-### find IC responsible
-clinical_data_plots <- ICA_explorator(
+## sample info
+sample_info_plots <- ICA_explorator(
   ica = best_ica,
-  df = metadata,
-  df_cont = metadata_cont,
-  df_disc = metadata_disc,
-  df_id = "bcr_patient_barcode")
+  df = sample_info,
+  df_cont = c("ISRact", "PAMG"),
+  df_id = "sample")
 
-clinical_data_plots$cont  
+sample_info_plots$cont
 
-clinical_data_plots$disc
+# technical info
+multiqc <- read_tsv("~/Documents/02_TRANSDUCER/02_PDX_stroma/00_Data/Processed_data/multiQC_summary.tsv") %>%
+  dplyr::filter(CITID %in% names(PDX_tumor_cyt)[-1], Fraction == "Cytosolic") %>%
+  dplyr::select(-c(fastq_name, Fraction)) %>%
+  dplyr::rename(sample = CITID)
 
-library(dorothea)
-# Generate TF act 
-### Select the regulon data
-data(dorothea_hs_pancancer, package = "dorothea")
-regulons <- dorothea_hs_pancancer %>%
-  dplyr::filter(confidence %in% c("A", "B","C"))
-
-## VIPER
-minsize = 5
-ges.filter = FALSE
-
-tf_act__<- dorothea::run_viper(column_to_rownames(cptac, "gene"), regulons,
-                               options =  list(minsize = minsize, eset.filter = ges.filter, 
-                                               cores = 1, verbose = FALSE, nes = TRUE))
-
-# Format for analysis
-tf_act_ <- as_tibble(tf_act__, rownames = "TF") %>%
-  pivot_longer(cols = -TF, names_to = "bcr_patient_barcode") %>%
-  pivot_wider(id_cols = c(bcr_patient_barcode), names_from = TF)
-
-# get 50 most variable
-tf_50_var <- summarise(tf_act_, across(where(is.double), var)) %>%
-  pivot_longer(cols = everything(), names_to = "TF", values_to = "var") %>%
-  dplyr::arrange(desc(var)) %>% dplyr::slice_head(n=50)
-
-tf_act <- tf_act_ %>% dplyr::select(bcr_patient_barcode, all_of(tf_50_var$TF))
-### find IC responsible
-TF_plots <- ICA_explorator(
+sample_info_plots <- ICA_explorator(
   ica = best_ica,
-  df = tf_act,
-  df_cont = tf_50_var$TF,
-  df_id = "bcr_patient_barcode")
+  df = multiqc,
+  df_cont = names(multiqc)[-1],
+  df_id = "sample")
 
-TF_plots$cont
+sample_info_plots$cont
 
 #In depth dimension analysis
-ic14_diabetes <- Sampleweights_indepth(ica = best_ica,
-                                     interest_IC = "IC.14",
-                                     df = metadata,
-                                     df_id = "bcr_patient_barcode",
+ic3_diabetes <- Sampleweights_indepth(ica = best_ica,
+                                     interest_IC = "IC.3",
+                                     df = sample_info,
+                                     df_id = "sample",
                                      var = "Diabetes",
-                                     test = "ttest")
+                                     test = "welch")
 
-ic14_diabetes + 
-  geom_violin(aes(fill = Diabetes), position=position_dodge(0.8), width=0.5) +
-  geom_boxplot(position=position_dodge(0.8), width=0.1) +
+ic3_diabetes + 
+  geom_boxplot(aes(fill = Diabetes), position=position_dodge(0.8), width=0.1) +
+  geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 2, alpha = 0.5) +
   theme_classic()
 
-ic14_PC1 <- Sampleweights_indepth(ica = best_ica,
-                                 interest_IC = "IC.14",
-                                 df = metadata,
-                                 df_id = "bcr_patient_barcode",
-                                 var = "PC1",
+ic3_ISRact <- Sampleweights_indepth(ica = best_ica,
+                                 interest_IC = "IC.3",
+                                 df = sample_info,
+                                 df_id = "sample",
+                                 var = "ISRact",
                                  test = "spearman")
+ic3_ISRact + geom_point() + geom_smooth(method=lm) +
+  theme_bw()
 
-ic14_PC1 + geom_point() + geom_smooth(method=lm) +
-  scale_colour_gradientn(colours = terrain.colors(10)) +
+ic3_ISRact + geom_point(aes(color = Diabetes)) + geom_smooth(method=lm) +
   theme_bw()
 
 #Plot gene weights
+column_annotation <- dplyr::select(sample_info, c(sample, Diabetes, PAMG, ISRact)) %>%
+  column_to_rownames("sample")
+
+annot_colors <- list(class = c(`most possitive` = "red", `most negative` = "blue"),
+                     PAMG = c("#FF7F00", "white", "#377DB8"),
+                     ISRact = c("#FFFFCC", "#006837"),
+                     Diabetes = c(`0` = "#F8766D" , `1` = "#00BFC4", `NA` = "#7F7F7F")) 
+
 gw <- PlotGeneWeights(ica = best_ica,
-                      interest_IC = "IC.14",
-                      expression = cptac_gn,
-                      df_id = "gene",
+                      interest_IC = "IC.3",
+                      expression = PDX_tumor_cyt,
+                      df_id = "EnsemblID",
                       n_genes  = 25,
-                      column_annotation = NA)
+                      column_annotation = column_annotation,
+                      annotation_colors = annot_colors)
 
 ggarrange(gw[["densplot"]] + rremove("xylab"), gw[["heatmap"]], heights = c(1.5, 10), widths = c(0.2,1),
-          labels = c("A", "B"),
           ncol = 2, nrow = 1)
+
+
 
 #GSVA
 library(msigdbr)
