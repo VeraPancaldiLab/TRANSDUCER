@@ -125,12 +125,32 @@ column_annotation <- dplyr::select(sample_info, c(sample, Diabetes, PAMG, ISRact
 annot_colors <- list(class = c(`most possitive` = "red", `most negative` = "blue"),
                      PAMG = c("#FF7F00", "white", "#377DB8"),
                      ISRact = c("#FFFFCC", "#006837"),
-                     Diabetes = c(`0` = "#F8766D" , `1` = "#00BFC4", `NA` = "#7F7F7F")) 
+                     Diabetes = c(`0` = "#F8766D" , `1` = "#00BFC4", `NA` = "#7F7F7F"))
 
-gw <- PlotGeneWeights(ica = best_ica,
+## Translate to gene names
+best_ica_gn <- best_ica
+as_tibble(best_ica_gn$S, rownames="EnsemblID") %>% 
+  dplyr::mutate(GeneName = ensembl_to_gene[EnsemblID]) -> best_ica_gn_ 
+
+summarise(best_ica_gn_, nan_count = sum(is.na(GeneName)),
+          dup_count = sum(duplicated(GeneName))) #0 NAs, 21Dups
+
+best_ica_gn$S <- dplyr::mutate(best_ica_gn_,  GeneName = if_else(GeneName %in% best_ica_gn_$GeneName[duplicated(best_ica_gn_$GeneName)],
+                                                                 paste(GeneName, EnsemblID, sep = "_"),
+                                                                 GeneName)) %>%
+  dplyr::select(- EnsemblID) %>% column_to_rownames("GeneName")
+
+PDX_tumor_cyt_gn <- dplyr::mutate(PDX_tumor_cyt,
+                                 GeneName = if_else(ensembl_to_gene[EnsemblID] %in% ensembl_to_gene[PDX_tumor_cyt$EnsemblID][duplicated(ensembl_to_gene[PDX_tumor_cyt$EnsemblID])],
+                                                     paste(ensembl_to_gene[EnsemblID], EnsemblID, sep = "_"),
+                                                    ensembl_to_gene[EnsemblID])) %>%
+  dplyr::select(-EnsemblID) %>% 
+  relocate(GeneName)
+
+gw <- PlotGeneWeights(ica = best_ica_gn,
                       interest_IC = "IC.3",
-                      expression = PDX_tumor_cyt,
-                      df_id = "EnsemblID",
+                      expression = PDX_tumor_cyt_gn,
+                      df_id = "GeneName",
                       n_genes  = 25,
                       column_annotation = column_annotation,
                       annotation_colors = annot_colors)
@@ -145,22 +165,34 @@ library(msigdbr)
 library(GSVA)
 
 all_genesets <- msigdbr("Homo sapiens")
-use_genesets <- dplyr::filter(all_genesets, gs_cat %in% c("H", "C2"))
-msigdbr_list <- split(x = use_genesets$gene_symbol, f = use_genesets$gs_name)
+#all_genesets %>% distinct(gs_subcat) #Check options
+gset_db = "CP:REACTOME"
+gset_remove_prefix = "REACTOME_"
+
+use_genesets <- all_genesets %>% filter(gs_subcat %in% c(gset_db))
+msigdbr_list <- split(x = use_genesets$ensembl_gene, f = use_genesets$gs_name)
 msigdb_descriptions <- use_genesets[c("gs_name", "gs_description")] %>%
   unique() %>% column_to_rownames("gs_name")
 
 gsvaRes <- gsva(data.matrix(best_ica$S), msigdbr_list, min.sz = 15)
 
-# best for IC.14
-gsvaTop <- as_tibble(gsvaRes, rownames = "gs_name") %>%  mutate(the_rank = rank(IC.14, ties.method = "random")) %>% 
-  dplyr::filter(the_rank < 26 | the_rank > (nrow(gsvaRes)-26)) %>% 
-  dplyr::mutate(gs_name = fct_reorder(gs_name, IC.14)) %>% mutate(sign = case_when(IC.14 < 0 ~ "neg", IC.14 > 0 ~ "pos")) %>%
-  dplyr::select(gs_name, IC.14, sign)
+# best for IC.4
+gsvaRes[order(gsvaRes[,"IC.3"]),]
 
-ggplot(gsvaTop, aes(x = IC.14, y = gs_name, color = sign)) + 
-  geom_point() +
-  ggtitle("Best H and C2 gene sets IC.14") +
+gsvaTop <- as_tibble(gsvaRes, rownames = "gene_set") %>% 
+  mutate(the_rank = rank(-IC.3, ties.method = "random"),
+         #gene_set = if_else(str_count(gene_set, "_") < 10, gene_set, signature_dict[gene_set]),
+         gene_set = str_remove(gene_set, gset_remove_prefix),
+         gene_set = fct_reorder(gene_set, the_rank,.desc = T)) %>%
+  pivot_longer(cols = -c(gene_set, the_rank), names_to = "component", values_to = "ES") %>% 
+  dplyr::filter(the_rank < 15 | the_rank > (nrow(gsvaRes)-15)) %>% 
+  mutate(component = if_else(component == "IC.3", "IC.3", "Other")) %>% 
+  dplyr::select(!c(the_rank))
+
+gsva_IC3 <- ggplot(gsvaTop, aes(x = ES, y = gene_set)) + 
+  geom_point(aes(alpha = if_else(component == "IC.3", 0.9, 0.3),
+                 color = if_else(ES > 0, "blue", "red"))) +
   theme_bw() +
+  labs(title = "IC.3", subtitle = paste0("Best ",gset_db, " gene sets")) +
   rremove("legend") +
   rremove("ylab")
