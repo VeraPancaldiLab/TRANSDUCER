@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 library(tidyverse)
 library(biomaRt)
+library(ggVennDiagram)
 source("functions.R")
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
@@ -193,8 +194,135 @@ dplyr::filter(cyt_m, EnsemblID %in% mtor$ensembl_gene) %>%
            cluster_rows = T, fontsize = 5, 
            treeheight_col = 10, main = "MTOR signaling cyt vs ICA.TEs", cellheight = 5, filename = "02_Output/reactome_mTOR.png")
 
-# CAF subtype markers
+# Reactome pathways genes vs enrichment
+## preparation
+all_genesets <- msigdbr("Mus musculus")
+reactome <- dplyr::filter(all_genesets, gs_subcat == "CP:REACTOME")
+annot_col <- inner_join(A_cyt, annotations, "sample") %>% 
+  dplyr::select(sample, PAMG, ISRact, IC.4.cyt) %>% column_to_rownames("sample")
 
+annot_colors <- list(PAMG = c("#FF7F00", "white", "#377DB8"),
+                     ISRact = c("#FFFFCC", "#006837"),
+                     IC.4.cyt = c("#FFFFCC", "#5b0066")) 
+
+## plot code
+PlotGenesetExpression <- function(expression, gene_set, title, filename, ...){
+  dplyr::filter(expression, EnsemblID %in% gene_set$ensembl_gene) %>%
+    mutate(gene_symbol = ensembl_to_gene[EnsemblID]) %>%
+    dplyr::select(gene_symbol, A_cyt$sample) %>% 
+    relocate(gene_symbol, all_of(order_by)) %>%
+    column_to_rownames("gene_symbol") %>% 
+    pheatmap(annotation_col = annot_col, 
+             annotation_colors = annot_colors, fontsize = 5, 
+             treeheight_col = 10, main = title, cellheight = 5, filename = filename, ...)
+}
+
+## mRNA activation by CAP and 43S binding
+mRNAactivation <- dplyr::filter(reactome, str_detect(gs_name, "REACTOME_ACTIVATION_OF_THE_MRNA_UPON_BINDING_OF_THE_CAP*")) %>% 
+  dplyr::select(gene_symbol, ensembl_gene)
+title <- "mRNA activation by CAP and 43S binding cyt vs IC.4.cyt"
+filename <- "02_Output/IC4cyt_mRNAactivation.png"
+PlotGenesetExpression(cyt_m, mRNAactivation, title, filename)
+
+## Translation initiation
+translation_initiation <- dplyr::filter(reactome, gs_name == "REACTOME_EUKARYOTIC_TRANSLATION_INITIATION") %>% 
+  dplyr::select(gene_symbol, ensembl_gene)
+title <- "T.initiation cyt vs IC.4.cyt"
+filename <- "02_Output/IC4cyt_translation_initiation.png"
+PlotGenesetExpression(cyt_m, translation_initiation, title, filename)
+
+## Translation elongation
+translation_elongation <- dplyr::filter(reactome, gs_name == "REACTOME_EUKARYOTIC_TRANSLATION_ELONGATION") %>% 
+  dplyr::select(gene_symbol, ensembl_gene)
+title <- "T.elongation cyt vs IC.4.cyt"
+filename <- "02_Output/IC4cyt_translation_elongation.png"
+PlotGenesetExpression(cyt_m, translation_elongation, title, filename)
+
+## GCN2 Response to AA deprivation
+GCN2AAdeprivation <- dplyr::filter(reactome, str_detect(gs_name, "REACTOME_RESPONSE_OF_EIF2AK4_GCN2")) %>% 
+  dplyr::select(gene_symbol, ensembl_gene)
+
+title <- "GCN2 response to AA deprivation cyt vs IC.4.cyt"
+filename <- "02_Output/IC4cyt_GCN2AAdeprivation.png"
+PlotGenesetExpression(cyt_m, GCN2AAdeprivation, title, filename)
+
+## Translation
+translation <- dplyr::filter(reactome, gs_name == "REACTOME_TRANSLATION") %>% 
+  dplyr::select(gene_symbol, ensembl_gene)
+
+title <- "Translation cyt vs IC.4.cyt"
+filename <- "02_Output/IC4cyt_translation.png"
+PlotGenesetExpression(cyt_m, translation, title, filename)
+
+## SRP cotranslational targeting
+SRPcotranstargeting <- dplyr::filter(reactome, gs_name == "REACTOME_SRP_DEPENDENT_COTRANSLATIONAL_PROTEIN_TARGETING_TO_MEMBRANE") %>% 
+  dplyr::select(gene_symbol, ensembl_gene)
+
+title <- "SRP cotranslational targeting cyt vs IC.4.cyt"
+filename <- "02_Output/IC4cyt_SRPcotranstargeting.png"
+PlotGenesetExpression(cyt_m, SRPcotranstargeting, title, filename)
+
+## rRNA processing 
+rRNAprocessing <- dplyr::filter(reactome, gs_name == "REACTOME_RRNA_PROCESSING") %>% 
+  dplyr::select(gene_symbol, ensembl_gene)
+
+title <- "rRNA processing cyt vs IC.4.cyt"
+filename <- "02_Output/IC4cyt_rRNAprocessing.png"
+PlotGenesetExpression(cyt_m, rRNAprocessing, title, filename)
+
+## Venn diagram as lots of these gene sets have redundant players
+
+gene_set_list = list(mRNAactivation$gene_symbol,
+                     translation_initiation$gene_symbol,
+                     translation_elongation$gene_symbol,
+                     GCN2AAdeprivation$gene_symbol,
+                     translation$gene_symbol,
+                     SRPcotranstargeting$gene_symbol,
+                     rRNAprocessing$gene_symbol)
+
+category.names = c("mRNA activation",
+                   "translation\ninitiation",
+                   "translation\nelongation",
+                   "GCN2\nAA\ndeprivation",
+                   "translation",
+                   "SRP\ncotranslational\ntargeting",
+                   "rRNA\nprocessing")
+
+ggVennDiagram(
+  gene_set_list,
+  category.names = category.names,
+  label = "count",
+  label_geom = "text",
+  label_color = "white"
+) + scale_fill_gradient(name = "count", trans = "log", na.value = "white")
+
+## plot of the 33 common genes
+common33 <- tibble(gene_symbol = Reduce(intersect, gene_set_list)) %>%
+  mutate(ensembl_gene = gene_to_ensembl[gene_symbol])
+
+title <- "common 33 genes to all translation related gene sets"
+filename <- "02_Output/IC4cyt_translationcommon33.png"
+PlotGenesetExpression(cyt_m, common33, title, filename, cluster_cols = T, scale = "none")
+
+## plot of the 11 GCN2 exclusive genes
+GetExclusiveGenes <- function(gene_set_list, reference_index){
+  ref <- gene_set_list[[reference_index]]
+  other <- gene_set_list[-reference_index] %>% flatten_chr() %>% unique()
+  exclusive_ref <- setdiff(ref, other)
+  return(exclusive_ref)
+}
+
+GCN2exclusive <- tibble(gene_symbol = GetExclusiveGenes(gene_set_list, 4)) %>%
+  mutate(ensembl_gene = gene_to_ensembl[gene_symbol]) %>% 
+  dplyr::filter(gene_symbol != "Gcn1") %>% 
+  add_row(gene_symbol = "Gcn1l1", ensembl_gene = gene_to_ensembl["Gcn1l1"]) #this gene changed from Gcn1l1 to Gcn1 in Ensembl anotation and dont find it styarting with gene symbol
+
+title <- "11 genes exclusive to response to GCN2 AA deprivation"
+filename <- "02_Output/IC4cyt_GCN2exclusive11.png"
+PlotGenesetExpression(cyt_m, GCN2exclusive, title, filename)
+
+
+# CAF subtype markers
 ## Elayada et al 2019
 ### gene weight check
 Elayada <- read_tsv("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/01_Input/CAF_Elayada_markers.tsv")
