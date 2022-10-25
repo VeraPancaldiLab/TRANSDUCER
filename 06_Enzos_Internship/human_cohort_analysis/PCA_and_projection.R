@@ -69,7 +69,7 @@ ISRact_data_bestoverall <- read_delim("5vs5_training_TMM_nonstandardized_bestove
 
 ## CPTAC (Proteogenomics)
 ### upper quartile normalized and log2 data 
-mRNA_tumor <- read_delim("PDAC_LinkedOmics_Data/mRNA_RSEM_UQ_log2_Tumor.cct", 
+CPTAC_tumor_raw <- read_delim("PDAC_LinkedOmics_Data/mRNA_RSEM_UQ_log2_Tumor.cct", 
                          delim = "\t", escape_double = FALSE, 
                          trim_ws = TRUE)%>%
      dplyr::rename(Gene = ...1)
@@ -92,16 +92,13 @@ Molecular_phenotype_data <- read_excel("mmc1.xlsx",
 
 ## PACAOMICS
 ### Remy Nicolle's 2017 PDX data
-Human_Tumor_rawcount_Transcriptome <- read_delim("Human-Tumor_rawcount_Transcriptome.tsv", 
+RN2017_raw <- read_delim("Human-Tumor_rawcount_Transcriptome.tsv", 
                                                  delim = "\t", escape_double = FALSE, 
                                                  trim_ws = TRUE)
 
-### Extended 73 sample cohort
-
-
 ################################################################################
 # PARAMETERS
-rawdata = rawTumor_Cyt #geneCount_raw_28s_totalRNA | rawTumor_Cyt
+Sauyeun_raw = rawTumor_Cyt #geneCount_raw_28s_totalRNA | rawTumor_Cyt
 cormethod = "pearson"
 keepgenes = 1000
 select_method = "bestsubset" #bestsubset | bestoverall
@@ -132,28 +129,27 @@ ensembl95 <- useEnsembl(biomart = "genes",
 annot_ensembl95 <- getBM(attributes = c('ensembl_gene_id',
                                         'external_gene_name'), mart = ensembl95)
 
-#Add a Gene names column to rawdata
+#Add a Gene names column to Sauyeun_raw
 translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
 
-rawdata$EnsemblID %>% 
+Sauyeun_raw$EnsemblID %>% 
   translate[.] %>%
-  make.names(unique = TRUE) -> rawdata$Genenames
+  make.names(unique = TRUE) -> Sauyeun_raw$Genenames
 
 
-#Add a Ensemble ID column to mRNA_tumor (Ensembl release 95 according to the paper)
+#Add a Ensemble ID column to CPTAC_tumor_raw (Ensembl release 95 according to the paper)
 #https://genome.ucsc.edu/cgi-bin/hgTables?db=hg38&hgta_group=genes&hgta_track=mane&hgta_table=mane&hgta_doSchema=describe+table+schema
 
 reverse_translate = deframe(annot_ensembl95[c("external_gene_name", "ensembl_gene_id")])
 
-mRNA_tumor$Gene %>% 
+CPTAC_tumor_raw$EnsemblID <- CPTAC_tumor_raw$Gene %>% 
   reverse_translate[.] %>%
-  make.names(unique = TRUE) -> mRNA_tumor$EnsemblID
-
+  make.names(unique = TRUE)
 
 # Processing and Normalization
 ## Sauyeun PDX
 ### Normalize raw counts
-normdata <- dplyr::select(rawdata, -Genenames) %>%
+Sauyeun_norm <- dplyr::select(Sauyeun_raw, -Genenames) %>%
   column_to_rownames( "EnsemblID") %>%
   DGEList() %>%
   calcNormFactors(method= norm_method) %>%
@@ -162,7 +158,7 @@ normdata <- dplyr::select(rawdata, -Genenames) %>%
   as_tibble(rownames = "sample")
 
 ### Visualize it
-data <- pivot_longer(normdata, cols = 2:length(normdata), names_to = "EnsemblID", values_to = "Expression", names_repair = "unique")
+data <- pivot_longer(Sauyeun_norm, cols = 2:length(Sauyeun_norm), names_to = "EnsemblID", values_to = "Expression", names_repair = "unique")
 
 g1 <- ggplot(data , mapping = aes(x = sample, y = Expression, fill = sample))+
   geom_violin()+
@@ -171,24 +167,23 @@ g1 <- ggplot(data , mapping = aes(x = sample, y = Expression, fill = sample))+
 
 g1
 
-### Keep common genes with Human_Tumor_rawcount_Transcriptome 
-normdata <- dplyr::select(normdata, sample, any_of(Human_Tumor_rawcount_Transcriptome$EnsemblID)) # needed to not get errors when projecting (Ensembl version?)
+### Keep common genes with RN2017_raw 
+Sauyeun_norm <- dplyr::select(Sauyeun_norm, sample, any_of(RN2017_raw$EnsemblID)) # needed to not get errors when projecting (Ensembl version?)
 
 
 
 ## CPTAC
 ### processing
 if (filter == TRUE){
-  mRNA_tumor <- dataFilter(mRNA_tumor, clinical_data, Molecular_phenotype_data, estimation_method, neoplastic_min, acinar_max, islet_max, tumor_tissue_min)
+  CPTAC_tumor_raw <- dataFilter(CPTAC_tumor_raw, clinical_data, Molecular_phenotype_data, estimation_method, neoplastic_min, acinar_max, islet_max, tumor_tissue_min)
 } else {
-  mRNA_tumor <- dplyr::select(mRNA_tumor, -low_purity_samples$case_id)
+  CPTAC_tumor_raw <- dplyr::select(CPTAC_tumor_raw, -low_purity_samples$case_id)
 }
 
 
 ## PACAOMICS
-Human_Tumor_rawcount <- column_to_rownames(Human_Tumor_rawcount_Transcriptome, "EnsemblID") 
-
-Human_Tumor_norm <- DGEList(Human_Tumor_rawcount) %>%
+RN2017_norm <- column_to_rownames(RN2017_raw, "EnsemblID") %>%
+  DGEList() %>%
   calcNormFactors(method= norm_method) %>%
   cpm(log=TRUE) %>%
   t() %>%
@@ -255,24 +250,24 @@ mostCorrGenes <- function(normdf, select_method, n, cormethod, top_samples, samp
 }
 
 
-top_genes <- mostCorrGenes(normdata, select_method, keepgenes, cormethod, top_samples, sample_info)
+top_genes <- mostCorrGenes(Sauyeun_norm, select_method, keepgenes, cormethod, top_samples, sample_info)
 
 #### Check if they are the same as ISRact best subset 
 table(top_genes$EnsemblID %in% colnames(ISRact_data_bestsubset)) #v different 568 genes missing
 
 #### Check presence in datasets
-table(top_genes$EnsemblID %in% mRNA_tumor$EnsemblID) # of these 321 do not exist in the original
+table(top_genes$EnsemblID %in% CPTAC_tumor_raw$EnsemblID) # of these 321 do not exist in the original
 
 #### Final subset
-normdata_topg_s <- dplyr::select(normdata, sample, top_genes$EnsemblID) %>% #to keep Jacobo's genes: any_of(colnames(ISRact_data_bestsubset))
+Sauyeun_norm_subset <- dplyr::select(Sauyeun_norm, sample, top_genes$EnsemblID) %>% #to keep Jacobo's genes: any_of(colnames(ISRact_data_bestsubset))
   dplyr::filter(sample %in% top_samples$sample) %>%
   arrange(sample) 
 
 
 ## Run the PCA 
-pca_pdx <- normdata_topg_s %>% 
+pca_pdx <- Sauyeun_norm_subset %>% 
   column_to_rownames( "sample") %>% 
-  dplyr::select(any_of(mRNA_tumor$EnsemblID)) %>%
+  dplyr::select(any_of(CPTAC_tumor_raw$EnsemblID)) %>%
   scale() %>%
   prcomp()
 
@@ -292,9 +287,9 @@ fviz_pca_ind(pca_pdx,
 ## Projecting datasets on this PCA
 ### CPTAC
 #### transpose human data for projection
-human_data <- mRNA_tumor %>%
+human_data <- CPTAC_tumor_raw %>%
   inner_join(dplyr::select(top_genes, EnsemblID), by = "EnsemblID") %>% #subset top genes
-  pivot_longer(cols = 2:(length(mRNA_tumor)-1), names_to = "case_id", values_to = "Expression") %>% 
+  pivot_longer(cols = 2:(length(CPTAC_tumor_raw)-1), names_to = "case_id", values_to = "Expression") %>% 
   dplyr::filter(!str_detect(EnsemblID, 'NA')) %>% #remove eventual NA for gene Ensembl
   dplyr::select(-Gene) %>% 
   pivot_wider(names_from = EnsemblID, values_from = Expression, names_repair = "minimal") %>%
@@ -310,9 +305,9 @@ all(projection == p)
 
 
 ### PACAOMICS
-projection_PACAOMICS <- predict(pca_pdx, Human_Tumor_norm) %>%
+projection_PACAOMICS <- predict(pca_pdx, RN2017_norm) %>%
   as_tibble() %>%
-  mutate(sample = Human_Tumor_norm$sample, .before = 1) %>%
+  mutate(sample = RN2017_norm$sample, .before = 1) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
   mutate(ISRact = replace_na(ISRact, "medium_ICA3"))
 
@@ -326,9 +321,9 @@ PACAOMICS_PC1 <- arrange(projection_PACAOMICS, PC1) %>%
 
 
 ### Same original Sauyeun PDX with the middle samples
-projection_Sauyeun <- predict(pca_pdx, normdata) %>%
+projection_Sauyeun <- predict(pca_pdx, Sauyeun_norm) %>%
   as_tibble() %>%
-  mutate(sample = normdata$sample, .before = 1) %>%
+  mutate(sample = Sauyeun_norm$sample, .before = 1) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
   mutate(ISRact = replace_na(ISRact, "medium_ICA3")) 
 
