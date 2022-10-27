@@ -95,10 +95,14 @@ Molecular_phenotype_data <- read_excel("mmc1.xlsx",
 RN2017_raw <- read_delim("Human-Tumor_rawcount_Transcriptome.tsv", 
                                                  delim = "\t", escape_double = FALSE, 
                                                  trim_ws = TRUE)
+### Extended 73 sample cohort
+load("Alexias_53PDX/PDX_HUMAN_RAW.RData")
+PACAOMICs_90_raw <- as_tibble(x, rownames ="EnsemblID")
 
 ################################################################################
 # PARAMETERS
 Sauyeun_raw = rawTumor_Cyt #geneCount_raw_28s_totalRNA | rawTumor_Cyt
+PACAOMICS_raw = PACAOMICs_90_raw #RN2017_raw | PACAOMICs_90_raw
 cormethod = "pearson"
 keepgenes = 1000
 select_method = "bestsubset" #bestsubset | bestoverall
@@ -182,7 +186,7 @@ if (filter == TRUE){
 
 
 ## PACAOMICS
-RN2017_norm <- column_to_rownames(RN2017_raw, "EnsemblID") %>%
+PACAOMICS_norm <- column_to_rownames(PACAOMICS_raw, "EnsemblID") %>%
   DGEList() %>%
   calcNormFactors(method= norm_method) %>%
   cpm(log=TRUE) %>%
@@ -296,20 +300,21 @@ human_data <- CPTAC_tumor_raw %>%
   column_to_rownames("case_id") 
 
 # Project test: manual vs project()
-projection <- scale(human_data[rownames(pca_pdx$rotation)], pca_pdx$center, pca_pdx$scale) %*% pca_pdx$rotation %>%
+projection_CPTAC <- scale(human_data[rownames(pca_pdx$rotation)], pca_pdx$center, pca_pdx$scale) %*% pca_pdx$rotation %>%
   as.data.frame()
 
 
 p <- predict(pca_pdx, human_data) 
-all(projection == p)
+all(projection_CPTAC== p)
 
 
 ### PACAOMICS
-projection_PACAOMICS <- predict(pca_pdx, RN2017_norm) %>%
+projection_PACAOMICS <- predict(pca_pdx, PACAOMICS_norm) %>%
   as_tibble() %>%
-  mutate(sample = RN2017_norm$sample, .before = 1) %>%
+  mutate(sample = PACAOMICS_norm$sample, .before = 1) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
-  mutate(ISRact = replace_na(ISRact, "medium_ICA3"))
+  mutate(ISRact = replace(ISRact, is.na(ISRact) & sample %in% Sauyeun_norm$sample, "medium_ICA3"),
+         ISRact = replace_na(ISRact, "Unknown"))
 
 PACAOMICS_PC1 <- arrange(projection_PACAOMICS, PC1) %>% 
   dplyr::filter(!sample=="!") %>%
@@ -362,26 +367,38 @@ ggplot(aes(x=PC1, y=PC2, color = ISRact, shape = dataset)) +
   ylim(-200,15)
 #-------------------------------------------------------------------------------
 
-#Select human cohort most extreme samples regarding PC1  
-human_ISR <- arrange(projection, PC1) %>%
-  dplyr::slice( unique(c(1:(nrow(projection)/3), n() - 0:((nrow(projection)/3)-1))) ) %>%
-  mutate(ISRact = ifelse(PC1 < median(projection$PC1), "low_ISR", "high_ISR")) %>%
+#Select human cohort most extreme samples regarding PC1 #! Remove when further scripts are adapted!
+human_ISR <- arrange(projection_CPTAC, PC1) %>%
+  dplyr::slice( unique(c(1:(nrow(projection_CPTAC)/3), n() - 0:((nrow(projection_CPTAC)/3)-1))) ) %>%
+  mutate(ISRact = ifelse(PC1 < median(projection_CPTAC$PC1), "low_ISR", "high_ISR")) %>%
   rownames_to_column("sample") %>%
   dplyr::select(sample, ISRact)
+#write.csv(human_ISR, "human_ISR1.csv", row.names = FALSE) #! Old! from Enzo's Code
 
-#Split in 3 group regarding projection dim 1
-human_PC1 <- arrange(projection, PC1) %>%
+# Select most extreme samples for further comparisons
+# PACAOMICS
+PACAOMICS_PC1 <-  arrange(projection_PACAOMICS, PC1) %>%
+  mutate(PC1status = if_else(PC1 < quantile(projection_PACAOMICS$PC1, probs = 0.3333), "low_PC1",
+                             if_else(PC1 < quantile(projection_PACAOMICS$PC1, probs = 0.6666), "medium_PC1", "high_PC1"))) %>% 
+  #mutate(PC1status = cut(.$PC1, 3, labels = c("low_PC1", "medium_PC1", "high_PC1"))) %>%
+  dplyr::select(sample, PC1,  PC1status) %>%
+  left_join(top_samples[,c("sample","ISRact")]) %>%
+  mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
+  left_join(sample_info[, c("sample","PAMG", "ICA3")], by = "sample")
+
+
+# CPTAC
+CPTAC_PC1 <- arrange(projection_CPTAC, PC1) %>%
   mutate(PC1status = cut(.$PC1, 3, labels = c("low_PC1", "medium_PC1", "high_PC1"))) %>%
   rownames_to_column("sample") %>%
   dplyr::select(sample, PC1,  PC1status)
 
-#Write it on a csv to use it on another script
-#write.csv(human_ISR, "human_ISR1.csv", row.names = FALSE)
+write.csv(CPTAC_PC1, "../02_Output/CPTAC_PC1.csv", row.names = FALSE)
 
 
 # Exploration of projection of CPTAC
 ## General Boxplot CPTAC clinical data
-projection_full_df <- rownames_to_column(projection, "case_id") %>%
+projection_full_df <- rownames_to_column(projection_CPTAC, "case_id") %>%
   inner_join(clinical_data[,c("case_id","medical_condition","tumor_stage_pathological")], by = "case_id" ) %>%
   inner_join(dplyr::select(Molecular_phenotype_data, case_id, Bailey, Collisson, Moffitt, contains("deconv"), contains("histology"), contains("pathway"), contains("MCPCounter")), by = "case_id")
 
