@@ -380,16 +380,17 @@ human_ISR <- arrange(projection_CPTAC, PC1) %>%
 PACAOMICS_PC1 <-  arrange(projection_PACAOMICS, PC1) %>%
   mutate(PC1status = if_else(PC1 < quantile(projection_PACAOMICS$PC1, probs = 0.3333), "low_PC1",
                              if_else(PC1 < quantile(projection_PACAOMICS$PC1, probs = 0.6666), "medium_PC1", "high_PC1"))) %>% 
-  #mutate(PC1status = cut(.$PC1, 3, labels = c("low_PC1", "medium_PC1", "high_PC1"))) %>%
   dplyr::select(sample, PC1,  PC1status) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
   mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
   left_join(sample_info[, c("sample","PAMG", "ICA3")], by = "sample")
 
+write.csv(PACAOMICS_PC1, "../02_Output/PACAOMICS_PC1.csv", row.names = FALSE)
 
 # CPTAC
 CPTAC_PC1 <- arrange(projection_CPTAC, PC1) %>%
-  mutate(PC1status = cut(.$PC1, 3, labels = c("low_PC1", "medium_PC1", "high_PC1"))) %>%
+  mutate(PC1status = if_else(PC1 < quantile(projection_CPTAC$PC1, probs = 0.3333), "low_PC1",
+                             if_else(PC1 < quantile(projection_CPTAC$PC1, probs = 0.6666), "medium_PC1", "high_PC1"))) %>%
   rownames_to_column("sample") %>%
   dplyr::select(sample, PC1,  PC1status)
 

@@ -26,41 +26,19 @@ library(viridis)
 
 setwd("~/Documents/02_TRANSDUCER/06_Enzos_Internship/human_cohort_analysis/Data/")
 
-#Import data
-geneCount_raw_28s_totalRNA <- read_delim("geneCount_raw_28s_totalRNA.tsv", 
-                                         delim = "\t", escape_double = FALSE, 
-                                         trim_ws = TRUE)
+# Import data
+## expression
+load("Alexias_53PDX/PDX_HUMAN_RAW.RData")
+PACAOMICs_90_raw <- as_tibble(x, rownames ="EnsemblID")
 
-sample_names_equivalences <- read_delim("sample_names_equivalences.tsv", 
-                                        delim = "\t", escape_double = FALSE, 
-                                        trim_ws = TRUE)
+RN2017_raw <- read_delim("Human-Tumor_rawcount_Transcriptome.tsv", 
+                         delim = "\t", escape_double = FALSE, 
+                         trim_ws = TRUE)
 
-#Rename geneCount_raw_28s_totalRNA sample 
-#(code from https://stackoverflow.com/questions/67076297/rename-columns-in-a-dataframe-by-list-of-correspondence)
-geneCount_raw_28s_totalRNA <- geneCount_raw_28s_totalRNA %>%
-  rename_with(~coalesce(sample_names_equivalences$CITID[match(., sample_names_equivalences$fastq_name)], .)) 
+## Import PC weight 
+PACAOMICs_90_PC1 <- read_csv("../02_Output/PACAOMICS_PC1_extended90.csv")
 
-####Translate EnsemblID to gene names####
-# load annotation with Biomart
-#Version 75 for PDX data
-ensembl75 <- useEnsembl(biomart = "genes",
-                        dataset = "hsapiens_gene_ensembl",
-                        version = 75)#listAttributes(ensembl75, page="feature_page")
-
-annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
-                                        'external_gene_id'), mart = ensembl75)
-
-#Add a Gene names column to rawTumor_Cyt
-translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
-
-geneCount_raw_28s_totalRNA$EnsemblID %>% 
-  translate[.] %>%
-  make.names(unique = TRUE) -> geneCount_raw_28s_totalRNA$Gene
-
-#Import PC weight 
-PACAOMICS_PC1 <- read_csv("PACAOMICS_PC1.csv")
-
-#load sample inf
+## load sample inf
 full_sample_info <- read_delim("sample_info.tsv", 
                                delim = "\t", escape_double = FALSE, 
                                trim_ws = TRUE) %>%
@@ -68,49 +46,60 @@ full_sample_info <- read_delim("sample_info.tsv",
   mutate(Diabetes = replace(Diabetes, Diabetes == 1, "yes"))%>%
   mutate(Diabetes = replace(Diabetes, Diabetes == 0, "no"))%>%
   dplyr::rename(case_id = sample) %>%
-  arrange(case_id)  
+  arrange(case_id)
 
 #Select extreme ICA3 samples
 top_sample_info <- full_sample_info %>%
   arrange(ICA3) %>%
   dplyr::slice( unique(c(1:5, n() - 0:4)) ) %>%
   mutate(ISRact = ifelse(ICA3 < 0, "low_ICA3", "high_ICA3")) %>%
-  arrange(case_id)  
+  arrange(case_id)
 
 ################################################################################
-sample_info = full_sample_info #full_sample_info | top_samples_info
+data <- "extended90" # "extended90" | "RemyNicolle27"
+if (data == "extended90") {
+  raw_data = PACAOMICs_90_raw
+  sample_info = PACAOMICs_90_PC1
+} else if (data == "RemyNicolle27") {
+  raw_data = RN2017_raw
+  sample_info = NULL # change parameters in PCA_and_projection.R and produce it
+}
 ################################################################################
+# Translate EnsemblID to gene names
+## load annotation with Biomart Version 75 for PDX data
+ensembl75 <- useEnsembl(biomart = "genes",
+                        dataset = "hsapiens_gene_ensembl",
+                        version = 75)#listAttributes(ensembl75, page="feature_page")
 
-counts <- dplyr::select(geneCount_raw_28s_totalRNA, Gene, sample_info$case_id) %>%
+annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_id'), mart = ensembl75)
+
+## Add a Gene names column to rawTumor_Cyt
+translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
+
+raw_data <- dplyr::mutate(raw_data, Gene = make.names(translate[EnsemblID], unique = TRUE)) %>% dplyr::select(-EnsemblID) %>%
   column_to_rownames("Gene")
 
 #Visualize expected counts 
-random10 <- sort(sample.int(dim(sample_info)[1], 10))
+random10 <- sort(sample.int(dim(raw_data)[2], 10))
 
-data <- rownames_to_column(counts[, random10], "Prot") %>%
-  pivot_longer(cols = 2:11, names_to = "case_id", values_to = "count") #pivot_longer data to make them easily plotable with ggplot 2
-
-ggplot(data, mapping = aes(x = case_id, y = count, fill = case_id))+
-  geom_violin()+
-  theme(legend.position = "none")+
-  coord_flip()+
+rownames_to_column(raw_data[, random10], "Prot") %>%
+  pivot_longer(cols = 2:11, names_to = "case_id", values_to = "count")  %>% 
+  ggplot(data, mapping = aes(x = case_id, y = count, fill = case_id)) +
+  geom_violin() +
+  theme(legend.position = "none") +
+  coord_flip() +
   yscale("log10")
 
 #Follow the Limma Voom pipeline from https://ucdavis-bioinformatics-training.github.io/2018-June-RNA-Seq-Workshop/thursday/DE.html 
 
 #Create DGEList object
-d0 <- dplyr::select(counts, sample_info$case_id) %>%
-  DGEList()
+d0 <- DGEList(raw_data) # Do a select here to filter and exclude some samples
+dim(d0) # original n of genes
 
 #Calculate normalization factors
 d0 <- calcNormFactors(d0)
 d0
-
-#Filter low-expressed genes
-cutoff <- 1
-drop <- which(apply(cpm(d0), 1, max) < cutoff)
-d <- d0[-drop,] 
-dim(d) # number of genes left
 
 #Create a new variable “group”
 group <- as.factor(sample_info$PC1status)
@@ -118,7 +107,7 @@ group <- as.factor(sample_info$PC1status)
 #Specify the model to be fitted
 mm <- model.matrix(~0 + group)
 
-#Filter with filter by expression
+#Filter with filter by expression 
 keep <- filterByExpr(d0, mm)
 d <- d0[keep,]
 dim(d) # number of genes left
@@ -126,11 +115,10 @@ dim(d) # number of genes left
 #Visualize after normalization and filtering
 dnorm <- cpm(d)
 
-data2 <- as.data.frame(dnorm[, random10]) %>%
+as.data.frame(dnorm[, random10]) %>%
   rownames_to_column("Prot") %>%
-  pivot_longer(cols = 2:11, names_to = "case_id", values_to = "count_norm") #pivot_longer data to make them easily plotable with ggplot 2
-
-ggplot(data2, mapping = aes(x = case_id, y = count_norm, fill = case_id))+
+  pivot_longer(cols = 2:11, names_to = "case_id", values_to = "count_norm") %>%  #pivot_longer data to make them easily plotable with ggplot 2
+  ggplot(data2, mapping = aes(x = case_id, y = count_norm, fill = case_id))+
   geom_violin()+
   theme(legend.position = "none")+
   coord_flip()+
@@ -185,8 +173,8 @@ plot_PCs <- function(pca_toplot, feat, ncomp, dotsize){
 
 #Join PCA results and more relevant clinical data
 pca_fulldf <- dnorm.pca$ind$coord %>%
-  as_tibble(rownames="case_id") %>%
-  inner_join(sample_info[, c("case_id", "Diabetes", "PAMG", "ICA3")])
+  as_tibble(rownames="sample") %>%
+  inner_join(sample_info[, c("sample", "PAMG", "ICA3")])
 
 #plot pca dimensions with the good number of dimensions
 for (feat in colnames(pca_fulldf)[-c(1:(dim(dnorm.pca$ind$coord)[2]+1))]){
@@ -230,7 +218,7 @@ top.table <- topTable(tmp, sort.by = "P", n = Inf) %>%
                            TRUE ~ "Unchanged")) %>%
   rownames_to_column("Gene")
 
-head(top.table, 20)
+head(top.table, 20) %>% View()
 
 #How many DE genes are there?
 length(which(top.table$adj.P.Val < 0.05))
@@ -302,14 +290,14 @@ regulons <- dorothea_hs_pancancer %>%
 minsize = 5
 ges.filter = FALSE
 
-tf_act__<- dorothea::run_viper(counts, regulons,
-                               options =  list(minsize = minsize, eset.filter = ges.filter, 
-                                               cores = 1, verbose = FALSE, nes = TRUE))
+tf_act__ <- dorothea::run_viper(raw_data, regulons, # Is this good with raw data?
+                                options =  list(minsize = minsize, eset.filter = ges.filter, 
+                                                cores = 1, verbose = FALSE, nes = TRUE))
 
 # Format for analysis
 tf_act_ <- as_tibble(tf_act__, rownames = "TF") %>%
-  pivot_longer(cols = -TF, names_to = "bcr_patient_barcode") %>%
-  pivot_wider(id_cols = c(bcr_patient_barcode), names_from = TF)
+  pivot_longer(cols = -TF, names_to = "sample") %>%
+  pivot_wider(id_cols = c(sample), names_from = TF)
 
 # get 50 most variable
 tf_50_var <- summarise(tf_act_, across(where(is.double), var)) %>%
@@ -319,7 +307,7 @@ tf_50_var <- summarise(tf_act_, across(where(is.double), var)) %>%
 #Visualize TF activity
 #Create the matrix with only 50 top variable TF 
 tf_matrix_var <-  as_tibble(tf_act__, rownames = "TF" ) %>%
-  dplyr::select(TF, sample_info$case_id) %>%
+  dplyr::select(TF, sample_info$sample) %>%
   dplyr::filter(TF %in% tf_50_var$TF) %>%
   column_to_rownames("TF") %>%
   as.matrix()
@@ -328,32 +316,31 @@ tf_matrix_var <-  as_tibble(tf_act__, rownames = "TF" ) %>%
 
 #Calculate absolute correlation for each gene
 tf_ICA3_cor <- tf_act_ %>% 
-  rename(case_id = bcr_patient_barcode) %>%
-  inner_join(dplyr::select(sample_info, case_id), by = "case_id")  %>% #make the two table in same order
-  arrange(case_id) %>%
-  column_to_rownames("case_id") %>% #select continuous variables
+  inner_join(dplyr::select(sample_info, sample), by = "sample")  %>% #make the two table in same order
+  arrange(sample) %>%
+  column_to_rownames("sample") %>% #select continuous variables
   as.matrix() %>%
-  cor(y = sample_info$ICA3, method = "spearman") %>%
+  cor(y = sample_info$ICA3, method = "spearman", use = "complete.obs") %>%
   as.data.frame()
 
 #keep the 50 most absolute correlated TF
 top_tf_ICA3 <- mutate(tf_ICA3_cor, V1 = abs(V1)) %>%
-  arrange(desc(V1)) %>%
-  slice(1:50) %>%
-  rename(cor = V1) %>%
+  dplyr::arrange(desc(V1)) %>%
+  dplyr::slice(1:50) %>%
+  dplyr::rename(cor = V1) %>%
   rownames_to_column(var = "TF") 
 
 #Final matrix
 tf_matrix_cor_ICA3 <-  as_tibble(tf_act__, rownames = "TF" ) %>%
-  dplyr::select(TF, sample_info$case_id) %>%
+  dplyr::select(TF, sample_info$sample) %>%
   dplyr::filter(TF %in% top_tf_ICA3$TF) %>%
   column_to_rownames("TF") %>%
   as.matrix()
 
 
 #Get a df of the variables I want to annotate the columns of the heatmap
-annotation_col <- dplyr::select(sample_info, case_id, Diabetes, PAMG, ICA3, PC1) %>%
-  column_to_rownames(var = "case_id")
+annotation_col <- dplyr::select(sample_info, sample, PAMG, ICA3, PC1) %>%
+  column_to_rownames(var = "sample")
 
 
 
@@ -389,7 +376,7 @@ pheatmap(tf_matrix_var, annotation_col = annotation_col,
 annotation_row_cor_ICA3 <- tf_ICA3_cor %>% 
   rownames_to_column("TF") %>%
   inner_join(dplyr::select(top_tf_ICA3, TF), by = "TF") %>%
-  rename(cor = V1) %>%
+  dplyr::rename(cor = V1) %>%
   column_to_rownames(var = "TF") 
 
 #Top correlated tf with ICA3
@@ -405,24 +392,24 @@ pheatmap(tf_matrix_cor_ICA3, annotation_col = annotation_col,
 
 #Calculate absolute correlation for each gene
 tf_PC1_cor <- tf_act_ %>% 
-  rename(case_id = bcr_patient_barcode) %>%
-  inner_join(dplyr::select(sample_info, case_id), by = "case_id")  %>% #make the two table in same order
-  arrange(case_id) %>%
-  column_to_rownames("case_id") %>% #select continuous variables
+  dplyr::rename(sample = sample) %>%
+  inner_join(dplyr::select(sample_info, sample), by = "sample")  %>% #make the two table in same order
+  dplyr::arrange(sample) %>%
+  column_to_rownames("sample") %>% #select continuous variables
   as.matrix() %>%
   cor(y = sample_info$PC1, method = "spearman") %>%
   as.data.frame()
 
 #keep the 50 most absolute correlated TF
 top_tf_PC1 <- mutate(tf_PC1_cor, V1 = abs(V1)) %>%
-  arrange(desc(V1)) %>%
-  slice(1:50) %>%
-  rename(cor = V1) %>%
+  dplyr::arrange(desc(V1)) %>%
+  dplyr::slice(1:50) %>%
+  dplyr::rename(cor = V1) %>%
   rownames_to_column(var = "TF") 
 
 #Final matrix
 tf_matrix_cor_PC1 <-  as_tibble(tf_act__, rownames = "TF" ) %>%
-  dplyr::select(TF, sample_info$case_id) %>%
+  dplyr::select(TF, sample_info$sample) %>%
   dplyr::filter(TF %in% top_tf_PC1$TF) %>%
   column_to_rownames("TF") %>%
   as.matrix()
@@ -431,7 +418,7 @@ tf_matrix_cor_PC1 <-  as_tibble(tf_act__, rownames = "TF" ) %>%
 annotation_row_cor_PC1 <- tf_PC1_cor %>% 
   rownames_to_column("TF") %>%
   inner_join(dplyr::select(top_tf_PC1, TF), by = "TF") %>%
-  rename(cor = V1) %>%
+  dplyr::rename(cor = V1) %>%
   column_to_rownames(var = "TF") 
 
 #Top correlated tf with PC1
