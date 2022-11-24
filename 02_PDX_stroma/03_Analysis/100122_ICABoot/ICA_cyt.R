@@ -261,16 +261,16 @@ system(paste(c("cd 02_Output/ \n convert", concat_pdf, "ICA_cyt.pdf"), collapse 
 # Network analysis
 MID <- read_csv("01_Input/MID2022.csv")
 
-trans_mgi_ensembl <- deframe(annot_ensembl75[c("mgi_id", "ensembl_gene_id")])
+trans_mgi_name <- deframe(annot_ensembl75[c("mgi_id", "external_gene_id")])
 trans_ensembl_name <- deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
 
-nodes <- as_tibble(S_mat, rownames = "id") %>%
-  mutate(gene_name = trans_ensembl_name[id]) %>%
-  relocate(gene_name, .after = "id")
+nodes <- as_tibble(S_mat, rownames = "ensembl_id") %>%
+  mutate(id = trans_ensembl_name[ensembl_id]) %>%
+  relocate(ensembl_id, .after = "id")
 
 edges <- mutate(MID,
-                gene1 = trans_mgi_ensembl[gene1],
-                gene2 = trans_mgi_ensembl[gene2]) %>%
+                gene1 = trans_mgi_name[gene1],
+                gene2 = trans_mgi_name[gene2]) %>%
   dplyr::filter(gene1 %in% nodes$id, 
                 gene2 %in% nodes$id) %>%
   dplyr::rename(source = gene1,

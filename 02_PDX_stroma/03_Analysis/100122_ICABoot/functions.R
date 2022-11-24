@@ -485,10 +485,8 @@ PlotNetwork <- function(nodes, edges, S_mat, valid_comp, main_name){
   bestgenes <- lapply(names(thresholds), function(x)
     rownames(dplyr::filter(S_mat, abs(get(x)) > thresholds[x])))
   names(bestgenes) <- names(thresholds)
-  ggVennDiagram(bestgenes, label = "count", label_alpha = 0) +
-    scale_fill_gradient(low="grey", high = "red",  trans = "log2")
 
-  is_bestgene <- lapply(names(bestgenes), function(x) nodes$id %in% bestgenes[[x]]) %>% 
+  is_bestgene <- lapply(names(bestgenes), function(x) nodes$ensembl_id %in% bestgenes[[x]]) %>% 
     as_tibble(.name_repair= "universal" ) %>% 
     rename_all(~paste0("best_IC.",valid_comp)) %>%
     mutate(best_any = rowSums(.), 
@@ -496,7 +494,7 @@ PlotNetwork <- function(nodes, edges, S_mat, valid_comp, main_name){
   
   nodes_ <- bind_cols(nodes, is_bestgene)
   network <- createNetworkFromDataFrames(nodes_, edges, title = main_name)
-  setNodeLabelMapping("gene_name")
+  setNodeLabelMapping("id")
   createColumnFilter(filter.name='best_IC_filter', column='best_any', 0, 'IS_NOT', network = network)
   createSubnetwork(subnetwork.name = paste0(main_name,'_5%'))
   
