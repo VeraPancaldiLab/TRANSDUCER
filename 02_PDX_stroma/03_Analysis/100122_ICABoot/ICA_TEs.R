@@ -241,27 +241,37 @@ PlotGeneWeights(S_mat, TEs, 25, translate, complete_annotation, analysis_name = 
 ## GSVA of best genes
 ### gene set preparation
 all_genesets <- msigdbr("Mus musculus")
-all_genesets %>% filter(gs_cat %in% c("H", "C2", "C7")) -> use_genesets
+all_genesets %>% filter(gs_subcat %in% c("CP:REACTOME")) -> use_genesets
 msigdbr_list = split(x = use_genesets$ensembl_gene, f = use_genesets$gs_name)
-msigdb_descriptions <- use_genesets[c("gs_name", "gs_description")] %>%
-  unique() %>% column_to_rownames("gs_name")
+
+signature_dict <- dplyr::select(all_genesets, c(gs_name, gs_id)) %>%
+  distinct(gs_id, .keep_all = T) %>%  deframe()
 
 gsvaRes <- gsva(data.matrix(S_mat), msigdbr_list, min.sz = 15)
 
 ### Plot
 for (comp in colnames(S_mat)){
   gsvaRes[order(gsvaRes[,comp]),]
-
-  gsvaRes %>% as.data.frame() %>%  mutate(the_rank = rank(-get(comp), ties.method = "random")) %>%
-    dplyr::filter(the_rank < 25 | the_rank > (nrow(gsvaRes)-25)) %>% arrange(the_rank) %>%
-    dplyr::select(!c(the_rank)) -> gsvaTop
-
-  gsvaTop %>% pheatmap(filename = paste("02_Output/gsva_TEs", comp, ".pdf", sep=""), height = 10 , width = 15,
-                       cluster_rows = F, main = paste(comp, "\n Best gene sets")) # to have a pheatmap
-  # gsvaTop  %>% rownames() %>% msigdb_descriptions[.,] %>%
-  #   cbind(gsvaTop[comp], .) %>% rownames_to_column("msigdb") %>% write_tsv("02_Output/gsvaRes_IC11nc13.tsv") #to write
+  
+  gsvaTop <- as_tibble(gsvaRes, rownames = "gene_set") %>% 
+    mutate(the_rank = rank(-get(comp), ties.method = "random"),
+           gene_set = if_else(str_count(gene_set, "_") < 10, gene_set, signature_dict[gene_set]),
+           gene_set = str_remove(gene_set, "REACTOME_"),
+           gene_set = fct_reorder(gene_set, the_rank,.desc = T)) %>%
+    pivot_longer(cols = -c(gene_set, the_rank), names_to = "component", values_to = "ES") %>% 
+    dplyr::filter(the_rank < 25 | the_rank > (nrow(gsvaRes)-25)) %>% 
+    mutate(component = if_else(component == comp, comp, "Other")) %>% 
+    dplyr::select(!c(the_rank))
+  
+  ggplot(gsvaTop, aes(x = ES, y = gene_set)) + 
+    geom_point(aes(alpha = if_else(component == comp, 0.9, 0.3),
+                   color = if_else(ES > 0, "blue", "red"))) +
+    theme_bw() +
+    labs(title = comp, subtitle = "Best Reactome gene sets") +
+    rremove("legend") +
+    rremove("ylab")
+  ggsave(paste0("02_Output/gsva_TEs", comp, ".pdf"))
 }
-
 
 concat_pdf <- c("TEs_bootstrapICA_lineplot.pdf",
                 "TEs_bootstrapICA_boxplot.pdf",
