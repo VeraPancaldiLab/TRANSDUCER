@@ -187,6 +187,14 @@ dev.off()
 cafs.choose.sym %>% Get_mostvar(n = 50) %>% pheatmap(main=title_res,scale = "row",  cellwidth=15, cellheight=10, filename = "02_Output/plots/50_mostvar.png",
                                                    cluster_cols = T, cluster_rows = T, show_rownames = T, annotation_col = cafs.info[full_colanot])
 dev.off()
+
+## Barplot of whatever gene
+cafs.gene.expression <- as_tibble(cafs.choose.sym, rownames = "gene") %>% 
+  pivot_longer(cols = -gene ,names_to = "CL",values_to = "expression" ) %>%
+  pivot_wider(id_cols = "CL", names_from = "gene", values_from = "expression")
+
+dplyr::mutate(cafs.gene.expression, CL = fct(CL, levels = arrange(cafs.gene.expression, desc(SHMT2))$CL)) %>% ggplot(aes(x = SHMT2, y = CL)) + geom_bar(stat = "identity")
+
 ## GSVA 
 ### General
 all_genesets <- msigdbr("human")
