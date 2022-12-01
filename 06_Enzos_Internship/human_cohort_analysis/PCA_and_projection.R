@@ -115,7 +115,9 @@ acinar_max = 0.05
 islet_max = 1
 tumor_tissue_min = 0.8
 ################################################################################
-
+# Create sample_info_PACAOMICS
+sample_info_PACAOMICS <- left_join(tibble(sample = names(PACAOMICS_raw)[-1]),
+                                   sample_info, by= "sample")
 # Translate EnsemblID to gene names
 ## Version 75 for PDX data
 ensembl75 <- useEnsembl(biomart = "genes",
@@ -354,7 +356,7 @@ pca_full_df <- pca_pdx[["x"]] %>%
 show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Sauyeun PDX"),
                              mutate(projection_PACAOMICS, sample = paste0(sample, "_OG"),
                                     dataset = "PACAOMICS PDX"),
-                             as_tibble(projection) %>% mutate(ISRact = "Unknown",
+                             as_tibble(projection_CPTAC) %>% mutate(ISRact = "Unknown",
                                                               dataset = "CPTAC"))
 
 dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
