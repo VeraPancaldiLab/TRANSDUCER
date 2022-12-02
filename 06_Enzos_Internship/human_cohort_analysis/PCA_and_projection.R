@@ -24,6 +24,9 @@ library(rcompanion)
 library(corrr)
 library(rstatix)
 library(survminer)
+library(pdacmolgrad)
+##devtools::install_github("RemyNicolle/pdacmolgrad")
+
 
 setwd("~/Documents/02_TRANSDUCER/06_Enzos_Internship/human_cohort_analysis/Data/")
 
@@ -115,9 +118,6 @@ acinar_max = 0.05
 islet_max = 1
 tumor_tissue_min = 0.8
 ################################################################################
-# Create sample_info_PACAOMICS
-sample_info_PACAOMICS <- left_join(tibble(sample = names(PACAOMICS_raw)[-1]),
-                                   sample_info, by= "sample")
 # Translate EnsemblID to gene names
 ## Version 75 for PDX data
 ensembl75 <- useEnsembl(biomart = "genes",
@@ -188,13 +188,21 @@ if (filter == TRUE){
 
 
 ## PACAOMICS
-PACAOMICS_norm <- column_to_rownames(PACAOMICS_raw, "EnsemblID") %>%
+PACAOMICS_norm_ <- column_to_rownames(PACAOMICS_raw, "EnsemblID") %>%
   DGEList() %>%
   calcNormFactors(method= norm_method) %>%
-  cpm(log=TRUE) %>%
-  t() %>%
+  cpm(log=TRUE)
+
+PACAOMICS_norm <- t(PACAOMICS_norm_) %>%
   as_tibble(rownames = "sample")
 
+### Create sample_info_PACAOMICS
+rownames(PACAOMICS_norm_) <- translate[rownames(PACAOMICS_norm_)]
+type_pamg <- projectMolGrad(newexp = PACAOMICS_norm_,  geneSymbols =rownames(PACAOMICS_norm_)) %>%
+  as_tibble(rownames = "sample")
+sample_info_PACAOMICS <- dplyr::select(sample_info, -PAMG) %>%
+  right_join(dplyr::select(type_pamg, sample, PDX)) %>% 
+  dplyr::rename(PAMG = PDX)
 
 # PCA
 ## Sauyeun PDX sample and gene filtering
@@ -324,7 +332,7 @@ PACAOMICS_PC1 <- arrange(projection_PACAOMICS, PC1) %>%
   dplyr::select(sample, PC1,  PC1status) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
   mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
-  inner_join(sample_info[, c("sample","PAMG", "ICA3")], by = "sample")
+  inner_join(sample_info_PACAOMICS[, c("sample","PAMG", "ICA3")], by = "sample")
 
 
 ### Same original Sauyeun PDX with the middle samples
@@ -385,7 +393,7 @@ PACAOMICS_PC1 <-  arrange(projection_PACAOMICS, PC1) %>%
   dplyr::select(sample, PC1,  PC1status) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
   mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
-  left_join(sample_info[, c("sample","PAMG", "ICA3")], by = "sample")
+  left_join(sample_info_PACAOMICS[, c("sample","PAMG", "ICA3")], by = "sample")
 
 write.csv(PACAOMICS_PC1, "../02_Output/PACAOMICS_PC1.csv", row.names = FALSE)
 
@@ -487,44 +495,41 @@ as_tibble(projection_full_df) %>% ggplot(aes(y = PC1, x = Moffitt)) +
 #-------------------------------------------------------------------------------
 
 # PC1 is Basal/Classical vs PC1 is ISRact
-## PacaOmics
-paca_ICA3_PC1_cor <- cor(PACAOMICS_PC1$PC1, PACAOMICS_PC1$ICA3, method = "spearman")
-
-ggplot(PACAOMICS_PC1, aes(PC1, ICA3, color = ICA3)) +
-  geom_point(shape = 16, size = 4, show.legend = FALSE) +
-  theme_minimal() +
-  scale_color_gradient(low = "#0091ff", high = "#f0650e") +
-  labs(title = "Comparison between PC1 and ICA3 in PaCaOmics samples",
-       subtitle = paste("Spearman correlation = ", round(paca_ICA3_PC1_cor, 2), sep = ""))
-
-paca_PAMG_PC1_cor <- cor(PACAOMICS_PC1$PC1, PACAOMICS_PC1$PAMG, method = "spearman")
-
-ggplot(PACAOMICS_PC1, aes(PC1, PAMG, color = PAMG)) +
-  geom_point(shape = 16, size = 4, show.legend = FALSE) +
-  theme_minimal() +
-  scale_color_gradient(low = "#0091ff", high = "#f0650e")  +
-  labs(title = "Comparison between PC1 and PAMG in PaCaOmics samples",
-       subtitle = paste("Spearman correlation = ", round(paca_PAMG_PC1_cor, 2), sep = ""))
-
+## Function to enhance correlation visualization
+correlation_plotter <- function(data = Sauyeun_PC1, col1 = "PC1", col2 = "PAMG", data_name = "sauyeun PDX"){
+  corr_spearman <- rcorr(data[[col1]], data[[col2]], type = "spearman")
+  corr_pearson <- rcorr(data[[col1]], data[[col2]], type = "pearson")
+  stats <- paste0("Spearman: R = ", round(corr_spearman$r["x","y"], 2), ", pval = ", round(corr_spearman$P["x","y"], 4),
+                 "\nPearson: R = ", round(corr_pearson$r["x","y"], 2), ", pval = ", round(corr_pearson$P["x","y"], 4))
+  
+  ggplot(data) +
+    aes_string(col1, col2) +
+    geom_point(shape = 16, size = 4, show.legend = FALSE) +
+    geom_smooth(method=lm) +
+    theme_minimal() +
+    labs(title = paste0("Comparison between ", col1, " and ", col2, " in ", data_name),
+         subtitle = stats)
+}
 
 ## Sauyeun PDX
-sauy_ICA3_PC1_cor <- cor(Sauyeun_PC1$PC1, Sauyeun_PC1$ICA3, method = "spearman")
+### ISR vs PC1
+correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PC1", data_name = "sauyeun PDX")
 
-ggplot(Sauyeun_PC1, aes(PC1, ICA3, color = ICA3)) +
-  geom_point(shape = 16, size = 4, show.legend = FALSE) +
-  theme_minimal() +
-  scale_color_gradient(low = "#0091ff", high = "#f0650e") +
-  labs(title = "Comparison between PC1 and ICA3 in Sauyeun samples",
-       subtitle = paste("Spearman correlation = ", round(sauy_ICA3_PC1_cor, 2), sep = ""))
+### PAMG vs PC1
+correlation_plotter(data = Sauyeun_PC1, col1 = "PAMG", col2 = "PC1", data_name = "sauyeun PDX")
 
-sauy_PAMG_PC1_cor <- cor(Sauyeun_PC1$PC1, Sauyeun_PC1$PAMG, method = "spearman")
+### ISR vs PAMG
+correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "sauyeun PDX")
 
-ggplot(Sauyeun_PC1, aes(PC1, PAMG, color = PAMG)) +
-  geom_point(shape = 16, size = 4, show.legend = FALSE) +
-  theme_minimal() +
-  scale_color_gradient(low = "#0091ff", high = "#f0650e")+
-  labs(title = "Comparison between PC1 and PAMG in Sauyeun samples",
-       subtitle = paste("Spearman correlation = ", round(sauy_PAMG_PC1_cor, 2), sep = ""))
+## PACAOMICs
+### ISR vs PC1
+correlation_plotter(data = PACAOMICS_PC1, col1 = "ICA3", col2 = "PC1", data_name = "PACAOMICs PDX")
+
+### PAMG vs PC1
+correlation_plotter(data = PACAOMICS_PC1, col1 = "PAMG", col2 = "PC1", data_name = "PACAOMICs PDX")
+
+### ISR vs PAMG
+correlation_plotter(data = PACAOMICS_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "PACAOMICs PDX")
 
 
 # Survival curves reguarding ISR status
