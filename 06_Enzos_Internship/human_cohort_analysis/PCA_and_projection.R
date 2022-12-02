@@ -181,10 +181,17 @@ Sauyeun_norm <- dplyr::select(Sauyeun_norm, sample, any_of(RN2017_raw$EnsemblID)
 ## CPTAC
 ### processing
 if (filter == TRUE){
-  CPTAC_tumor_raw <- dataFilter(CPTAC_tumor_raw, clinical_data, Molecular_phenotype_data, estimation_method, neoplastic_min, acinar_max, islet_max, tumor_tissue_min)
+  CPTAC_tumor <- dataFilter(CPTAC_tumor_raw, clinical_data, Molecular_phenotype_data, estimation_method, neoplastic_min, acinar_max, islet_max, tumor_tissue_min)
 } else {
-  CPTAC_tumor_raw <- dplyr::select(CPTAC_tumor_raw, -low_purity_samples$case_id)
+  CPTAC_tumor <- dplyr::select(CPTAC_tumor_raw, -low_purity_samples$case_id)
 }
+
+### Create sample_info_CPTAC
+
+type_pamg <- projectMolGrad(newexp = column_to_rownames(dplyr::select(CPTAC_tumor,-EnsemblID), "Gene"),  geneSymbols = CPTAC_tumor$Gene) %>%
+  as_tibble(rownames = "sample")
+sample_info_CPTAC <- dplyr::select(type_pamg, sample, ICGCrnaseq) %>% 
+  dplyr::rename(PAMG = ICGCrnaseq)
 
 
 ## PACAOMICS
@@ -203,6 +210,7 @@ type_pamg <- projectMolGrad(newexp = PACAOMICS_norm_,  geneSymbols =rownames(PAC
 sample_info_PACAOMICS <- dplyr::select(sample_info, -PAMG) %>%
   right_join(dplyr::select(type_pamg, sample, PDX)) %>% 
   dplyr::rename(PAMG = PDX)
+
 
 # PCA
 ## Sauyeun PDX sample and gene filtering
@@ -270,7 +278,7 @@ top_genes <- mostCorrGenes(Sauyeun_norm, select_method, keepgenes, cormethod, to
 table(top_genes$EnsemblID %in% colnames(ISRact_data_bestsubset)) #v different 568 genes missing
 
 #### Check presence in datasets
-table(top_genes$EnsemblID %in% CPTAC_tumor_raw$EnsemblID) # of these 321 do not exist in the original
+table(top_genes$EnsemblID %in% CPTAC_tumor$EnsemblID) # of these 321 do not exist in the original
 
 #### Final subset
 Sauyeun_norm_subset <- dplyr::select(Sauyeun_norm, sample, top_genes$EnsemblID) %>% #to keep Jacobo's genes: any_of(colnames(ISRact_data_bestsubset))
@@ -281,7 +289,7 @@ Sauyeun_norm_subset <- dplyr::select(Sauyeun_norm, sample, top_genes$EnsemblID) 
 ## Run the PCA 
 pca_pdx <- Sauyeun_norm_subset %>% 
   column_to_rownames( "sample") %>% 
-  dplyr::select(any_of(CPTAC_tumor_raw$EnsemblID)) %>%
+  dplyr::select(any_of(CPTAC_tumor$EnsemblID)) %>%
   scale() %>%
   prcomp()
 
@@ -301,9 +309,9 @@ fviz_pca_ind(pca_pdx,
 ## Projecting datasets on this PCA
 ### CPTAC
 #### transpose human data for projection
-human_data <- CPTAC_tumor_raw %>%
+human_data <- CPTAC_tumor %>%
   inner_join(dplyr::select(top_genes, EnsemblID), by = "EnsemblID") %>% #subset top genes
-  pivot_longer(cols = 2:(length(CPTAC_tumor_raw)-1), names_to = "case_id", values_to = "Expression") %>% 
+  pivot_longer(cols = 2:(length(CPTAC_tumor)-1), names_to = "case_id", values_to = "Expression") %>% 
   dplyr::filter(!str_detect(EnsemblID, 'NA')) %>% #remove eventual NA for gene Ensembl
   dplyr::select(-Gene) %>% 
   pivot_wider(names_from = EnsemblID, values_from = Expression, names_repair = "minimal") %>%
@@ -402,7 +410,10 @@ CPTAC_PC1 <- arrange(projection_CPTAC, PC1) %>%
   mutate(PC1status = if_else(PC1 < quantile(projection_CPTAC$PC1, probs = 0.3333), "low_PC1",
                              if_else(PC1 < quantile(projection_CPTAC$PC1, probs = 0.6666), "medium_PC1", "high_PC1"))) %>%
   rownames_to_column("sample") %>%
-  dplyr::select(sample, PC1,  PC1status)
+  dplyr::select(sample, PC1,  PC1status) %>%
+  left_join(sample_info_CPTAC, by = "sample")
+
+
 
 write.csv(CPTAC_PC1, "../02_Output/CPTAC_PC1.csv", row.names = FALSE)
 
@@ -504,7 +515,7 @@ correlation_plotter <- function(data = Sauyeun_PC1, col1 = "PC1", col2 = "PAMG",
   
   ggplot(data) +
     aes_string(col1, col2) +
-    geom_point(shape = 16, size = 4, show.legend = FALSE) +
+    geom_point(shape = 16, size = 2, show.legend = FALSE) +
     geom_smooth(method=lm) +
     theme_minimal() +
     labs(title = paste0("Comparison between ", col1, " and ", col2, " in ", data_name),
@@ -513,13 +524,13 @@ correlation_plotter <- function(data = Sauyeun_PC1, col1 = "PC1", col2 = "PAMG",
 
 ## Sauyeun PDX
 ### ISR vs PC1
-correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PC1", data_name = "sauyeun PDX")
+correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PC1", data_name = "Sauyeun PDX")
 
 ### PAMG vs PC1
-correlation_plotter(data = Sauyeun_PC1, col1 = "PAMG", col2 = "PC1", data_name = "sauyeun PDX")
+correlation_plotter(data = Sauyeun_PC1, col1 = "PAMG", col2 = "PC1", data_name = "Sauyeun PDX")
 
 ### ISR vs PAMG
-correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "sauyeun PDX")
+correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "Sauyeun PDX")
 
 ## PACAOMICs
 ### ISR vs PC1
@@ -531,6 +542,9 @@ correlation_plotter(data = PACAOMICS_PC1, col1 = "PAMG", col2 = "PC1", data_name
 ### ISR vs PAMG
 correlation_plotter(data = PACAOMICS_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "PACAOMICs PDX")
 
+## CPTAC
+### PAMG vs PC1
+correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "CPTAC tumors")
 
 # Survival curves reguarding ISR status
 surv_data <- dplyr::rename(human_ISR, case_id = sample) %>%
