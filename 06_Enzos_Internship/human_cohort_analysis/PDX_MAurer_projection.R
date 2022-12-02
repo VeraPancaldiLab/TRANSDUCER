@@ -21,6 +21,7 @@ library(rcompanion)
 library(corrr)
 library(rstatix)
 library(survminer)
+library(pdacmolgrad)
 
 
 setwd("~/Documents/02_TRANSDUCER/06_Enzos_Internship/human_cohort_analysis/")
@@ -38,22 +39,6 @@ load("Data/Start Maurer EvsSvsB.RData")
 sample_info <- read_delim("Data/sample_info.tsv", 
                           delim = "\t", escape_double = FALSE, 
                           trim_ws = TRUE)
-# #List of low neoplastic purity samples as mentioned in the proteogenomics paper
-# low_purity_samples <- read_delim("Data/low_purity_samples.csv", 
-#                                  delim = "\t", escape_double = FALSE, 
-#                                  trim_ws = TRUE)
-# 
-# #Clinical data sheet for human cohort data
-# clinical_data <- read_excel("Data/mmc1.xlsx", 
-#                             sheet = "Clinical_data") %>%
-#   mutate(follow_up_days = as.numeric(follow_up_days)) %>%
-#   mutate(status = ifelse(vital_status == "Deceased", 2, 1))
-# 
-# #Molecular phenotype data sheet for human cohort data
-# Molecular_phenotype_data <- read_excel("Data/mmc1.xlsx", 
-#                                        sheet = "Molecular_phenotype_data") %>% 
-#   mutate_at(vars(immune_deconv:`necrosis_(%OF_TUMOR_WITH_NECROSIS)_histology_estimate`, KRAS_VAF), as.numeric) %>%
-#   mutate_at(vars(Bailey:Moffitt), as.factor) #change type to avoid errors
 
 ################################################################################
 #Variables for normalization and gene selection
@@ -100,16 +85,23 @@ normdata <- dplyr::select(rawdata, -EnsemblID) %>%
   t() %>%
   as_tibble(rownames = "sample")
 
-maurer_normcount <- DGEList(maurer_rawcount) %>%
+maurer_normcount_ <- DGEList(maurer_rawcount) %>%
   calcNormFactors(method= norm_method) %>%
-  cpm(log=TRUE) %>%
-  t() %>%
+  cpm(log=TRUE) 
+
+maurer_normcount <- %>%
+  t(maurer_normcount_) %>%
   as_tibble(rownames = "sample")
 
+### Create sample_info_maurer
+
+type_pamg <- projectMolGrad(newexp = maurer_normcount_,  geneSymbols = rownames(maurer_normcount_)) %>%
+  as_tibble(rownames = "sample")
+sample_info_Maurer <- dplyr::select(type_pamg, sample, ICGCrnaseq) %>% 
+  dplyr::rename(PAMG = ICGCrnaseq)
 
 
 ####Subset top genes and extreme samples####
-
 #List 10 most extreme samples for ICA3 
 ICA3_density <- ggdensity(
   sample_info, x = "ICA3", 
@@ -216,6 +208,27 @@ ggplot(projection_Maurer, aes(x=PC1, y=PC2)) +
 #write PC1 weight
 Maurer_PC1 <- arrange(projection_Maurer, PC1) %>% 
   mutate(PC1status = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3/3))), labels = c("low_PC1", "medium_PC1", "high_PC1"), include.lowest = TRUE)) %>%
-  dplyr::select(sample, PC1,  PC1status) 
+  dplyr::select(sample, PC1,  PC1status)  %>%
+  left_join(sample_info_Maurer, by="sample")
   
 write.csv(Maurer_PC1, "Maurer_bulk_PC1.csv", row.names = FALSE)
+
+# check correlation with PAMG
+## Function to enhance correlation visualization
+correlation_plotter <- function(data = Sauyeun_PC1, col1 = "PC1", col2 = "PAMG", data_name = "sauyeun PDX"){
+  corr_spearman <- rcorr(data[[col1]], data[[col2]], type = "spearman")
+  corr_pearson <- rcorr(data[[col1]], data[[col2]], type = "pearson")
+  stats <- paste0("Spearman: R = ", round(corr_spearman$r["x","y"], 2), ", pval = ", round(corr_spearman$P["x","y"], 4),
+                  "\nPearson: R = ", round(corr_pearson$r["x","y"], 2), ", pval = ", round(corr_pearson$P["x","y"], 4))
+  
+  ggplot(data) +
+    aes_string(col1, col2) +
+    geom_point(shape = 16, size = 2, show.legend = FALSE) +
+    geom_smooth(method=lm) +
+    theme_minimal() +
+    labs(title = paste0("Comparison between ", col1, " and ", col2, " in ", data_name),
+         subtitle = stats)
+}
+
+## PAMG vs PC1
+correlation_plotter(data = Maurer_PC1, col1 = "PAMG", col2 = "PC1", data_name = "Maurer epithelial")
