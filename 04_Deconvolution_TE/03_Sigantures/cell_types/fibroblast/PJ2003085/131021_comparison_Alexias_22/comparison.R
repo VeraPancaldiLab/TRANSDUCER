@@ -227,17 +227,22 @@ if (signatures_magali == F){
     caf.labs <- names(pdac_CAF_signatures)
 }
 
+#Espinet et al 2019 signature
+IFNsign <- read_tsv("01_Input/IFNsign_Espinet.tsv", col_names = "IFNsign")
+stroma_signatures$IFNsign <- IFNsign$IFNsign
+
 ### Venn of the signature composition
 myCol <- brewer.pal(4, "Pastel2")
 
 ggvenn::ggvenn(data = stroma_signatures[caf.labs], fill_color = myCol)
 
+### Analysis perse
 gsvaRes <- gsva(cafs.choose.sym %>% data.matrix(), stroma_signatures) 
+gsvaRes[caf.labs,] -> gsvaRes.cafs
 
 gsvaRes %>% pheatmap(main=title_res,
                            cluster_cols = T, cluster_rows = T, annotation_col = cafs.info[full_colanot])
 
-gsvaRes[caf.labs,] -> gsvaRes.cafs
 
 ### Signature enrichment
 #svg("02_Output/CAFs_class.svg")
