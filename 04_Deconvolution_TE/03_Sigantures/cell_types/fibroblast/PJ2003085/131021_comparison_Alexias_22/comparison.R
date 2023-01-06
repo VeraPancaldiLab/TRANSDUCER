@@ -255,14 +255,38 @@ gsvaRes.cafs %>% t() -> cafs.info[, caf.labs]
 
 
 ### Marker genes + signature enrichments
-subtype_genes <- tibble(subtype = caf.labs, value = stroma_signatures[caf.labs]) %>%
-  unnest(c("value")) %>% filter(value %in% rownames(cafs.choose.sym)) %>%
-  column_to_rownames("value")
+#### function
+Get_geneset_genes <- function(data, gene_set, gene_set_name){
+  
+  #(data = cafs.choose.sym, gene_set = stroma_signatures, gene_set_name = caf.labs
+  
+  gene_set_genes <- tibble(name = gene_set_name, value = gene_set[gene_set_name]) %>%
+    unnest(c("value")) %>% filter(value %in% rownames(data)) %>%
+    column_to_rownames("value")
+}
 
-cafs.choose.sym[rownames(subtype_genes),] %>% pheatmap(main=title_res,  cellwidth=15, cellheight=1, filename = "02_Output/plots/PDAcsignaturemarkers.png",
-                                                       cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = F, annotation_col = cafs.info[caf.labs],
-                                                       annotation_row = subtype_genes)
+#### Elayada et al 2019 (myCAF iCAF)
+elayada2019_genes <- Get_geneset_genes(data = cafs.choose.sym,
+                                 gene_set = stroma_signatures,
+                                 gene_set_name = caf.labs)
+
+cafs.choose.sym[rownames(elayada2019_genes),] %>% 
+  pheatmap(main=title_res,  cellwidth=15, cellheight=1, filename = "02_Output/plots/PDAC_elayada2019_markergenes.png",
+           cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = F, annotation_col = as.data.frame(t(gsvaRes[caf.labs,])),
+           annotation_row = elayada2019_genes)
 dev.off()
+
+#### Espinet et al 2019 (IFNsign)
+espinet2019_genes <- Get_geneset_genes(data = cafs.choose.sym,
+                                       gene_set = stroma_signatures,
+                                       gene_set_name = "IFNsign")
+
+cafs.choose.sym[rownames(espinet2019_genes),] %>% 
+  pheatmap(main=title_res,  cellwidth=15, cellheight=10, filename = "02_Output/plots/PDAC_espinet2019_markergenes.png",
+           cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = T, annotation_col = as.data.frame(t(gsvaRes[c("IFNsign", caf.labs),])),
+           annotation_row = espinet2019_genes)
+dev.off()
+
 
 ## PCA analysis
 cafs.choose %>% prcomp() -> pca_res
