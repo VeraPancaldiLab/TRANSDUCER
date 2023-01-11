@@ -25,6 +25,7 @@ library(corrr)
 library(rstatix)
 library(survminer)
 library(pdacmolgrad)
+library(GSVA)
 ##devtools::install_github("RemyNicolle/pdacmolgrad")
 
 
@@ -102,6 +103,10 @@ RN2017_raw <- read_delim("Human-Tumor_rawcount_Transcriptome.tsv",
 load("Alexias_53PDX/PDX_HUMAN_RAW.RData")
 PACAOMICs_90_raw <- as_tibble(x, rownames ="EnsemblID")
 
+## Other data
+### Espinet et al 2019 IFNsign
+IFNsign_geneset <- read_tsv("IFNsign_Espinet.tsv",col_names = "IFNsign")
+
 ################################################################################
 # PARAMETERS
 Sauyeun_raw = rawTumor_Cyt #geneCount_raw_28s_totalRNA | rawTumor_Cyt
@@ -155,11 +160,13 @@ CPTAC_tumor_raw$EnsemblID <- CPTAC_tumor_raw$Gene %>%
 # Processing and Normalization
 ## Sauyeun PDX
 ### Normalize raw counts
-Sauyeun_norm <- dplyr::select(Sauyeun_raw, -Genenames) %>%
+Sauyeun_norm_ <- dplyr::select(Sauyeun_raw, -Genenames) %>%
   column_to_rownames( "EnsemblID") %>%
   DGEList() %>%
   calcNormFactors(method= norm_method) %>%
-  cpm(log=TRUE) %>%
+  cpm(log=TRUE) 
+
+Sauyeun_norm <- Sauyeun_norm_ %>%
   t() %>%
   as_tibble(rownames = "sample")
 
@@ -176,6 +183,12 @@ g1
 ### Keep common genes with RN2017_raw 
 Sauyeun_norm <- dplyr::select(Sauyeun_norm, sample, any_of(RN2017_raw$EnsemblID)) # needed to not get errors when projecting (Ensembl version?)
 
+### add Espinet IFNsign enrichment
+rownames(Sauyeun_norm_) <- translate[rownames(Sauyeun_norm_)]
+sample_info <- gsva(Sauyeun_norm_, IFNsign_geneset) %>% 
+  t() %>% 
+  as_tibble(rownames = "sample") %>% 
+  right_join(sample_info, "sample")
 
 
 ## CPTAC
@@ -190,7 +203,13 @@ if (filter == TRUE){
 
 type_pamg <- projectMolGrad(newexp = column_to_rownames(dplyr::select(CPTAC_tumor,-EnsemblID), "Gene"),  geneSymbols = CPTAC_tumor$Gene) %>%
   as_tibble(rownames = "sample")
+
+type_IFNsign <- gsva(data.matrix(column_to_rownames(dplyr::select(CPTAC_tumor,-EnsemblID), "Gene")), IFNsign_geneset) %>%
+  t() %>% 
+  as_tibble(rownames = "sample")
+
 sample_info_CPTAC <- dplyr::select(type_pamg, sample, ICGCrnaseq) %>% 
+  left_join(type_IFNsign, "sample") %>%
   dplyr::rename(PAMG = ICGCrnaseq)
 
 
@@ -205,10 +224,17 @@ PACAOMICS_norm <- t(PACAOMICS_norm_) %>%
 
 ### Create sample_info_PACAOMICS
 rownames(PACAOMICS_norm_) <- translate[rownames(PACAOMICS_norm_)]
+
 type_pamg <- projectMolGrad(newexp = PACAOMICS_norm_,  geneSymbols =rownames(PACAOMICS_norm_)) %>%
   as_tibble(rownames = "sample")
-sample_info_PACAOMICS <- dplyr::select(sample_info, -PAMG) %>%
+
+type_IFNsign <- gsva(PACAOMICS_norm_, IFNsign_geneset) %>%
+  t() %>% 
+  as_tibble(rownames = "sample")
+
+sample_info_PACAOMICS <- dplyr::select(sample_info, -PAMG, -IFNsign) %>%
   right_join(dplyr::select(type_pamg, sample, PDX)) %>% 
+  left_join(type_IFNsign, "sample") %>%
   dplyr::rename(PAMG = PDX)
 
 
@@ -356,7 +382,7 @@ Sauyeun_PC1 <- arrange(projection_Sauyeun, PC1) %>%
   dplyr::select(sample, PC1,  PC1status) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
   mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
-  inner_join(sample_info[, c("sample","PAMG", "ICA3", "Diabetes")], by = "sample")
+  inner_join(sample_info[, c("sample","PAMG", "ICA3", "IFNsign", "Diabetes")], by = "sample")
 
 
 #Plot pca and projections
@@ -376,13 +402,25 @@ show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Sauyeu
                                                               dataset = "CPTAC"))
 
 dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
-  dplyr::filter(dataset %in% c("Sauyeun PDX", "PACAOMICS PDX"),
+  dplyr::filter(dataset %in% c("Sauyeun PDX", "PACAOMICS PDX", "CPTAC"),
               ISRact %in% c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) %>% 
 ggplot(aes(x=PC1, y=PC2, color = ISRact, shape = dataset)) +
   geom_point() +
   scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "CPTAC")) +
   scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) +
-  ylim(-200,15)
+  ylim(-250,15)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Distribution of PC1 gene weights with respect to IFNsign
+PC1_vs_IFNsign <- as_tibble(pca_pdx$rotation, rownames = "EnsemblID") %>%
+  mutate(Gene_symbol = translate[EnsemblID],
+         in_IFNsign = ifelse(Gene_symbol %in% IFNsign_geneset$IFNsign, TRUE, FALSE))
+  
+ggplot(PC1_vs_IFNsign, aes(x = PC1)) +
+  geom_density() +
+  geom_rug(data = dplyr::filter(PC1_vs_IFNsign, in_IFNsign == T))
+
+dplyr::filter(PC1_vs_IFNsign, in_IFNsign == T) %>% dplyr::select(PC1, Gene_symbol)
 #-------------------------------------------------------------------------------
 
 #Select human cohort most extreme samples regarding PC1 #! Remove when further scripts are adapted!
@@ -401,7 +439,7 @@ PACAOMICS_PC1 <-  arrange(projection_PACAOMICS, PC1) %>%
   dplyr::select(sample, PC1,  PC1status) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
   mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
-  left_join(sample_info_PACAOMICS[, c("sample","PAMG", "ICA3")], by = "sample")
+  left_join(sample_info_PACAOMICS[, c("sample","PAMG", "IFNsign", "ICA3")], by = "sample")
 
 write.csv(PACAOMICS_PC1, "../02_Output/PACAOMICS_PC1.csv", row.names = FALSE)
 
@@ -532,6 +570,13 @@ correlation_plotter(data = Sauyeun_PC1, col1 = "PAMG", col2 = "PC1", data_name =
 ### ISR vs PAMG
 correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "Sauyeun PDX")
 
+### ISR vs IFNsign
+correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "IFNsign", data_name = "Sauyeun PDX")
+
+### PC1 vs IFNsign
+correlation_plotter(data = Sauyeun_PC1, col1 = "PC1", col2 = "IFNsign", data_name = "Sauyeun PDX")
+
+
 ## PACAOMICs
 ### ISR vs PC1
 correlation_plotter(data = PACAOMICS_PC1, col1 = "ICA3", col2 = "PC1", data_name = "PACAOMICs PDX")
@@ -542,9 +587,20 @@ correlation_plotter(data = PACAOMICS_PC1, col1 = "PAMG", col2 = "PC1", data_name
 ### ISR vs PAMG
 correlation_plotter(data = PACAOMICS_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "PACAOMICs PDX")
 
+### ISR vs IFNsign
+correlation_plotter(data = PACAOMICS_PC1, col1 = "ICA3", col2 = "IFNsign", data_name = "PACAOMICs PDX")
+
+### PC1 vs IFNsign
+correlation_plotter(data = PACAOMICS_PC1, col1 = "PC1", col2 = "IFNsign", data_name = "PACAOMICs PDX")
+
+
 ## CPTAC
 ### PAMG vs PC1
 correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "CPTAC tumors")
+
+### IFNsign vs PC1
+correlation_plotter(data = CPTAC_PC1, col1 = "PC1", col2 = "IFNsign", data_name = "CPTAC tumors")
+
 
 # Survival curves reguarding ISR status
 surv_data <- dplyr::rename(human_ISR, case_id = sample) %>%
