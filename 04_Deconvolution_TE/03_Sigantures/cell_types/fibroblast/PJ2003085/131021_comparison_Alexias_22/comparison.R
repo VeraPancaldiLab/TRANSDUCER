@@ -170,7 +170,7 @@ if (correct_batch == F){
 
 # Analysis
 title_res <- paste(title_prefix, batch, collapse = " ")
-annot <- select(org.Hs.eg.db, keys=rownames(cafs.choose), columns="SYMBOL", keytype="ENSEMBL")
+annot <- AnnotationDbi::select(org.Hs.eg.db, keys=rownames(cafs.choose), columns="SYMBOL", keytype="ENSEMBL")
 cafs.choose.sym <- ID_converter(df = cafs.choose,annotation_table = annot,
                                 old_IDs = "ENSEMBL", new_IDs = "SYMBOL")
 
@@ -227,9 +227,13 @@ if (signatures_magali == F){
     caf.labs <- names(pdac_CAF_signatures)
 }
 
-#Espinet et al 2019 signature
+# Espinet et al 2019 signature
 IFNsign <- read_tsv("01_Input/IFNsign_Espinet.tsv", col_names = "IFNsign")
 stroma_signatures$IFNsign <- IFNsign$IFNsign
+
+# Huocong et al 2022 apCAF signature (adaptation human by case ~)
+apCAF_Huocong <- read_tsv("01_Input/apCAF_Huocong.tsv", col_names = "apCAF_Huocong")
+stroma_signatures$apCAF_Huocong <- str_to_upper(apCAF_Huocong$apCAF_Huocong)
 
 ### Venn of the signature composition
 myCol <- brewer.pal(4, "Pastel2")
@@ -287,6 +291,16 @@ cafs.choose.sym[rownames(espinet2019_genes),] %>%
            annotation_row = espinet2019_genes)
 dev.off()
 
+#### Huocong et al 2022 apCAF
+huocong2022_genes <- Get_geneset_genes(data = cafs.choose.sym,
+                                       gene_set = stroma_signatures,
+                                       gene_set_name = "apCAF_Huocong")
+
+cafs.choose.sym[rownames(huocong2022_genes),] %>% 
+  pheatmap(main=title_res,  cellwidth=15, cellheight=10, filename = "02_Output/plots/PDAC_huocong2022_markergenes.png",
+           cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = T, annotation_col = as.data.frame(t(gsvaRes[c("apCAF_Huocong", caf.labs),])),
+           annotation_row = huocong2022_genes)
+dev.off()
 
 ## PCA analysis
 cafs.choose %>% prcomp() -> pca_res
@@ -319,5 +333,3 @@ pca_toplot %>%
   theme_bw(base_size=15) + 
   theme(legend.position="top") +
   labs(title = title_res) 
-
-
