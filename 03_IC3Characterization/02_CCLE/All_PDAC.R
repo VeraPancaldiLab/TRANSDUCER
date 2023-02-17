@@ -9,14 +9,14 @@ library(ggplot2)
 library(ComplexHeatmap)
 #library(circlize)
 #library(RColorBrewer)
-#library(edgeR)
-#library(scales)
+library(edgeR)
+library(scales)
 library(factoextra)
 library(pdacmolgrad)
 library(DESeq2) 
 library(EnhancedVolcano)
 library(enrichR)
-
+library(apeglm)
 
 setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/02_CCLE/")
 
