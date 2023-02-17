@@ -14,7 +14,7 @@ library(scales)
 library(factoextra)
 library(biomaRt)
 '%ni%' <- Negate('%in%')
-setwd("/home/jacobo/Documents/03_Sauyeun_paper/02_CCLE/")
+setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/02_CCLE/")
 
 interesting_cl <- c(
   "ASPC1_PANCREAS", "HUPT3_PANCREAS", "PANC1005_PANCREAS",

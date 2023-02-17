@@ -2,7 +2,7 @@ library(tidyverse)
 library(pdacmolgrad)
 library(JADE)
 
-setwd("/home/jacobo/Documents/03_Sauyeun_paper/02_CCLE/")
+setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/02_CCLE/")
 
 # Data loading
 interesting_cl <- c("ASPC1_PANCREAS", "HUPT3_PANCREAS", "PANC1005_PANCREAS",

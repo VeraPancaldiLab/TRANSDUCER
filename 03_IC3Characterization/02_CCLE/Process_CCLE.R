@@ -1,7 +1,7 @@
 library(tidyverse)
 library(biomaRt)
 
-setwd("/home/jacobo/Documents/03_Sauyeun_paper/02_CCLE/")
+setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/02_CCLE/")
 
 # Raw counts -> TMM
 # normalization should be performed 

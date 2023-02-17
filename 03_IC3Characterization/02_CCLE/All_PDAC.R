@@ -13,12 +13,12 @@ library(ComplexHeatmap)
 #library(scales)
 library(factoextra)
 library(pdacmolgrad)
-library(DESeq2)
+library(DESeq2) 
 library(EnhancedVolcano)
 library(enrichR)
 
 
-setwd("/home/jacobo/Documents/03_Sauyeun_paper/02_CCLE/")
+setwd("/home/jacobo/Documents/02_TRANSDUCER/03_IC3Characterization/02_CCLE/")
 
 # Data loading
 metadata <- read_tsv("01_Input/CCLE_Pancreatic_meta.tsv")
