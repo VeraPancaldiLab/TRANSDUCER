@@ -103,6 +103,16 @@ RN2017_raw <- read_delim("Human-Tumor_rawcount_Transcriptome.tsv",
 load("Alexias_53PDX/PDX_HUMAN_RAW.RData")
 PACAOMICs_90_raw <- as_tibble(x, rownames ="EnsemblID")
 
+## CCLE 
+ccle_raw <- read_delim(file="CCLE/CCLE_RNAseq_genes_counts_20180929.gct", skip=2) %>%
+  dplyr::rename(EnsemblID = Name, GeneName = Description) %>% dplyr::mutate(EnsemblID = str_remove(EnsemblID, '\\.[0-9]*$'))
+
+ccle_info <- read_csv("CCLE/primary-screen-cell-line-info.csv") %>%
+  dplyr::mutate(ISRact = if_else(ccle_name %in% c("ASPC1_PANCREAS", "PATU8902_PANCREAS", "PATU8988T_PANCREAS", "MIAPACA2_PANCREAS"),
+                                 if_else(ccle_name %in% c("ASPC1_PANCREAS", "PATU8902_PANCREAS"),
+                                         "ISRact", "Control"),
+                                 NA))
+
 ## Other data
 ### Espinet et al 2019 IFNsign
 IFNsign_geneset <- read_tsv("IFNsign_Espinet.tsv",col_names = "IFNsign")
@@ -123,6 +133,7 @@ acinar_max = 0.05
 islet_max = 1
 tumor_tissue_min = 0.8
 ################################################################################
+
 # Translate EnsemblID to gene names
 ## Version 75 for PDX data
 ensembl75 <- useEnsembl(biomart = "genes",
@@ -238,13 +249,26 @@ sample_info_PACAOMICS <- dplyr::select(sample_info, -PAMG, -IFNsign) %>%
   dplyr::rename(PAMG = PDX)
 
 
+## CCLE
+### Normalize (all together)
+ccle_norm_ <- dplyr::select(ccle_raw, -GeneName) %>%
+  column_to_rownames( "EnsemblID") %>%
+  DGEList() %>%
+  calcNormFactors(method= norm_method) %>%
+  cpm(log=TRUE) 
+
+ccle_norm <- ccle_norm_ %>%
+  t() %>%
+  as_tibble(rownames = "sample")
+
+
 # PCA
 ## Sauyeun PDX sample and gene filtering
 ### get 5 and 5 most extreme samples for ICA3 
 ICA3_density <- ggdensity(
   sample_info, x = "ICA3", 
   rug = TRUE
-) 
+)
 ICA3_density
 
 top_samples <- sample_info %>%
@@ -383,6 +407,32 @@ Sauyeun_PC1 <- arrange(projection_Sauyeun, PC1) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
   mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
   inner_join(sample_info[, c("sample","PAMG", "ICA3", "IFNsign", "Diabetes")], by = "sample")
+
+
+### CCLE
+ccle_norm_minval <- min(ccle_norm_) # same minimum value (unlike TMM?)
+ccle_missing_genes <- rownames(pca_pdx$rotation)[(rownames(pca_pdx$rotation) %in% names(ccle_norm)) == F]
+
+ccle_missing_data <- as_tibble(matrix(ccle_norm_minval,
+                                      ncol = length(ccle_missing_genes),
+                                      nrow = nrow(ccle_norm),
+                                      dimnames = list(ccle_norm$sample, ccle_missing_genes)),
+                               rownames = "sample")
+
+
+projection_ccle <- predict(pca_pdx, inner_join(ccle_norm, ccle_missing_data, by="sample")) %>% 
+  as_tibble() %>%
+  mutate(sample = ccle_norm$sample, .before = 1)
+
+Sauyeun_PC1 <- arrange(projection_Sauyeun, PC1) %>% 
+  dplyr::filter(!sample=="!") %>%
+  mutate(PC1status = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3/3))), labels = c("low_PC1", "medium_PC1", "high_PC1"), include.lowest = TRUE)) %>%
+  dplyr::select(sample, PC1,  PC1status) %>%
+  left_join(top_samples[,c("sample","ISRact")]) %>%
+  mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
+  inner_join(sample_info[, c("sample","PAMG", "ICA3", "IFNsign", "Diabetes")], by = "sample")
+
+
 
 
 #Plot pca and projections
