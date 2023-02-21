@@ -259,7 +259,7 @@ ccle_norm_ <- dplyr::select(ccle_raw, -GeneName) %>%
 
 ccle_norm <- ccle_norm_ %>%
   t() %>%
-  as_tibble(rownames = "sample")
+  as_tibble(rownames = "ccle_name")
 
 
 # PCA
@@ -416,14 +416,17 @@ ccle_missing_genes <- rownames(pca_pdx$rotation)[(rownames(pca_pdx$rotation) %in
 ccle_missing_data <- as_tibble(matrix(ccle_norm_minval,
                                       ncol = length(ccle_missing_genes),
                                       nrow = nrow(ccle_norm),
-                                      dimnames = list(ccle_norm$sample, ccle_missing_genes)),
-                               rownames = "sample")
+                                      dimnames = list(ccle_norm$ccle_name, ccle_missing_genes)),
+                               rownames = "ccle_name")
 
-
-projection_ccle <- predict(pca_pdx, inner_join(ccle_norm, ccle_missing_data, by="sample")) %>% 
+projection_ccle <- predict(pca_pdx, inner_join(ccle_norm, ccle_missing_data, by="ccle_name")) %>% 
   as_tibble() %>%
-  mutate(sample = ccle_norm$sample, .before = 1)
+  mutate(ccle_name = ccle_norm$ccle_name, .before = 1)
 
+ccle_PC1 <- arrange(projection_ccle, PC1) %>% 
+  mutate(PC1status = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3/3))), labels = c("low_PC1", "medium_PC1", "high_PC1"), include.lowest = TRUE)) %>%
+  dplyr::select(ccle_name, PC1,  PC1status) %>%
+  left_join(ccle_info[,c("ccle_name","primary_tissue", "ISRact")], by="ccle_name")
 
 
 #Plot pca and projections
