@@ -424,15 +424,6 @@ projection_ccle <- predict(pca_pdx, inner_join(ccle_norm, ccle_missing_data, by=
   as_tibble() %>%
   mutate(sample = ccle_norm$sample, .before = 1)
 
-Sauyeun_PC1 <- arrange(projection_Sauyeun, PC1) %>% 
-  dplyr::filter(!sample=="!") %>%
-  mutate(PC1status = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3/3))), labels = c("low_PC1", "medium_PC1", "high_PC1"), include.lowest = TRUE)) %>%
-  dplyr::select(sample, PC1,  PC1status) %>%
-  left_join(top_samples[,c("sample","ISRact")]) %>%
-  mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
-  inner_join(sample_info[, c("sample","PAMG", "ICA3", "IFNsign", "Diabetes")], by = "sample")
-
-
 
 
 #Plot pca and projections
