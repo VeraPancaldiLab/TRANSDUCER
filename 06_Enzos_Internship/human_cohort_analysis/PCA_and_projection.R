@@ -268,6 +268,7 @@ ccle_norm <- ccle_norm_ %>%
   t() %>%
   as_tibble(rownames = "ccle_name")
 
+### create version with Gene Names
 ccle_translate = deframe(ccle_raw[c("EnsemblID", "GeneName")])
 
 ccle_norm_gn <- as_tibble(ccle_norm_, rownames = "EnsemblID") %>%
@@ -275,6 +276,13 @@ ccle_norm_gn <- as_tibble(ccle_norm_, rownames = "EnsemblID") %>%
   dplyr::select(-EnsemblID) %>% group_by(GeneName) %>% 
   summarise_all(sum)
 
+### Add PAMG status
+type_pamg <- projectMolGrad(newexp = column_to_rownames(ccle_norm_gn, "GeneName"),  geneSymbols = ccle_norm_gn$GeneName) %>%
+  as_tibble(rownames = "ccle_name")
+
+ccle_info <- dplyr::select(type_pamg, ccle_name, PDX) %>% 
+  right_join(ccle_info, "ccle_name") %>%
+  dplyr::rename(PAMG = PDX)
 
 # PCA
 ## Sauyeun PDX sample and gene filtering
@@ -436,7 +444,7 @@ ccle_missing_data <- as_tibble(matrix(ccle_norm_minval,
 projection_ccle <- predict(pca_pdx, inner_join(ccle_norm, ccle_missing_data, by="ccle_name")) %>% 
   as_tibble() %>%
   mutate(ccle_name = ccle_norm$ccle_name, .before = 1) %>%
-  left_join(ccle_info[,c("ccle_name","primary_tissue", "ISRact")], by="ccle_name")
+  left_join(ccle_info[,c("ccle_name","primary_tissue", "ISRact", "PAMG")], by="ccle_name")
 
 ccle_PC1 <- arrange(projection_ccle, PC1) %>% 
   mutate(PC1status = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3/3))), labels = c("low_PC1", "medium_PC1", "high_PC1"), include.lowest = TRUE)) %>%
@@ -670,6 +678,12 @@ correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "
 
 ### IFNsign vs PC1
 correlation_plotter(data = CPTAC_PC1, col1 = "PC1", col2 = "IFNsign", data_name = "CPTAC tumors")
+
+## CCLE
+### PAMG vs PC1
+correlation_plotter(data = projection_ccle, col1 = "PAMG", col2 = "PC1", data_name = "CCLE")
+
+
 
 
 # Survival curves reguarding ISR status
