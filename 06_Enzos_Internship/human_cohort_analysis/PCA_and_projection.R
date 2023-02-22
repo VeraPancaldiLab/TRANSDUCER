@@ -110,7 +110,7 @@ ccle_raw <- read_delim(file="CCLE/CCLE_RNAseq_genes_counts_20180929.gct", skip=2
 ccle_info <- read_csv("CCLE/primary-screen-cell-line-info.csv") %>%
   dplyr::mutate(ISRact = if_else(ccle_name %in% c("ASPC1_PANCREAS", "PATU8902_PANCREAS", "PATU8988T_PANCREAS", "MIAPACA2_PANCREAS"),
                                  if_else(ccle_name %in% c("ASPC1_PANCREAS", "PATU8902_PANCREAS"),
-                                         "ISRact", "Control"),
+                                         "high_ISRact", "low_ISRact"),
                                  NA))
 
 ## Other data
@@ -121,6 +121,7 @@ IFNsign_geneset <- read_tsv("IFNsign_Espinet.tsv",col_names = "IFNsign")
 # PARAMETERS
 Sauyeun_raw = rawTumor_Cyt #geneCount_raw_28s_totalRNA | rawTumor_Cyt
 PACAOMICS_raw = PACAOMICs_90_raw #RN2017_raw | PACAOMICs_90_raw
+keep_CCLE = "PANCREAS" #ALL | PANCREAS 
 cormethod = "pearson"
 keepgenes = 1000
 select_method = "bestsubset" #bestsubset | bestoverall
@@ -251,8 +252,14 @@ sample_info_PACAOMICS <- dplyr::select(sample_info, -PAMG, -IFNsign) %>%
 
 ## CCLE
 ### Normalize (all together)
+if (keep_CCLE == "PANCREAS"){
+  keep <- dplyr::filter(ccle_info, primary_tissue == "pancreas") %>% 
+    dplyr::select(ccle_name) %>%
+    deframe()
+  ccle_raw <- dplyr::select(ccle_raw, EnsemblID, GeneName, all_of(keep))
+}
 ccle_norm_ <- dplyr::select(ccle_raw, -GeneName) %>%
-  column_to_rownames( "EnsemblID") %>%
+  column_to_rownames("EnsemblID") %>%
   DGEList() %>%
   calcNormFactors(method= norm_method) %>%
   cpm(log=TRUE) 
@@ -261,12 +268,19 @@ ccle_norm <- ccle_norm_ %>%
   t() %>%
   as_tibble(rownames = "ccle_name")
 
+ccle_translate = deframe(ccle_raw[c("EnsemblID", "GeneName")])
+
+ccle_norm_gn <- as_tibble(ccle_norm_, rownames = "EnsemblID") %>%
+  mutate(GeneName = ccle_translate[EnsemblID]) %>% 
+  dplyr::select(-EnsemblID) %>% group_by(GeneName) %>% 
+  summarise_all(sum)
+
 
 # PCA
 ## Sauyeun PDX sample and gene filtering
 ### get 5 and 5 most extreme samples for ICA3 
 ICA3_density <- ggdensity(
-  sample_info, x = "ICA3", 
+  sample_info, x = "ICA3",
   rug = TRUE
 )
 ICA3_density
@@ -421,12 +435,13 @@ ccle_missing_data <- as_tibble(matrix(ccle_norm_minval,
 
 projection_ccle <- predict(pca_pdx, inner_join(ccle_norm, ccle_missing_data, by="ccle_name")) %>% 
   as_tibble() %>%
-  mutate(ccle_name = ccle_norm$ccle_name, .before = 1)
+  mutate(ccle_name = ccle_norm$ccle_name, .before = 1) %>%
+  left_join(ccle_info[,c("ccle_name","primary_tissue", "ISRact")], by="ccle_name")
 
 ccle_PC1 <- arrange(projection_ccle, PC1) %>% 
   mutate(PC1status = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3/3))), labels = c("low_PC1", "medium_PC1", "high_PC1"), include.lowest = TRUE)) %>%
   dplyr::select(ccle_name, PC1,  PC1status) %>%
-  left_join(ccle_info[,c("ccle_name","primary_tissue", "ISRact")], by="ccle_name")
+ 
 
 
 #Plot pca and projections
@@ -443,30 +458,41 @@ show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Sauyeu
                              mutate(projection_PACAOMICS, sample = paste0(sample, "_OG"),
                                     dataset = "PACAOMICS PDX"),
                              as_tibble(projection_CPTAC) %>% mutate(ISRact = "Unknown",
-                                                              dataset = "CPTAC"))
+                                                              dataset = "CPTAC"),
+                             as_tibble(projection_ccle %>% mutate(ISRact = if_else(is.na(ISRact), "Unknown", ISRact),
+                                                                  dataset = "CCLE")))
 
 dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
-  dplyr::filter(dataset %in% c("Sauyeun PDX", "PACAOMICS PDX", "CPTAC"),
+  dplyr::filter(dataset %in% c("Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"), # "Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"
               ISRact %in% c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) %>% 
 ggplot(aes(x=PC1, y=PC2, color = ISRact, shape = dataset)) +
   geom_point() +
-  scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "CPTAC")) +
-  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) +
+  scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "CPTAC", "CCLE")) +
+  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) + #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
   ylim(-250,15)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# CCLE plot with names and colored according to any gene expression
+pivot_longer(ccle_norm_gn,-GeneName, names_to = "ccle_name", values_to = "expression") %>%
+  pivot_wider(id_cols = "ccle_name", names_from = "GeneName", values_from = "expression") %>%
+  inner_join(projection_ccle, by="ccle_name") %>% 
+  ggplot(aes(x=PC1, y=GATA6, label = str_remove(ccle_name, "_PANCREAS"))) +
+  geom_point(aes(color = ISRact)) + 
+  geom_smooth(method=lm) + theme_bw() + geom_text_repel()
+
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Distribution of PC1 gene weights with respect to IFNsign
 PC1_vs_IFNsign <- as_tibble(pca_pdx$rotation, rownames = "EnsemblID") %>%
   mutate(Gene_symbol = translate[EnsemblID],
          in_IFNsign = ifelse(Gene_symbol %in% IFNsign_geneset$IFNsign, TRUE, FALSE))
-  
+
 ggplot(PC1_vs_IFNsign, aes(x = PC1)) +
   geom_density() +
   geom_rug(data = dplyr::filter(PC1_vs_IFNsign, in_IFNsign == T))
 
 dplyr::filter(PC1_vs_IFNsign, in_IFNsign == T) %>% dplyr::select(PC1, Gene_symbol)
 #-------------------------------------------------------------------------------
-
 #Select human cohort most extreme samples regarding PC1 #! Remove when further scripts are adapted!
 human_ISR <- arrange(projection_CPTAC, PC1) %>%
   dplyr::slice( unique(c(1:(nrow(projection_CPTAC)/3), n() - 0:((nrow(projection_CPTAC)/3)-1))) ) %>%
