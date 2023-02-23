@@ -26,6 +26,7 @@ library(rstatix)
 library(survminer)
 library(pdacmolgrad)
 library(GSVA)
+library(ggVennDiagram)
 ##devtools::install_github("RemyNicolle/pdacmolgrad")
 
 
@@ -683,6 +684,63 @@ correlation_plotter(data = CPTAC_PC1, col1 = "PC1", col2 = "IFNsign", data_name 
 ### PAMG vs PC1
 correlation_plotter(data = projection_ccle, col1 = "PAMG", col2 = "PC1", data_name = "CCLE")
 
+#-------------------------------------------------------------------------------
+# Gene weight comparison with PAMG
+PAMG_gw <- as_tibble(pdacmolgrad:::.molGradSys$PDX$gw[pdacmolgrad:::.molGradSys$PDX$k], rownames="GeneName") %>%
+  dplyr::rename(PAMG = "ICA1")
+
+ISRactPCA_gw <- as_tibble(pca_pdx$rotation, rownames="EnsemblID") %>%
+  mutate(GeneName = translate[EnsemblID]) %>%
+  dplyr::select(GeneName, PC1) %>%
+  dplyr::rename(ISRactPCA = PC1)
+
+## discrete
+compare = list(PAMG_gw$GeneName, ISRactPCA_gw$GeneName)
+
+compare_names = c("PAMG", "ISRactPCA")
+
+ggVennDiagram(
+  compare,
+  category.names = compare_names,
+  label = "count",
+  label_geom = "text",
+  label_color = "white"
+)
+
+## Cuantitative comparison of common genes
+PAMG_ISRact_quantc <- full_join(PAMG_gw, ISRactPCA_gw, by = "GeneName") %>%
+  mutate(na_PAMG = is.na(PAMG),na_ISRactPCA = is.na(ISRactPCA))
+
+PAMG_ISRact_quantc %>%
+  drop_na() %>%
+  correlation_plotter(col1 = "ISRactPCA", col2 = "PAMG", data_name = "gene weights")
+
+## Whats the gene weight of ISRactPCA and PAMG unique genes?
+## ISRact vs PAMG presence
+PAMG_absence_test = wilcox.test(x = dplyr::filter(PAMG_ISRact_quantc, na_PAMG == T) %>% dplyr::select(ISRactPCA) %>% deframe() %>% abs(),
+                           y = dplyr::filter(PAMG_ISRact_quantc, na_PAMG == F) %>% dplyr::select(ISRactPCA) %>% deframe() %>% abs(),
+                           alternative = "two.sided")
+PAMG_ISRact_quantc %>%
+  ggplot(aes(x = na_PAMG, y = abs(ISRactPCA))) + 
+  geom_violin(aes(fill = na_PAMG)) + 
+  geom_boxplot(width=0.1) +
+  labs(title = "Are ISRactPCA GW different when absent in PAMG?",
+       subtitle = paste0("Wilcoxon test one-tailed p-value = ", 
+                         formatC(PAMG_absence_test$p.value, format = "e", digits = 2)))
+
+## PAMG vs ISRact presence
+ISRactPCA_absence_test = wilcox.test(x = dplyr::filter(PAMG_ISRact_quantc, na_ISRactPCA == T) %>% dplyr::select(PAMG) %>% deframe() %>% abs(),
+                                y = dplyr::filter(PAMG_ISRact_quantc, na_ISRactPCA == F) %>% dplyr::select(PAMG) %>% deframe() %>% abs(),
+                                alternative = "two.sided")
+PAMG_ISRact_quantc %>%
+  ggplot(aes(x = na_ISRactPCA, y = abs(PAMG))) + 
+  geom_violin(aes(fill = na_ISRactPCA)) + 
+  geom_boxplot(width=0.1) +
+  labs(title = "Are PAMG GW different when absent in ISRactPCA?",
+       subtitle = paste0("Wilcoxon test one-tailed p-value = ", 
+                         formatC(ISRactPCA_absence_test$p.value, format = "e", digits = 2)))
+
+#-------------------------------------------------------------------------------
 
 
 
