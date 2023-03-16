@@ -208,7 +208,7 @@ gsvaRes %>% Get_mostvar(50) %>% pheatmap(main=title_res,  cellwidth=10, cellheig
 
 
 ### stromal subtypes
-#Elayada et al signatures
+#### Elayada et al signatures
 if (signatures_magali == F){
   
   stroma_signatures <- read_rds("01_Input/PDACstromaSignatures.rds")
@@ -227,13 +227,21 @@ if (signatures_magali == F){
     caf.labs <- names(pdac_CAF_signatures)
 }
 
-# Espinet et al 2019 signature
+#### Espinet et al 2019 signature
 IFNsign <- read_tsv("01_Input/IFNsign_Espinet.tsv", col_names = "IFNsign")
 stroma_signatures$IFNsign <- IFNsign$IFNsign
 
-# Huocong et al 2022 apCAF signature (adaptation human by case ~)
+#### Huocong et al 2022 apCAF signature (adaptation human by case ~)
 apCAF_Huocong <- read_tsv("01_Input/apCAF_Huocong.tsv", col_names = "apCAF_Huocong")
 stroma_signatures$apCAF_Huocong <- str_to_upper(apCAF_Huocong$apCAF_Huocong)
+
+#### Luo Nature Communications 2022 (Not only CAFs)
+Luo_info <- read_tsv("01_Input/Luo_NatComs_2022_info.tsv")
+Luo_clusters <- read_tsv("01_Input/Luo_NatComs_2022.tsv") %>%
+  rename_with(~Luo_info$name) %>% 
+  dplyr::select(Luo_info[Luo_info$Fibroblast == TRUE,]$name)
+
+stroma_signatures <- c(stroma_signatures, Luo_clusters)
 
 ### Venn of the signature composition
 myCol <- brewer.pal(4, "Pastel2")
@@ -259,13 +267,14 @@ gsvaRes.cafs %>% t() -> cafs.info[, caf.labs]
 
 
 ### Marker genes + signature enrichments
-#### function
+#### function 
+####(by default will drop duplicated genes if any)
 Get_geneset_genes <- function(data, gene_set, gene_set_name){
   
-  #(data = cafs.choose.sym, gene_set = stroma_signatures, gene_set_name = caf.labs
-  
   gene_set_genes <- tibble(name = gene_set_name, value = gene_set[gene_set_name]) %>%
-    unnest(c("value")) %>% filter(value %in% rownames(data)) %>%
+    unnest(c("value")) %>%
+    filter(value %in% rownames(data)) %>%
+    distinct(value, .keep_all = T) %>%
     column_to_rownames("value")
 }
 
@@ -301,6 +310,18 @@ cafs.choose.sym[rownames(huocong2022_genes),] %>%
            cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = T, annotation_col = as.data.frame(t(gsvaRes[c("apCAF_Huocong", caf.labs),])),
            annotation_row = huocong2022_genes)
 dev.off()
+
+#### Luo Nature Communications 2022 Pn cancer CAFs
+Luo2022_genes <- Get_geneset_genes(data = cafs.choose.sym,
+                                       gene_set = stroma_signatures,
+                                       gene_set_name = names(Luo_clusters))
+
+cafs.choose.sym[rownames(Luo2022_genes),] %>% 
+  pheatmap(main=title_res,  cellwidth=15, cellheight=10, filename = "02_Output/plots/PDAC_Luo2022_markergenes.png",
+           cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = T, annotation_col = as.data.frame(t(gsvaRes[c(names(Luo_clusters), caf.labs),])),
+           annotation_row = Luo2022_genes)
+dev.off()
+
 
 ## PCA analysis
 cafs.choose %>% prcomp() -> pca_res
