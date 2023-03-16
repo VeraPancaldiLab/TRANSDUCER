@@ -93,7 +93,8 @@ clinical_data <- read_excel("mmc1.xlsx",
 Molecular_phenotype_data <- read_excel("mmc1.xlsx", 
                                        sheet = "Molecular_phenotype_data") %>% 
   mutate_at(vars(immune_deconv:`necrosis_(%OF_TUMOR_WITH_NECROSIS)_histology_estimate`, KRAS_VAF), as.numeric) %>%
-  mutate_at(vars(Bailey:Moffitt), as.factor) #change type to avoid errors
+  mutate_at(vars(Bailey:Moffitt), as.factor) %>% #change type to avoid errors
+  dplyr::rename(sample = case_id)
 
 ## PACAOMICS
 ### Remy Nicolle's 2017 PDX data
@@ -223,7 +224,8 @@ type_IFNsign <- gsva(data.matrix(column_to_rownames(dplyr::select(CPTAC_tumor,-E
 
 sample_info_CPTAC <- dplyr::select(type_pamg, sample, ICGCrnaseq) %>% 
   left_join(type_IFNsign, "sample") %>%
-  dplyr::rename(PAMG = ICGCrnaseq)
+  dplyr::rename(PAMG = ICGCrnaseq) %>% 
+  left_join(dplyr::select(Molecular_phenotype_data, sample, KRAS_VAF), "sample")
 
 
 ## PACAOMICS
@@ -679,6 +681,10 @@ correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "
 
 ### IFNsign vs PC1
 correlation_plotter(data = CPTAC_PC1, col1 = "PC1", col2 = "IFNsign", data_name = "CPTAC tumors")
+
+### KRAS_VAF vs PC1
+correlation_plotter(data = CPTAC_PC1, col1 = "PC1", col2 = "KRAS_VAF", data_name = "CPTAC tumors")
+
 
 ## CCLE
 ### PAMG vs PC1
