@@ -274,7 +274,10 @@ Get_geneset_genes <- function(data, gene_set, gene_set_name){
   gene_set_genes <- tibble(name = gene_set_name, value = gene_set[gene_set_name]) %>%
     unnest(c("value")) %>%
     filter(value %in% rownames(data)) %>%
-    distinct(value, .keep_all = T) %>%
+    group_by(value) %>% 
+    mutate(name = ifelse(base::duplicated(value,fromLast=T), "multiple", name)) %>%
+    distinct(value, .keep_all = T,) %>%
+    arrange(name) %>% 
     column_to_rownames("value")
 }
 
@@ -318,7 +321,7 @@ Luo2022_genes <- Get_geneset_genes(data = cafs.choose.sym,
 
 cafs.choose.sym[rownames(Luo2022_genes),] %>% 
   pheatmap(main=title_res,  cellwidth=15, cellheight=10, filename = "02_Output/plots/PDAC_Luo2022_markergenes.png",
-           cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = T, annotation_col = as.data.frame(t(gsvaRes[c(names(Luo_clusters), caf.labs),])),
+           cluster_cols = T, cluster_rows = F, show_rownames = T, annotation_col = as.data.frame(t(gsvaRes[c(names(Luo_clusters), caf.labs),])),
            annotation_row = Luo2022_genes)
 dev.off()
 
