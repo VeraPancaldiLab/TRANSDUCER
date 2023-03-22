@@ -8,6 +8,7 @@ library(msigdbr)
 library(GSVA)
 library(ggplotify)
 library(ggpubr)
+library(pdacmolgrad)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/170323_PACAOMICs_ICA/")
 source("../100122_ICABoot/functions.R")
@@ -21,6 +22,7 @@ boot.iter <- 500
 boot.perc <- 0.95
 
 # Analysis
+data <- "2017" # "extended" "2017"
 elected_ncomp <- 6 # 4 if looking at distribution, 6 for standar, like in tumour way
 component_reorientation = TRUE
 reorient <- c(1, 1, 1, -1, 1, 1)
@@ -29,23 +31,89 @@ reorient <- c(1, 1, 1, -1, 1, 1)
 # DATA LOADING/PROCESSING
 #-------------------------------------------------------------------------------
 # load cyt data
-PACA_cyt <- read_tsv("../../00_Data/Processed_data/normHost_Cyt.tsv")
-sample_info <- read_tsv("../../00_Data/Processed_data/sample_info.tsv") %>%
-  column_to_rownames("sample") %>% .[colnames(PACA_cyt)[-1],]
+if (data == "2017"){
+  PACA_cyt_raw <- read_tsv("../../00_Data/PACAOMICs_data/Nicolle_2017/Murine-Stroma_rawcount_Transcriptome.tsv") %>%
+    column_to_rownames("EnsemblID")
+  
 
-sample_info$Diabetes <- as_factor(sample_info$Diabetes)
+} else if( data == "extended"){
+  PACA_cyt_raw <- read_rds("../../00_Data/PACAOMICs_data/Alexias_53PDX/PDXstromaRaw.rds")
+}
 
-# load annotation with Biomart
+## normalize cyt data
+PACA_cyt_raw_ <- PACA_cyt_raw[!(apply(PACA_cyt_raw, 1, function(x) {
+    any(x == 0)
+  })), ] # from anota2seqRemoveZeroSamples()
+
+PACA_cyt <-
+  limma::voom(edgeR::calcNormFactors(edgeR::DGEList(PACA_cyt_raw_)))$E %>% ## TMM-log2 from anota2seqNormalize()
+  as_tibble(rownames= "EnsemblID")
+
+
+# load annotation with Biomart for later
+## Human (for PAMG)
+hs_ensembl75 <- useEnsembl(biomart = "genes",
+                        dataset = "hsapiens_gene_ensembl",
+                        version = 75)#listAttributes(ensembl75, page="feature_page")
+
+hs_annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_id'), mart = hs_ensembl75)
+
+hs_translate <- deframe(hs_annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
+
+## mice
 ensembl75 <- useEnsembl(biomart = "genes",
                         dataset = "mmusculus_gene_ensembl",
-                        version = 75)
+                        version = 75)#listAttributes(ensembl75, page="feature_page")
 
-#listAttributes(ensembl75, page="feature_page")
 annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
                                         'external_gene_id',
                                         'entrezgene',
                                         'mgi_id',
                                         'chromosome_name'), mart = ensembl75)
+
+translate <- deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
+
+## Create sample_info_PACAOMICS
+sample_info_ <- read_tsv("../../00_Data/Processed_data/sample_info.tsv") %>%
+  dplyr::select(- RNAconc_cyt, -RNAconc_pol, -cyt_tumor_counts, -pol_tumor_counts, -cyt_host_counts, -pol_host_counts, -PAMG)
+
+sample_info_$Diabetes <- as_factor(sample_info_$Diabetes)
+
+### add True PAMG
+if (data == "2017"){
+  tumor_counts <- read_tsv("../../00_Data/PACAOMICs_data/Nicolle_2017/Human-Tumor_rawcount_Transcriptome.tsv") %>%
+    mutate(GeneNames = hs_translate[EnsemblID]) %>% 
+    dplyr::select(-EnsemblID) %>% 
+    group_by(GeneNames) %>% 
+    summarise_all(mean) %>%
+    column_to_rownames("GeneNames") %>%
+    DGEList() %>%
+    calcNormFactors(method= "upperquartile") %>%
+    cpm(log=TRUE)
+
+}else if (data == "extended"){
+  load("../../00_Data/PACAOMICs_data/Alexias_53PDX/PDX_HUMAN_RAW.RData")
+
+  tumor_counts <- as_tibble(x, rownames = "EnsemblID") %>% 
+    mutate(GeneNames = hs_translate[EnsemblID]) %>% 
+    dplyr::select(-EnsemblID) %>% 
+    group_by(GeneNames) %>% 
+    summarise_all(mean) %>%
+    column_to_rownames("GeneNames") %>%
+    DGEList() %>%
+    calcNormFactors(method= "upperquartile") %>%
+    cpm(log=TRUE)
+}
+
+type_pamg <- projectMolGrad(newexp = tumor_counts,
+                            geneSymbols = rownames(tumor_counts)) %>%
+  as_tibble(rownames = "sample") %>%
+  dplyr::select(sample, PDX) %>%
+  dplyr::rename(PAMG = PDX)
+
+sample_info <- right_join(sample_info_, type_pamg, by = "sample") %>% column_to_rownames("sample")
+  
 
 # filtering
 ## XY
@@ -110,13 +178,17 @@ S_mat <- as.data.frame(jade_result[["S"]])
 #-------------------------------------------------------------------------------
 # Sample weight analysis
 ## Metadata
-annotations <- sample_info[-1]
+annotations <- sample_info[-1] %>% .[rownames(A_mat),]
 stopifnot(rownames(A_mat) == rownames(annotations))
 annotations %>% dplyr::select(!Diabetes) %>%
   names() -> cont_names
 
 ## plot
 plot_sample_weights(A_mat = A_mat, annotations = annotations, cont_names = cont_names, analysis_name = "sampleweights_PACA_cyt")
+
+
+# FIXED UNTIL HERE!!!
+
 
 ## Export for further correlations
 stopifnot(rownames(A_mat) == rownames(annotations))
@@ -140,9 +212,6 @@ PlotBestCorr(complete_annotation, tumour_tf, 10, "best_TF_tumor_vs_PACA_cyt")
 PlotBestCorr(complete_annotation, stroma_tf, 10, "best_TF_stroma_vs_PACA_cyt")
 
 # Gene weight analysis
-## translate to gene names
-translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
-
 ## plot
 PlotGeneWeights(S_mat, PACA_cyt, 25, translate, complete_annotation, analysis_name = "gene_weights_PACA_cyt")
 
