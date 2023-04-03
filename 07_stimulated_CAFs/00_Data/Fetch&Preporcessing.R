@@ -2,7 +2,13 @@ library(tidyverse)
 library(ggpubr)
 library(factoextra)
 library(RColorBrewer)
+library(sva)
 ################################################################################
+################################PARAMETERS######################################
+correct_batch = T # Should correct for batch effect?
+################################################################################
+#################################FUNCTIONS######################################
+
 # Plot ncomp features
 plot_PCs <- function(pca_toplot, feat, ncomp, dotsize){
   col_factor <- as.factor(pca_toplot[[feat]])
@@ -22,7 +28,7 @@ plot_PCs <- function(pca_toplot, feat, ncomp, dotsize){
   legend(x = "center",fill = cols, legend = levels(col_factor), horiz = F, title = feat)
 }
 ################################################################################
-
+###################################MAIN#########################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/07_stimulated_CAFs/00_Data/")
 
 # Data loading
@@ -43,7 +49,11 @@ picard_metrics <- read_tsv("240323_PicardTools/02_Output/picard_rnaseqmetrics_as
 
 sample_info <- left_join(manip_info, multiqc, by = "sample_name") %>%
   left_join(STAR_align, by = "sample_name") %>%
-  left_join(picard_metrics, by = "sample_name")
+  left_join(picard_metrics, by = "sample_name") %>% 
+  dplyr::mutate(sample_name = fct(sample_name, levels=names(counts)[-1])) %>%
+  dplyr::arrange(sample_name)
+
+all(names(counts)[-1] == sample_info$sample_name) %>% stopifnot()
 
 ## initial boxplot
 raw_box <- log2(column_to_rownames(counts, "Geneid")+1)  %>%
@@ -98,6 +108,23 @@ norm_box <- as_tibble(norm_tmp, rownames = "Gene")  %>%
   ggtitle("log2TMM") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+
+## Batch effect correction
+if (correct_batch == F){
+  norm_tmp -> norm_tmp
+  batch <- "non corrected"
+  
+} else if (correct_batch == T){
+  
+  as.matrix(norm_tmp) %>% 
+    ComBat(batch = sample_info$Batch, 
+           par.prior=TRUE, 
+           prior.plots=FALSE) -> norm_tmp
+  
+  batch <- "batch corrected"
+}
+
+
 # Exploratory Analysis
 ## comparison Boxplots
 ggarrange(raw_box + rremove("x.text"),
@@ -128,4 +155,5 @@ plot_PCs(pca_toplot, "Fraction", 3, 2)
 plot_PCs(pca_toplot, "CAF", 3, 2)
 plot_PCs(pca_toplot, "Batch", 3, 2)
 plot_PCs(pca_toplot, "Condition", 10, 0.6)
+plot_PCs(pca_toplot, "Condition", 3, 2)
 plot_PCs(pca_toplot, "Experimentalist", 3, 2)
