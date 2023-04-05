@@ -3,6 +3,7 @@ library(ggpubr)
 library(factoextra)
 library(RColorBrewer)
 library(sva)
+library(pheatmap)
 ################################################################################
 ################################PARAMETERS######################################
 correct_batch = T # Should correct for batch effect?
@@ -27,6 +28,26 @@ plot_PCs <- function(pca_toplot, feat, ncomp, dotsize){
   plot.new()
   legend(x = "center",fill = cols, legend = levels(col_factor), horiz = F, title = feat)
 }
+
+# Customizable corrplot (modified from https://www.khstats.com/blog/corr-plots/corr-plots/)
+cors <- function(df, cor.stat) {
+  M <- Hmisc::rcorr(as.matrix(df), type = cor.stat)
+  Mdf <- map(M, ~data.frame(.x))
+  return(Mdf)
+}
+
+formatted_cors <- function(df, cor.stat){
+  cors(df, cor.stat) %>%
+    map(~rownames_to_column(.x, var="measure1")) %>%
+    map(~pivot_longer(.x, -measure1, names_to = "measure2")) %>%
+    bind_rows(.id = "id") %>%
+    pivot_wider(names_from = id, values_from = value) %>%
+    dplyr::rename(p = P) %>%
+    mutate(sig_p = ifelse(p < .05, T, F),
+           p_if_sig = ifelse(sig_p, p, NA),
+           r_if_sig = ifelse(sig_p, r, NA)) 
+}
+
 ################################################################################
 ###################################MAIN#########################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/07_stimulated_CAFs/00_Data/")
@@ -146,7 +167,6 @@ fviz_eig(norm_pca, barfill = "lightgrey",
                           "th component"))
 
 ### plots
-
 pca_toplot <- merge(norm_pca$x,
                     column_to_rownames(sample_info, "sample_name"),
                     by="row.names")
@@ -157,3 +177,16 @@ plot_PCs(pca_toplot, "Batch", 3, 2)
 plot_PCs(pca_toplot, "Condition", 10, 0.6)
 plot_PCs(pca_toplot, "Condition", 3, 2)
 plot_PCs(pca_toplot, "Experimentalist", 3, 2)
+
+## Exploratory corrplots
+### sample vs sample
+annot <- dplyr::select(sample_info, sample_name, Batch, CAF, Condition, Experimentalist, Fraction) %>%
+  column_to_rownames("sample_name")
+
+formatted_cors(norm_tmp, "pearson") %>%
+  dplyr::select(measure1, measure2, r) %>%
+  pivot_wider(id_cols = measure1, names_from = measure2, values_from = r) %>%
+  column_to_rownames("measure1") %>%
+  pheatmap(annotation_col = annot)
+
+### PCA vs contmetadata
