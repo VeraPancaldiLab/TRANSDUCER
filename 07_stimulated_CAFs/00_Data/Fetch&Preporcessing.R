@@ -196,3 +196,19 @@ formatted_cors(norm_tmp, "pearson") %>%
   pheatmap(annotation_col = annot)
 
 ### PCA vs contmetadata
+column_to_rownames(pca_toplot, "Row.names") %>%
+  dplyr::select(where(is.numeric)) %>%
+  formatted_cors("spearman") %>%
+  dplyr::filter(!str_detect(measure1, "PC")) %>%
+  dplyr::filter(str_detect(measure2, "PC.$")) %>% 
+  ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nCorrelation", title="",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0)) +
+  scale_y_discrete(expand=c(0,0)) +
+  ggpubr::rotate_x_text(angle = 90)
+  
