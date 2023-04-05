@@ -7,6 +7,7 @@ library(pheatmap)
 ################################################################################
 ################################PARAMETERS######################################
 correct_batch = T # Should correct for batch effect?
+sample_sample_corrplot_annot = "manip_info" # manip_info | picard_metrics
 ################################################################################
 #################################FUNCTIONS######################################
 
@@ -180,8 +181,13 @@ plot_PCs(pca_toplot, "Experimentalist", 3, 2)
 
 ## Exploratory corrplots
 ### sample vs sample
-annot <- dplyr::select(sample_info, sample_name, Batch, CAF, Condition, Experimentalist, Fraction) %>%
-  column_to_rownames("sample_name")
+if (sample_sample_corrplot_annot == "manip_info") {
+  annot <- dplyr::select(sample_info, sample_name, Batch, CAF, Condition, Experimentalist, Fraction) %>%
+    column_to_rownames("sample_name")
+} else if (sample_sample_corrplot_annot == "picard_metrics") {
+  annot <- dplyr::select(sample_info, sample_name, Coding, UTR, Intronic, Intergenic, Ribosomal, PF_not_aligned) %>%
+    column_to_rownames("sample_name")
+}
 
 formatted_cors(norm_tmp, "pearson") %>%
   dplyr::select(measure1, measure2, r) %>%
