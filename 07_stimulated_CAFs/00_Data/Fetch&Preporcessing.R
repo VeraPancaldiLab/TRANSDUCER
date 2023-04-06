@@ -6,8 +6,9 @@ library(sva)
 library(pheatmap)
 ################################################################################
 ################################PARAMETERS######################################
+filter_samples = "17AC" # NULL | 17AC | 02136
 correct_batch = T # Should correct for batch effect?
-sample_sample_corrplot_annot = "manip_info" # manip_info | picard_metrics
+sample_sample_corrplot_annot = "picard_metrics" # manip_info | picard_metrics
 ################################################################################
 #################################FUNCTIONS######################################
 
@@ -60,8 +61,13 @@ counts <- read_tsv("240323_Alignment/featureCountsOUTPUT.csv",
   dplyr::select(-all_of(c("Chr", "Start", "End", "Strand", "Length"))) %>% 
   dplyr::rename_with( ~ str_remove_all(.,"output_bams/|_Aligned.sortedByCoord.out.bam|__Aligned.sortedByCoord.out.bam"))
 
-### Export raw counts  
+### Export unfiltered raw counts for further analyses
 write_tsv(counts, "rawcounts.tsv")
+
+### filter to a subset of samples
+if (!is.null(filter_samples)){
+  counts <- dplyr::select(counts, Geneid, names(counts)[str_detect(names(counts), pattern = filter_samples)])
+}
 
 ## load metadata
 manip_info <- read_tsv("Data_RNA_sample_Jacobo.tsv")
@@ -71,7 +77,8 @@ picard_metrics <- read_tsv("240323_PicardTools/02_Output/picard_rnaseqmetrics_as
 
 sample_info <- left_join(manip_info, multiqc, by = "sample_name") %>%
   left_join(STAR_align, by = "sample_name") %>%
-  left_join(picard_metrics, by = "sample_name") %>% 
+  left_join(picard_metrics, by = "sample_name") %>%
+  dplyr::filter(sample_name %in% names(counts)) %>%
   dplyr::mutate(sample_name = fct(sample_name, levels=names(counts)[-1])) %>%
   dplyr::arrange(sample_name)
 
@@ -117,6 +124,22 @@ filt_box <- log2(filt_tmp) %>%
   ggtitle("log2Filt") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+## Batch effect correction
+if (correct_batch == F){
+  filt_tmp -> filt_tmp
+  batch <- "non corrected"
+  
+} else if (correct_batch == T){
+  
+  filt_tmp <- ComBat_seq(as.matrix(filt_tmp),
+                         batch = sample_info$Batch,
+                         full_mod = TRUE,
+                         covar_mod = cbind(as.numeric(factor(sample_info$Condition)), 
+                                           as.numeric(factor(sample_info$Fraction)))) 
+  
+  batch <- "batch corrected"
+}
+
 ## Normalize
 norm_tmp <-
     limma::voom(edgeR::calcNormFactors(edgeR::DGEList(filt_tmp)))$E ## TMM-log2 from anota2seqNormalize()
@@ -129,22 +152,6 @@ norm_box <- as_tibble(norm_tmp, rownames = "Gene")  %>%
   geom_boxplot() +
   ggtitle("log2TMM") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-## Batch effect correction
-if (correct_batch == F){
-  norm_tmp -> norm_tmp
-  batch <- "non corrected"
-  
-} else if (correct_batch == T){
-  
-  as.matrix(norm_tmp) %>% 
-    ComBat(batch = sample_info$Batch, 
-           par.prior=TRUE, 
-           prior.plots=FALSE) -> norm_tmp
-  
-  batch <- "batch corrected"
-}
 
 
 # Exploratory Analysis
