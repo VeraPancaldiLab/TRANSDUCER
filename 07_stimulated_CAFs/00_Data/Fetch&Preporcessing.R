@@ -8,7 +8,7 @@ library(pheatmap)
 ################################PARAMETERS######################################
 filter_samples = "17AC" # NULL | 17AC | 02136
 correct_batch = T # Should correct for batch effect?
-sample_sample_corrplot_annot = "picard_metrics" # manip_info | picard_metrics
+sample_sample_corrplot_annot = "picard_metrics" # manip_info | picard_metrics | tech_info | STAR_info
 ################################################################################
 #################################FUNCTIONS######################################
 
@@ -182,16 +182,23 @@ pca_toplot <- merge(norm_pca$x,
 plot_PCs(pca_toplot, "Fraction", 3, 2)
 plot_PCs(pca_toplot, "CAF", 3, 2)
 plot_PCs(pca_toplot, "Batch", 3, 2)
-plot_PCs(pca_toplot, "Condition", 10, 0.6)
+plot_PCs(pca_toplot, "Condition", 5, 1.6)
 plot_PCs(pca_toplot, "Condition", 3, 2)
 plot_PCs(pca_toplot, "Experimentalist", 3, 2)
+
 
 ## Exploratory corrplots
 ### sample vs sample
 if (sample_sample_corrplot_annot == "manip_info") {
   annot <- dplyr::select(sample_info, sample_name, Batch, CAF, Condition, Experimentalist, Fraction) %>%
     column_to_rownames("sample_name")
-} else if (sample_sample_corrplot_annot == "picard_metrics") {
+  } else if (sample_sample_corrplot_annot == "tech_info") {
+  annot <- dplyr::select(sample_info, sample_name, ng_ul, R260_280, R260_230, RQN, RQN_Integragen, ng_ul_Integragen) %>%
+    column_to_rownames("sample_name")
+  } else if (sample_sample_corrplot_annot == "STAR_info") {
+    annot <- dplyr::select(sample_info, sample_name, Number_of_input_reads, Uniquely_mapped_reads_perc, average_mapped_input_diff_, Mismatch_rate_per_base_perc, Deletion_rate_per_base, Insertion_rate_per_base, perc_of_reads_mapped_to_multiple_loci, perc_of_reads_mapped_to_too_many_loci) %>%
+      column_to_rownames("sample_name")
+  } else if (sample_sample_corrplot_annot == "picard_metrics") {
   annot <- dplyr::select(sample_info, sample_name, Coding, UTR, Intronic, Intergenic, Ribosomal, PF_not_aligned) %>%
     column_to_rownames("sample_name")
 }
