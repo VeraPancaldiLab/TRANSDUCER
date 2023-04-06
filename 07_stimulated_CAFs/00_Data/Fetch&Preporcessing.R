@@ -186,6 +186,13 @@ plot_PCs(pca_toplot, "Condition", 5, 1.6)
 plot_PCs(pca_toplot, "Condition", 3, 2)
 plot_PCs(pca_toplot, "Experimentalist", 3, 2)
 
+#### custom plot
+highlight = c("Batch_A_17AC_FAKi_Input", "Batch_A_17AC_TGF_F8")
+as_tibble(pca_toplot) %>% 
+  mutate(highlight = fct(if_else(Row.names %in% highlight, Row.names, "other"))) %>%
+  ggplot(aes(x=PC1, y=PC2, color = highlight)) +
+  geom_point() +
+  theme_pubr()
 
 ## Exploratory corrplots
 ### sample vs sample
@@ -225,4 +232,5 @@ column_to_rownames(pca_toplot, "Row.names") %>%
   scale_x_discrete(expand=c(0,0)) +
   scale_y_discrete(expand=c(0,0)) +
   ggpubr::rotate_x_text(angle = 90)
+
   
