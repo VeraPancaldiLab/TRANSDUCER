@@ -233,4 +233,9 @@ column_to_rownames(pca_toplot, "Row.names") %>%
   scale_y_discrete(expand=c(0,0)) +
   ggpubr::rotate_x_text(angle = 90)
 
+#### PCA vs specific metadata
+as_tibble(pca_toplot) %>%
+  ggplot(aes(x=RQN, y=RQN_Integragen)) +
+  geom_point() + 
+  theme_pubr()
   
