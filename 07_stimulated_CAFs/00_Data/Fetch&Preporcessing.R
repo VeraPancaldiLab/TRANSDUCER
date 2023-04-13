@@ -183,7 +183,7 @@ fviz_eig(norm_pca, barfill = "lightgrey",
 pca_toplot <- merge(norm_pca$x,
                     column_to_rownames(sample_info, "sample_name"),
                     by="row.names")
-
+plot_PCs(pca_toplot, "sample", 3, 2)
 plot_PCs(pca_toplot, "Fraction", 3, 2)
 plot_PCs(pca_toplot, "CAF", 3, 2)
 plot_PCs(pca_toplot, "Batch", 3, 2)
@@ -198,6 +198,39 @@ as_tibble(pca_toplot) %>%
   ggplot(aes(x=PC1, y=PC2, color = highlight)) +
   geom_point() +
   theme_pubr()
+
+### Gene leverage analysis
+leverages <- get_pca_var(norm_pca)$cos2
+
+all_genesets <- msigdbr("Homo sapiens")
+all_genesets %>% filter(gs_subcat %in% c("CP:REACTOME")) -> use_genesets
+msigdbr_list = split(x = use_genesets$ensembl_gene, f = use_genesets$gs_name)
+
+signature_dict <- dplyr::select(all_genesets, c(gs_name, gs_id)) %>%
+  distinct(gs_id, .keep_all = T) %>%  deframe()
+
+gsvaRes <- gsva(data.matrix(leverages), msigdbr_list, min.sz = 15)
+
+#### plot of whatever PC Reactome enrichment
+comp = "Dim.1"
+
+gsvaTop <- as_tibble(gsvaRes, rownames = "gene_set") %>% 
+  mutate(the_rank = rank(-get(comp), ties.method = "random"),
+         gene_set = if_else(str_count(gene_set, "_") < 10, gene_set, signature_dict[gene_set]),
+         gene_set = str_remove(gene_set, "REACTOME_"),
+         gene_set = fct_reorder(gene_set, the_rank,.desc = T)) %>%
+  pivot_longer(cols = -c(gene_set, the_rank), names_to = "component", values_to = "ES") %>% 
+  dplyr::filter(the_rank < 25 | the_rank > (nrow(gsvaRes)-25)) %>% 
+  mutate(component = if_else(component == comp, comp, "Other")) %>% 
+  dplyr::select(!c(the_rank))
+
+ggplot(gsvaTop, aes(x = ES, y = gene_set)) + 
+  geom_point(aes(alpha = if_else(component == comp, 0.9, 0.3),
+                 color = if_else(ES > 0, "blue", "red"))) +
+  theme_bw() +
+  labs(title = comp, subtitle = "Best Reactome gene sets") +
+  rremove("legend") +
+  rremove("ylab")
 
 ## Exploratory plots
 ### corrplots sample vs sample
