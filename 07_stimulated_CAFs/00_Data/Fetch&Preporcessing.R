@@ -199,8 +199,8 @@ as_tibble(pca_toplot) %>%
   geom_point() +
   theme_pubr()
 
-## Exploratory corrplots
-### sample vs sample
+## Exploratory plots
+### corrplots sample vs sample
 if (sample_sample_corrplot_annot == "manip_info") {
   annot <- dplyr::select(sample_info, sample_name, Batch, CAF, Condition, Experimentalist, Fraction) %>%
     column_to_rownames("sample_name")
@@ -221,7 +221,7 @@ formatted_cors(norm_tmp, "pearson") %>%
   column_to_rownames("measure1") %>%
   pheatmap(annotation_col = annot)
 
-### PCA vs contmetadata
+### corrplots PCA vs contmetadata
 column_to_rownames(pca_toplot, "Row.names") %>%
   dplyr::select(where(is.numeric)) %>%
   formatted_cors("spearman") %>%
@@ -239,8 +239,16 @@ column_to_rownames(pca_toplot, "Row.names") %>%
   ggpubr::rotate_x_text(angle = 90)
 
 #### PCA vs specific metadata
+##### cont
 as_tibble(pca_toplot) %>%
   ggplot(aes(x=RQN, y=RQN_Integragen)) +
   geom_point() + 
+  theme_pubr()
+
+##### disc
+as_tibble(pca_toplot) %>%
+  ggplot(aes(x=PC1, color=Fraction)) +
+  geom_density() + 
+  geom_rug() +
   theme_pubr()
   
