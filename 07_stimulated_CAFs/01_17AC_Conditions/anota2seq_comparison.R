@@ -2,12 +2,27 @@ library(tidyverse)
 library(anota2seq)
 ################################PARAMETERS######################################
 filter_samples = "17AC" # NULL | 17AC | 02136
+filter_genes = "custom" # custom | allzeros | NULL
 exclude_samples = NULL # NULL c("Batch_A_17AC_FAKi", "Batch_A_17AC_TGF")
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/07_stimulated_CAFs/01_17AC_Conditions/")
 
 # Data loading
 counts <- read_tsv("../00_Data/rawcounts.tsv")
+
+## filter genes
+if (filter_genes == "custom"){
+  anotafilter = FALSE
+  counts <- column_to_rownames(counts, "Geneid") %>%
+    .[!(apply(., 1, function(x) {
+      sum(x == 0) > ncol(counts)/2
+    })), ] %>% as_tibble(rownames = "Geneid")
+} else if (filter_genes == "allzeros"){
+  anotafilter = TRUE
+} else if (filter_genes == NULL){
+  anotafilter = FALSE
+}
+
 
 ## filter of samples
 if (!is.null(filter_samples)){
@@ -41,12 +56,15 @@ ads <- anota2seqDataSetFromMatrix(
   dataP = column_to_rownames(dataP, "Geneid"),
   dataT = column_to_rownames(dataT, "Geneid"),
   phenoVec = phenoVec,
-  #batchVec = BatchVec,
+  batchVec = BatchVec,
   dataType = "RNAseq",
-  filterZeroGenes = TRUE,
+  filterZeroGenes = anotafilter, # determined in filter_genes
   normalize = TRUE,
   transformation = "TMM-log2",
   varCutOff = NULL)
 
-ads <- anota2seqPerformQC(Anota2seqDataSet = ads,
+## QC
+ads <- anota2seqPerformQC(ads,
                           generateSingleGenePlots = TRUE)
+
+ads <- anota2seqResidOutlierTest(ads)
