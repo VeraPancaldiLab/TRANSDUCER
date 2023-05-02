@@ -3,6 +3,7 @@ library(edgeR)
 library(AnnotationDbi)
 library(org.Hs.eg.db)
 library(readxl)
+library(GSVA)
 ################################################################################
 sample_ID = "public" # private | public
 signature_selection = NULL  # Luo_NatCom2022 | Foster_CancerCell2022 | Huang_CancerCell2022 | Verginadis_NatureCellBio2022 | Grauel_NatComms2020 | Carpenter_CancerDiscovery2023
@@ -87,6 +88,8 @@ for (sign in excel_sheets("01_Input/CAF_signatures.xlsx")){
   
 }
 
+list_of_signatures <- split(signatures, f = signatures$signature) %>%
+  map(~ .$value)
 
 # Preprocessing
 ## choose sample IDs
@@ -121,4 +124,9 @@ dplyr::mutate(cafs.gene.expression, CL = fct(CL, levels = arrange(cafs.gene.expr
   ggplot(aes(x = get(gene), y = CL)) + 
   #aes_string(x = gene, y = "CL") +
   geom_bar(stat = "identity")
+
+
+## GSEA of signatures
+gsvaRes <- gsva(cafs.choose.sym %>% data.matrix(), list_of_signatures)
+
 
