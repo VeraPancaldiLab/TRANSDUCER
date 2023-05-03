@@ -27,7 +27,13 @@ mySampleFun <- function(x, names, sampSize=1e6){
   return(tmpOut)
 }
 
-sampSizes <- rep(1e6, ncol(datExpr))
+sampSizes <- read_tsv("MarkDuplicates/MarkDuplicatesStats.tsv")  %>% 
+  dplyr::mutate(FILE = str_remove_all(FILE,"_Aligned.sortedByCoord.out.bam.txt|__Aligned.sortedByCoord.out.bam.txt") %>%
+                  fct(levels = colnames(datExpr))) %>%
+  dplyr::arrange(FILE) %>%
+  dplyr::select(ESTIMATED_LIBRARY_SIZE) %>%
+  deframe()
+  
 
 testOut <- list()
 for(t in 1:length(sampSizes)){
