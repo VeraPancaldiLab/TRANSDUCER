@@ -77,7 +77,8 @@ acafs.raw <- read_tsv("01_Input/CAF_rawcounts.tsv") %>%
 ## Signatures
 if (is.null(signature_selection)){
   signatures = tibble(signature = character(), value = character())
-for (sign in excel_sheets("01_Input/CAF_signatures.xlsx")){
+  sign_list <- excel_sheets("01_Input/CAF_signatures.xlsx")
+for (sign in sign_list){
   signatures_temp <- read_xlsx("01_Input/CAF_signatures.xlsx", sheet = sign) %>%
     rename_with( ~ paste0(sign,"_", .x)) %>%
     pivot_longer(cols = everything(), names_to = "signature")
@@ -144,6 +145,10 @@ if (include_tech_annot == TRUE){
 
 pheatmap(gsvaRes,
          cluster_cols = T, cluster_rows = T, annotation_col = tech_annot)
-## comparison plot of signatures (the one like venn but with bars)
 
 
+### Specific pheatmaps per signature set (output in files)
+for (sign in sign_list){
+  sign_sub = dplyr::filter(signatures, str_detect(signature, sign))
+  pheatmap()
+}
