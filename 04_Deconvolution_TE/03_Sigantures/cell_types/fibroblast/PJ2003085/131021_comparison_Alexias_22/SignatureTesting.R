@@ -4,9 +4,11 @@ library(AnnotationDbi)
 library(org.Hs.eg.db)
 library(readxl)
 library(GSVA)
+library(pheatmap)
 ################################################################################
 sample_ID = "public" # private | public
 signature_selection = NULL  # Luo_NatCom2022 | Foster_CancerCell2022 | Huang_CancerCell2022 | Verginadis_NatureCellBio2022 | Grauel_NatComms2020 | Carpenter_CancerDiscovery2023
+include_tech_annot = FALSE # TRUE | FALSE
 ################################################################################
 #' Filter a dataframe to keep genes with at least a defined % of non 0 expression samples
 #'@description
@@ -71,6 +73,7 @@ acafs.raw <- read_tsv("01_Input/CAF_rawcounts.tsv") %>%
   dplyr::select(EnsemblID, acafs.info$rawID) %>%
   dplyr::relocate(EnsemblID, acafs.info$rawID)
 
+
 ## Signatures
 if (is.null(signature_selection)){
   signatures = tibble(signature = character(), value = character())
@@ -128,5 +131,19 @@ dplyr::mutate(cafs.gene.expression, CL = fct(CL, levels = arrange(cafs.gene.expr
 
 ## GSEA of signatures
 gsvaRes <- gsva(cafs.choose.sym %>% data.matrix(), list_of_signatures)
+
+### pheatmap of all the CAF subtypes
+if (include_tech_annot == TRUE){
+  full_colanot <- c("proliferation", "passes", "Inmortalized", "tissue_origin",
+                    "sex", "age", "tumor_differentiation", "initial_sample",
+                    "treatment_neoadjuvant", "OS")
+  tech_annot = acafs.info[full_colanot]
+  
+}else {tech_annot = NULL}
+
+
+pheatmap(gsvaRes,
+         cluster_cols = T, cluster_rows = T, annotation_col = tech_annot)
+## comparison plot of signatures (the one like venn but with bars)
 
 
