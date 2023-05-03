@@ -1,12 +1,12 @@
-$isfirst = 1
+isfirst=1
 for file in metrics_*.bam.txt
 do
 	while [ $isfirst == 1 ]
 	do
-		awk '/## METRICS CLASS/,/## HISTOGRAM/' "$file" | grep -v "##"
-		$isfirst = 0
+		awk -v F=$file 'FNR==7{print "File\t"$0}; FNR==8{print F"\t"$0}' $file
+		isfirst=0
 	done
-	awk '/## METRICS CLASS/,/## HISTOGRAM/' "$file" | grep -v "##"
+	awk -v F=$file 'FNR==8{print F"\t"$0}' "$file"
 	
 done
 
