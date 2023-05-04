@@ -149,6 +149,15 @@ pheatmap(gsvaRes,
 
 ### Specific pheatmaps per signature set (output in files)
 for (sign in sign_list){
-  sign_sub = dplyr::filter(signatures, str_detect(signature, sign))
-  pheatmap()
+  sign_sub <- dplyr::filter(signatures, str_detect(signature, sign)) %>%
+    dplyr::filter(value %in% rownames(cafs.choose.sym)) %>% 
+    dplyr::arrange(signature) %>%
+    column_to_rownames("value")
+  
+  gsvaRes_sub <- as.data.frame(t(gsvaRes[unique(sign_sub$signature),]))
+  
+  cafs.choose.sym[rownames(sign_sub),] %>% 
+    pheatmap(cellwidth=15, cellheight=15, filename = paste0("02_Output/",sign,".png"),
+             cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = T, annotation_col = gsvaRes_sub,
+             annotation_row = sign_sub)
 }
