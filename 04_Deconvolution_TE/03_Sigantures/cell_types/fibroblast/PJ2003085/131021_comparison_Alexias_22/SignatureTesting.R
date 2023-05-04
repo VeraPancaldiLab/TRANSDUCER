@@ -151,10 +151,13 @@ pheatmap(gsvaRes,
 for (sign in sign_list){
   sign_sub <- dplyr::filter(signatures, str_detect(signature, sign)) %>%
     dplyr::filter(value %in% rownames(cafs.choose.sym)) %>% 
+    group_by(value) %>% 
+    mutate(signature = ifelse(base::duplicated(value,fromLast=T), "multiple", signature)) %>%
+    distinct(value, .keep_all = T,) %>%
     dplyr::arrange(signature) %>%
     column_to_rownames("value")
   
-  gsvaRes_sub <- as.data.frame(t(gsvaRes[unique(sign_sub$signature),]))
+  gsvaRes_sub <- as.data.frame(t(gsvaRes[unique(sign_sub$signature)[!unique(sign_sub$signature) == 'multiple'],]))
   
   cafs.choose.sym[rownames(sign_sub),] %>% 
     pheatmap(cellwidth=15, cellheight=15, filename = paste0("02_Output/",sign,".png"),
