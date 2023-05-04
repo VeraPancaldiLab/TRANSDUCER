@@ -7,6 +7,9 @@ datExpr <-  read_tsv("../rawcounts.tsv") %>%
   column_to_rownames("Geneid") %>% 
   as.matrix()
 
+Pol_pos <- which(str_detect(colnames(datExpr), "F8"))
+Tot_pos <- which(str_detect(colnames(datExpr), "Input"))
+
 mySampleFun <- function(x, names, sampSize=1e6){
   data <- x
   ##The idea here is to sample a fixed number of reads to enable a more comparable analysis
@@ -49,25 +52,28 @@ for(d in 1:length(testOut)){
   }
 }
 
-par(mar=c(6,6,5,4),bty='l',font=2, font.axis=2, font.lab=2, cex.axis=0.8,cex.main=0.8,cex.lab=1)
-plot(sampSizes[which(plotTable[1,]>0)],as.numeric(plotTable[1,][which(plotTable[1,]>0)]),xlab='', ylab='',pch=20,ylim=c(0,18000),xlim=c(0,1e6),col='#F22F08',lwd=2,bty="n",yaxt="n",xaxt="n")
+limx <- c(min(sampSizes)-1000, max(sampSizes) +1000)
+limy <- c(min(plotTable[which(plotTable>0)])-1000, max(plotTable)+ 1000)
 
-axis(format(sampSizes[c(seq(1,28))],scientific = T,digits = 2),side=1,at=sampSizes[c(seq(1,28))],font=2,las=2,lwd=2)
-axis(seq(0,18000,3000),side=2,at=seq(0,18000,3000),font=2,las=2,lwd=2)
+par(mar=c(6,6,5,4),bty='l',font=2, font.axis=2, font.lab=2, cex.axis=0.8,cex.main=0.8,cex.lab=1)
+plot(sampSizes[which(plotTable[1,]>0)],as.numeric(plotTable[1,][which(plotTable[1,]>0)]),xlab='', ylab='',pch=20,ylim=limy,xlim=limx,col='#F22F08',lwd=2,bty="n",yaxt="n",xaxt="n")
+
+axis(format(sampSizes[c(seq(1,ncol(datExpr)))],scientific = T,digits = 2),side=1,at=sampSizes[c(seq(1,ncol(datExpr)))],font=2,las=2,lwd=2)
+axis(seq(0,limy[2],3000),side=2,at=seq(0,limy[2],3000),font=2,las=2,lwd=2)
 mtext(side=2, line=4, 'Number of genes detected', col="black", font=2, cex=1.7)
 mtext(side=1, line=5, 'Millions reads sampled', col="black", font=2, cex=1.7)
 
 lines(sampSizes[which(plotTable[1,]>0)],as.numeric(plotTable[1,][which(plotTable[1,]>0)]),lwd=2,col='#F22F08')
-for(i in seq(14,2,by=-2)){
-  print(i)
+for(i in Tot_pos){
+  print(colnames(datExpr)[i])
   lines(sampSizes[which(plotTable[i,]>0)],as.numeric(plotTable[i,][which(plotTable[i,]>0)]),lwd=2,col='#F22F08')
   points(sampSizes[which(plotTable[i,]>0)],as.numeric(plotTable[i,][which(plotTable[i,]>0)]),pch=20,col='#F22F08')
 }
 
-for(i in seq(13,1,by=-2)){
-  print(i)
+for(i in Pol_pos){
+  print(colnames(datExpr)[i])
   lines(sampSizes[which(plotTable[i,]>0)],as.numeric(plotTable[i,][which(plotTable[i,]>0)]),lwd=2,col='#8D2F23')
   points(sampSizes[which(plotTable[i,]>0)],as.numeric(plotTable[i,][which(plotTable[i,]>0)]),pch=20,col='#8D2F23')
 }
 
-legend(1,19000,bty='n', fill=c('#8D2F23','#F22F08'), horiz=TRUE, xpd=T, cex=1.5,legend=c('polyRNA','totalRNA'))
+legend(10e5,24000,bty='n', fill=c('#8D2F23','#F22F08'), horiz=TRUE, xpd=T, cex=1.5,legend=c('polyRNA','totalRNA'))
