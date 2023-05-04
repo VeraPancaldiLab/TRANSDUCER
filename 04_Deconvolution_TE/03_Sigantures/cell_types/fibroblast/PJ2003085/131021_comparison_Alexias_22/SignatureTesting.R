@@ -6,9 +6,10 @@ library(readxl)
 library(GSVA)
 library(pheatmap)
 ################################################################################
-sample_ID = "public" # private | public
+sample_ID = "private" # private | public
 signature_selection = NULL  # Luo_NatCom2022 | Foster_CancerCell2022 | Huang_CancerCell2022 | Verginadis_NatureCellBio2022 | Grauel_NatComms2020 | Carpenter_CancerDiscovery2023
 include_tech_annot = FALSE # TRUE | FALSE
+whatever_genes_filename = "Receptors_info.csv" # Receptors_info.csv "whatever csv ythat uses tab as separator and has columns of groups (avoid spaces in names)
 ################################################################################
 #' Filter a dataframe to keep genes with at least a defined % of non 0 expression samples
 #'@description
@@ -102,7 +103,7 @@ if (sample_ID == "public") {
   names(acafs.raw)[-1] <-  acafs.info$Official_name
   acafs.info <- column_to_rownames(acafs.info, "Official_name")
 
-} else if (saple_ID == "private"){
+} else if (sample_ID == "private"){
   names(acafs.raw)[-1] <-  acafs.info$Name
   acafs.info <- column_to_rownames(acafs.info, "Name")
 }
@@ -164,3 +165,27 @@ for (sign in sign_list){
              cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = T, annotation_col = gsvaRes_sub,
              annotation_row = sign_sub)
 }
+
+## Whatever list of genes Enrichment and pheatmap
+whatever_genes <- read_tsv(paste0("01_Input/",whatever_genes_filename)) %>%
+  pivot_longer(cols = everything(), names_to = "signature") %>%
+  dplyr::filter(!is.na(value))
+
+list_of_whatever_genes <- split(whatever_genes, f = whatever_genes$signature) %>%
+  map(~ .$value)
+
+### GSEA
+gsvaRes_whatever_genes <- gsva(data.matrix(cafs.choose.sym), list_of_whatever_genes)
+
+### Plot
+gene_anotation <- dplyr::filter(whatever_genes, value %in% rownames(cafs.choose.sym)) %>% 
+  group_by(value) %>% 
+  mutate(signature = ifelse(base::duplicated(value,fromLast=T), "multiple", signature)) %>%
+  distinct(value, .keep_all = T,) %>%
+  dplyr::arrange(signature) %>%
+  column_to_rownames("value")
+
+cafs.choose.sym[rownames(gene_anotation),] %>% 
+  pheatmap(cellwidth=15, cellheight=15, filename = paste0("02_Output/",whatever_genes_filename,".png"),
+           cluster_cols = T, cluster_rows = F, scale = "row", show_rownames = T, annotation_col = as.data.frame(t(gsvaRes_whatever_genes)),
+           annotation_row = gene_anotation)
