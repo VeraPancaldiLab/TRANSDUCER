@@ -1,16 +1,6 @@
 library(tidyverse)
+
 ################################################################################
-setwd("/home/jacobo/Documents/02_TRANSDUCER/07_stimulated_CAFs/00_Data/270423_Complexity/")
-
-# load expression data
-datExpr <-  read_tsv("../rawcounts.tsv") %>% 
-  column_to_rownames("Geneid") %>% 
-  as.matrix()
-
-Pol_pos <- which(str_detect(colnames(datExpr), "F8"))
-Tot_pos <- which(str_detect(colnames(datExpr), "Input"))
-
-#
 mySampleFun <- function(x, names, sampSize=1e6){
   data <- x
   ##The idea here is to sample a fixed number of reads to enable a more comparable analysis
@@ -31,6 +21,17 @@ mySampleFun <- function(x, names, sampSize=1e6){
   return(tmpOut)
 }
 
+################################################################################
+setwd("/home/jacobo/Documents/02_TRANSDUCER/07_stimulated_CAFs/00_Data/270423_Complexity/")
+
+
+# load expression data
+datExpr <-  read_tsv("../rawcounts.tsv") %>% 
+  column_to_rownames("Geneid") %>% 
+  as.matrix()
+
+Pol_pos <- which(str_detect(colnames(datExpr), "F8"))
+Tot_pos <- which(str_detect(colnames(datExpr), "Input"))
 
 sampSizes <- c(0.1e5,0.2e5,0.3e5,0.4e5,0.5e5,0.6e5,0.7e5,0.8e5,0.9e5,1e5,1.5e5,2e5,2.5e5,3e5,3.5e5,4e5,4.5e5,5e5,5.5e5,6e5,6.5e5,7e5,7.5e5,8e5,8.5e5,9e5,9.5e5,1e6)
 
