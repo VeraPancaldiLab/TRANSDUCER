@@ -6,10 +6,10 @@ library(sva)
 library(pheatmap)
 ################################################################################
 ################################PARAMETERS######################################
-filter_samples = "17AC" # NULL | 17AC | 02136
-exclude_samples = c("Batch_A_17AC_FAKi_Input", "Batch_A_17AC_TGF_F8")
-correct_batch = T # Should correct for batch effect?
-sample_sample_corrplot_annot = "picard_metrics" # manip_info | picard_metrics | tech_info | STAR_info
+filter_samples = "17AC_(TGF|NT)" # NULL | 17AC | 02136 | more complex like "17AC_(FAKi|NT)" for FAKi vs NT
+exclude_samples = NULL # NULL | c("Batch_A_17AC_FAKi_Input", "Batch_A_17AC_TGF_F8")
+correct_batch = F # Should correct for batch effect?
+sample_sample_corrplot_annot = "manip_info" # manip_info | picard_metrics | tech_info | STAR_info
 ################################################################################
 #################################FUNCTIONS######################################
 
@@ -73,6 +73,7 @@ if (!is.null(filter_samples)){
 if (!is.null(exclude_samples)){
   counts <- dplyr::select(counts, Geneid, names(counts)[!names(counts) %in% exclude_samples])
 }
+
 
 ## load metadata
 manip_info <- read_tsv("Data_RNA_sample_Jacobo.tsv")
