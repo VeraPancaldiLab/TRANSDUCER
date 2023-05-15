@@ -21,6 +21,10 @@ mySampleFun <- function(x, names, sampSize=1e6){
   return(tmpOut)
 }
 
+PlotComplexity <- function(){
+  
+}
+
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/07_stimulated_CAFs/00_Data/270423_Complexity/")
 
@@ -29,6 +33,9 @@ setwd("/home/jacobo/Documents/02_TRANSDUCER/07_stimulated_CAFs/00_Data/270423_Co
 datExpr <-  read_tsv("../rawcounts.tsv") %>% 
   column_to_rownames("Geneid") %>% 
   as.matrix()
+
+# load Metadata
+datInfo <- read_tsv("../Data_RNA_sample_Jacobo.tsv")
 
 Pol_pos <- which(str_detect(colnames(datExpr), "F8"))
 Tot_pos <- which(str_detect(colnames(datExpr), "Input"))
@@ -71,3 +78,46 @@ for(i in Pol_pos){
 }
 
 legend(1,19000,bty='n', fill=c('#8D2F23','#F22F08'), horiz=TRUE, xpd=T, cex=1.5,legend=c('polyRNA','totalRNA'))
+
+
+complexity_toplot <- as_tibble(plotTable, rownames ="sample_name") %>%
+    pivot_longer(cols = -sample_name, names_to = "reads_sampled", values_to = "detected_genes") %>% 
+    mutate(reads_sampled = as.numeric(str_remove(reads_sampled, "test_"))) %>% 
+    left_join(datInfo, "sample_name")
+
+## Fraction
+ggplot(complexity_toplot) +
+  aes(x = reads_sampled, y = detected_genes, color = Fraction, group =  sample_name) + 
+  geom_line() +
+  theme_bw()
+
+## Batch  
+ggplot(complexity_toplot) +
+  aes(x = reads_sampled, y = detected_genes, color = Batch, group =  sample_name) + 
+  geom_line() +
+  theme_bw()
+
+## CAF
+ggplot(complexity_toplot) +
+  aes(x = reads_sampled, y = detected_genes, color = CAF, group =  sample_name) + 
+  geom_line() +
+  theme_bw()
+
+## Experimentalist
+ggplot(complexity_toplot) +
+  aes(x = reads_sampled, y = detected_genes, color = Experimentalist, group =  sample_name) + 
+  geom_line() +
+  theme_bw()
+
+## Condition
+ggplot(complexity_toplot) +
+  aes(x = reads_sampled, y = detected_genes, color = Condition, group =  sample_name) + 
+  geom_line() +
+  theme_bw()
+
+## Sample
+ggplot(complexity_toplot) +
+  aes(x = reads_sampled, y = detected_genes, color = sample, group =  sample_name) + 
+  geom_line() +
+  theme_bw()
+
