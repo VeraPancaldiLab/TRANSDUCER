@@ -5,6 +5,7 @@ library(biomaRt)
 filter_samples = "(A|B|C)_17AC_(NT|NEAA)" # NULL | 17AC | 02136
 filter_genes = "allzeros" # custom | allzeros | NULL
 exclude_samples = NULL # NULL c("Batch_A_17AC_FAKi", "Batch_A_17AC_TGF")
+correct_batch = TRUE
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/07_stimulated_CAFs/02_17AC_NTvsCondition/")
 
@@ -69,7 +70,27 @@ ads <- anota2seqDataSetFromMatrix(
 
 ## QC
 ads <- anota2seqPerformQC(ads,
-                          generateSingleGenePlots = TRUE)
+                          generateSingleGenePlots = TRUE, 
+                          fileStem = "02_Output/")
 
 ads <- anota2seqResidOutlierTest(ads)
+
+## Analysis
+ads <- anota2seqAnalyze(ads,
+                        correctionMethod = "BH", useProgBar = TRUE, fileStem = "02_Output/",
+                        analysis = c("translation", "buffering", "translated mRNA", "total mRNA"))
+
+ads <- anota2seqSelSigGenes(Anota2seqDataSet = ads,
+                            selContrast = 1,
+                            minSlopeTranslation = -1,
+                            maxSlopeTranslation = 2,
+                            minSlopeBuffering = -2,
+                            maxSlopeBuffering = 1,
+                            maxPAdj = 0.25)
+## Result Plots
+par(mfrow = c(1, 2))
+anota2seqPlotPvalues(ads, selContrast = 1, useRVM = TRUE, plotToFile = FALSE, contrastName = "provisional_name")
+
+ads <- anota2seqRegModes(ads, c(TRUE, TRUE))
+anota2seqPlotFC(ads, selContrast = 1, plotToFile = FALSE, contrastName = "WT vs. SRCinh")
 
