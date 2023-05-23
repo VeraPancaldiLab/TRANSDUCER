@@ -4,9 +4,10 @@ library(factoextra)
 library(RColorBrewer)
 library(sva)
 library(pheatmap)
+library(biomaRt)
 ################################################################################
 ################################PARAMETERS######################################
-filter_samples = "17AC_(TGF|NT)" # NULL | 17AC | 02136 | more complex like "17AC_(FAKi|NT)" for FAKi vs NT
+filter_samples = "Batch_D_17AC" # NULL | 17AC | 02136 | more complex like "17AC_(FAKi|NT)" for FAKi vs NT
 exclude_samples = NULL # NULL | c("Batch_A_17AC_FAKi_Input", "Batch_A_17AC_TGF_F8")
 correct_batch = F # Should correct for batch effect?
 sample_sample_corrplot_annot = "manip_info" # manip_info | picard_metrics | tech_info | STAR_info
@@ -285,4 +286,31 @@ as_tibble(pca_toplot) %>%
   geom_density() + 
   geom_rug() +
   theme_pubr()
+
+
+### Gene plots
+#### Get gene name dataset
+ensembl75 <- useEnsembl(biomart = "genes",
+                        dataset = "hsapiens_gene_ensembl",
+                        version = 75)
+
+annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_id'), mart = ensembl75)
+
+translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
+
+norm_gene_name <- as_tibble(norm_tmp, rownames = "Gene")  %>%
+  dplyr::mutate(Gene = translate[Gene])
+
+#### CAF stimuli
+stimuli_markers <- read_tsv("../00_Data/stimuli_markers.tsv")
+
+dplyr::filter(norm_gene_name, Gene %in% stimuli_markers$gene) %>%
+  dplyr::mutate(Gene = fct(Gene, levels = stimuli_markers$gene)) %>%
+  dplyr::arrange(Gene) %>% 
+  column_to_rownames("Gene") %>% 
+  pheatmap(annotation_col = annot,
+           scale = "row",
+           annotation_row = column_to_rownames(stimuli_markers, "gene"), cluster_rows = F)
+
   
