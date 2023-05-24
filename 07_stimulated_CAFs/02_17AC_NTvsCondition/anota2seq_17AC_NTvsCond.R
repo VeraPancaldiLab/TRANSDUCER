@@ -5,7 +5,7 @@ library(biomaRt)
 filter_samples = "(A|B|C)_17AC_(NT|NEAA)" # NULL | 17AC | 02136
 filter_genes = "allzeros" # custom | allzeros | NULL
 exclude_samples = NULL # NULL c("Batch_A_17AC_FAKi", "Batch_A_17AC_TGF")
-correct_batch = FALSE
+correct_batch = TRUE
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/07_stimulated_CAFs/02_17AC_NTvsCondition/")
 
@@ -101,15 +101,12 @@ ads_results <- anota2seqGetOutput(ads, output="singleDf", selContrast=1)
 
 ### get gene ID with Biomart
 ensembl75 <- useEnsembl(biomart = "genes",
-                        dataset = "mmusculus_gene_ensembl",
+                        dataset = "hsapiens_gene_ensembl",
                         version = 75)
 
 #listAttributes(ensembl75, page="feature_page")
 annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
-                                        'external_gene_id',
-                                        'entrezgene',
-                                        'mgi_id',
-                                        'chromosome_name'), mart = ensembl75)
+                                        'external_gene_id'), mart = ensembl75)
 
 translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
 
