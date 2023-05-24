@@ -115,3 +115,17 @@ ads_results <- dplyr::mutate(ads_results, identifier = translate[identifier])
 filename <- paste0("02_Output/result_tables/", paste(unique(phenoVec), collapse = "vs"), "_CorrectBatch", correct_batch, ".tsv")
   
 write_tsv(ads_results, filename)
+
+## Plot of specific factors/Markers
+highlight_list = c("PHGDH", "CHOP", "PSAT1",  "SESN2", "ATF4")
+
+tibble(ads_results) %>%
+  mutate(highlight = if_else(identifier %in% highlight_list, identifier, "Other") %>% fct(levels = c("Other", highlight_list))) %>% 
+  dplyr::arrange(highlight) %>%
+  ggplot() +
+  aes(x = totalmRNA.apvEff, y = translatedmRNA.apvEff, color = highlight) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1)+
+  theme_classic() + 
+  labs(title = filename)
+
