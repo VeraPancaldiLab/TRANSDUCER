@@ -117,7 +117,8 @@ filename <- paste0("02_Output/result_tables/", paste(unique(phenoVec), collapse 
 write_tsv(ads_results, filename)
 
 ## Plot of specific factors/Markers
-highlight_list = c("PHGDH", "CHOP", "PSAT1",  "SESN2", "ATF4")
+stimuli_markers <- read_tsv(file = "../00_Data/stimuli_markers.tsv")
+highlight_list <- dplyr::filter(stimuli_markers, stimuli %in% phenoVec) %>% deframe()
 
 tibble(ads_results) %>%
   mutate(highlight = if_else(identifier %in% highlight_list, identifier, "Other") %>% fct(levels = c("Other", highlight_list))) %>% 
