@@ -5,7 +5,7 @@ library(biomaRt)
 filter_samples = "(A|B|C)_17AC_(NT|NEAA)" # NULL | 17AC | 02136
 filter_genes = "allzeros" # custom | allzeros | NULL
 exclude_samples = NULL # NULL c("Batch_A_17AC_FAKi", "Batch_A_17AC_TGF")
-correct_batch = TRUE
+correct_batch = FALSE
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/07_stimulated_CAFs/02_17AC_NTvsCondition/")
 
@@ -38,8 +38,7 @@ if (!is.null(exclude_samples)){
 ## Metadata
 manip_info <- read_tsv("../00_Data/Data_RNA_sample_Jacobo.tsv") %>% 
   dplyr::filter(sample_name %in% names(counts)) %>%
-  dplyr::mutate(sample_name = fct(sample_name, levels=names(counts)[-1]),
-                Condition = fct(Condition, levels=unique(c("NT", Condition)))) %>%
+  dplyr::mutate(sample_name = fct(sample_name, levels=names(counts)[-1])) %>%
   dplyr::arrange(sample_name)
 
 all(names(counts)[-1] == manip_info$sample_name) %>% stopifnot()
@@ -91,8 +90,31 @@ ads <- anota2seqSelSigGenes(Anota2seqDataSet = ads,
                             maxPAdj = 0.25)
 ## Result Plots
 par(mfrow = c(1, 2))
-anota2seqPlotPvalues(ads, selContrast = 1, useRVM = TRUE, plotToFile = FALSE, contrastName = paste(levels(phenoVec), collapse = " vs. "))
+anota2seqPlotPvalues(ads, selContrast = 1, useRVM = TRUE, plotToFile = FALSE, contrastName = paste(unique(phenoVec), collapse = " vs. "))
 
 ads <- anota2seqRegModes(ads, c(TRUE, TRUE))
-anota2seqPlotFC(ads, selContrast = 1, plotToFile = FALSE,  paste(levels(phenoVec), collapse = " vs. "))
+anota2seqPlotFC(ads, selContrast = 1, plotToFile = FALSE,  contrastName = paste(unique(phenoVec), collapse = " vs. "))
 
+## Export results
+ads_results <- anota2seqGetOutput(ads, output="singleDf", selContrast=1)
+
+
+### get gene ID with Biomart
+ensembl75 <- useEnsembl(biomart = "genes",
+                        dataset = "mmusculus_gene_ensembl",
+                        version = 75)
+
+#listAttributes(ensembl75, page="feature_page")
+annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_id',
+                                        'entrezgene',
+                                        'mgi_id',
+                                        'chromosome_name'), mart = ensembl75)
+
+translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
+
+ads_results <- dplyr::mutate(ads_results, identifier = translate[identifier])
+
+filename <- paste0("02_Output/result_tables/", paste(unique(phenoVec), collapse = "vs"), "_CorrectBatch", correct_batch, ".tsv")
+  
+write_tsv(ads_results, filename)
