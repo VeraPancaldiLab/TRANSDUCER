@@ -38,7 +38,8 @@ if (!is.null(exclude_samples)){
 ## Metadata
 manip_info <- read_tsv("../00_Data/Data_RNA_sample_Jacobo.tsv") %>% 
   dplyr::filter(sample_name %in% names(counts)) %>%
-  dplyr::mutate(sample_name = fct(sample_name, levels=names(counts)[-1])) %>%
+  dplyr::mutate(sample_name = fct(sample_name, levels=names(counts)[-1]),
+                Condition = fct(Condition, levels=unique(c("NT", Condition)))) %>%
   dplyr::arrange(sample_name)
 
 all(names(counts)[-1] == manip_info$sample_name) %>% stopifnot()
@@ -49,6 +50,7 @@ dataT <-  dplyr::select(counts, Geneid, deframe(manip_info[manip_info$Fraction==
 phenoVec <- dplyr::filter(manip_info, Fraction=="F8") %>% # just to select one of the fractions
   dplyr::select(Condition) %>% 
   deframe()
+
 if (correct_batch == TRUE){
   BatchVec <- dplyr::filter(manip_info, Fraction=="F8") %>%
   dplyr::select(Batch) %>% 
@@ -89,8 +91,8 @@ ads <- anota2seqSelSigGenes(Anota2seqDataSet = ads,
                             maxPAdj = 0.25)
 ## Result Plots
 par(mfrow = c(1, 2))
-anota2seqPlotPvalues(ads, selContrast = 1, useRVM = TRUE, plotToFile = FALSE, contrastName = "provisional_name")
+anota2seqPlotPvalues(ads, selContrast = 1, useRVM = TRUE, plotToFile = FALSE, contrastName = paste(levels(phenoVec), collapse = " vs. "))
 
 ads <- anota2seqRegModes(ads, c(TRUE, TRUE))
-anota2seqPlotFC(ads, selContrast = 1, plotToFile = FALSE, contrastName = "WT vs. SRCinh")
+anota2seqPlotFC(ads, selContrast = 1, plotToFile = FALSE,  paste(levels(phenoVec), collapse = " vs. "))
 
