@@ -2,7 +2,7 @@ library(tidyverse)
 library(anota2seq)
 library(biomaRt)
 ################################PARAMETERS######################################
-filter_samples = "(A|B|C)_17AC_(NT|NEAA)" # NULL | 17AC | 02136
+filter_samples = "17AC_(NT|FAKi)" # (A|B|C)_17AC_(NT|NEAA) | 17AC_(NT|IL1) | (A|B|D)_17AC_(NT|TGF) | 17AC_(NT|FAKi)
 filter_genes = "allzeros" # custom | allzeros | NULL
 exclude_samples = NULL # NULL c("Batch_A_17AC_FAKi", "Batch_A_17AC_TGF")
 correct_batch = TRUE
@@ -87,7 +87,7 @@ ads <- anota2seqSelSigGenes(Anota2seqDataSet = ads,
                             maxSlopeTranslation = 2,
                             minSlopeBuffering = -2,
                             maxSlopeBuffering = 1,
-                            maxPAdj = 0.25)
+                            maxPAdj = 0.10)
 ## Result Plots
 par(mfrow = c(1, 2))
 anota2seqPlotPvalues(ads, selContrast = 1, useRVM = TRUE, plotToFile = FALSE, contrastName = paste(unique(phenoVec), collapse = " vs. "))
