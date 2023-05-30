@@ -1,21 +1,9 @@
 #Import library
-library(readr)
-library(readxl)
-library(biomaRt)
 library(tidyverse)
-library(Hmisc)
-library(ggpubr)
-library(FactoMineR)
-library(factoextra)
+library(biomaRt)
 library(edgeR)
-library(rcompanion)
-library(corrr)
-library(rstatix)
-library(survminer)
-library(pdacmolgrad)
-library(GSVA)
-library(ggVennDiagram)
-
+library(factoextra)
+library(ggpubr)
 ################################################################################
 #List the n most absolute correlated genes with ICA3
 #'@description
