@@ -118,9 +118,9 @@ ensembl75 <- useEnsembl(biomart = "genes",
 annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
                                         'external_gene_id'), mart = ensembl75)
 
-#Add a Gene names column to Sauyeun_raw
 translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
 
+#Add a Gene names column to Sauyeun_raw
 Sauyeun_raw$EnsemblID %>% 
   translate[.] %>%
   make.names(unique = TRUE) -> Sauyeun_raw$Genenames
