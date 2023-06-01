@@ -54,6 +54,7 @@ setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
 
 #Import filter function
 source("src/human_cohort_data_filter.R")
+source("src/correlation_plotter.R")
 
 #Import datasets
 ## Sauyeun PDX
@@ -194,6 +195,32 @@ fviz_pca_ind(pca_pdx,
              invisible="quali"
 )
 
-## export object
+## export PCA for projection
 write_rds(pca_pdx, "data/Classifiers/pca_pdx.RDS")
+
+## create object for further comparisons
+projection_Sauyeun <- predict(pca_pdx, Sauyeun_norm) %>%
+  as_tibble() %>%
+  mutate(sample = Sauyeun_norm$sample, .before = 1) %>%
+  left_join(top_samples[,c("sample","ISRact")]) %>%
+  mutate(ISRact = replace_na(ISRact, "medium_ICA3")) 
+
+Sauyeun_PC1 <- arrange(projection_Sauyeun, PC1) %>% 
+  dplyr::filter(!sample=="!") %>%
+  mutate(PC1status = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3/3))), labels = c("low_PC1", "medium_PC1", "high_PC1"), include.lowest = TRUE)) %>%
+  dplyr::select(sample, PC1,  PC1status) %>%
+  left_join(top_samples[,c("sample","ISRact")]) %>%
+  mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
+  inner_join(sample_info[, c("sample","PAMG", "ICA3", "Diabetes")], by = "sample")
+
+# Plot comparisons with Basal/Classical and ISRact
+## ISR vs PC1
+correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PC1", data_name = "Sauyeun PDX")
+## PAMG vs PC1
+correlation_plotter(data = Sauyeun_PC1, col1 = "PAMG", col2 = "PC1", data_name = "Sauyeun PDX")
+## ISR vs PAMG
+correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "Sauyeun PDX")
+## ISR vs IFNsign
+correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "IFNsign", data_name = "Sauyeun PDX")
+
 

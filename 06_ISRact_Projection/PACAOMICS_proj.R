@@ -8,6 +8,7 @@ library(pdacmolgrad) #devtools::install_github("RemyNicolle/pdacmolgrad")
 ################################################################################
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
 source("src/human_cohort_data_filter.R")
+source("src/correlation_plotter.R")
 
 # Import datasets
 ## PACAOMICS
@@ -125,10 +126,9 @@ dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %
 #-------------------------------------------------------------------------------
 
 # Plot comparisons with Basal/Classical and ISRact
-
-### ISR vs PC1
+## ISR vs PC1
 correlation_plotter(data = PACAOMICS_PC1, col1 = "ICA3", col2 = "PC1", data_name = "PACAOMICs PDX")
-### PAMG vs PC1
+## PAMG vs PC1
 correlation_plotter(data = PACAOMICS_PC1, col1 = "PAMG", col2 = "PC1", data_name = "PACAOMICs PDX")
-### ISR vs PAMG
+## ISR vs PAMG
 correlation_plotter(data = PACAOMICS_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "PACAOMICs PDX")
