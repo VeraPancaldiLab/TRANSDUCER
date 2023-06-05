@@ -2,8 +2,8 @@
 library(tidyverse)
 library(biomaRt)
 library(pdacmolgrad) #devtools::install_github("RemyNicolle/pdacmolgrad")
-#library(edgeR)
-#library(factoextra)
+library(edgeR)
+library(Hmisc)
 #library(ggpubr)
 ################################################################################
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
@@ -78,7 +78,6 @@ filter_pca <- function(.data, objective){
     column_to_rownames("tmp") %>%
     data.matrix()
 }
-filter_pca(pca_pdx$rotation, names(PACAOMICS_norm)[-1])
 
 pca_pdx$rotation <- filter_pca(pca_pdx$rotation, names(PACAOMICS_norm)[-1])
 pca_pdx$center <- filter_pca(pca_pdx$center, names(PACAOMICS_norm)[-1])
