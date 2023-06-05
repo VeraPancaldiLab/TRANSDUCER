@@ -79,16 +79,18 @@ ccle_info <- dplyr::select(type_pamg, ccle_name, PDX) %>%
 # Projection
 ## CCLE
 ### Add missing genes to expression before the PCA
-ccle_norm_minval <- min(ccle_norm_) # same minimum value (unlike TMM?)
-ccle_missing_genes <- rownames(pca_pdx$rotation)[(rownames(pca_pdx$rotation) %in% names(ccle_norm)) == F]
+filter_pca <- function(.data, objective){
+  as_tibble(.data, rownames = "tmp") %>% 
+    dplyr::filter(tmp %in% objective) %>% 
+    column_to_rownames("tmp") %>%
+    data.matrix()
+}
 
-ccle_missing_data <- as_tibble(matrix(ccle_norm_minval,
-                                      ncol = length(ccle_missing_genes),
-                                      nrow = nrow(ccle_norm),
-                                      dimnames = list(ccle_norm$ccle_name, ccle_missing_genes)),
-                               rownames = "ccle_name")
+pca_pdx$rotation <- filter_pca(pca_pdx$rotation, names(ccle_norm)[-1])
+pca_pdx$center <- filter_pca(pca_pdx$center, names(ccle_norm)[-1])
+pca_pdx$scale <- filter_pca(pca_pdx$scale, names(ccle_norm)[-1])
 
-projection_ccle <- predict(pca_pdx, inner_join(ccle_norm, ccle_missing_data, by="ccle_name")) %>% 
+projection_ccle <- predict(pca_pdx, ccle_norm) %>% 
   as_tibble() %>%
   mutate(ccle_name = ccle_norm$ccle_name, .before = 1) %>%
   left_join(ccle_info[,c("ccle_name","primary_tissue", "ISRact", "PAMG")], by="ccle_name")
