@@ -78,6 +78,7 @@ ccle_info <- dplyr::select(type_pamg, ccle_name, PDX) %>%
 
 # Projection
 ## CCLE
+### Add missing genes to expression before the PCA
 ccle_norm_minval <- min(ccle_norm_) # same minimum value (unlike TMM?)
 ccle_missing_genes <- rownames(pca_pdx$rotation)[(rownames(pca_pdx$rotation) %in% names(ccle_norm)) == F]
 
