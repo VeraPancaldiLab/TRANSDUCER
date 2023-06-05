@@ -22,11 +22,11 @@ ccle_info <- read_csv("data/CCLE/primary-screen-cell-line-info.csv") %>%
                                  NA))
 
 ### Sample info and top samples from Sauyeun_PDX
-sample_info <- read_delim("data/Sauyeun_PDX/sample_info.tsv", 
+Sauyeun_info <- read_delim("data/Sauyeun_PDX/sample_info.tsv", 
                           delim = "\t", escape_double = FALSE, 
                           trim_ws = TRUE)
 
-top_samples <- arrange(sample_info, ICA3) %>%
+top_samples <- arrange(Sauyeun_info, ICA3) %>%
   dplyr::slice( unique(c(1:5, n() - 0:4)) ) %>%
   mutate(ISRact = ifelse(ICA3 < 0, "low_ICA3", "high_ICA3")) %>%
   arrange(sample)
@@ -40,15 +40,6 @@ pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 keep_CCLE = "PANCREAS" #ALL | PANCREAS
 norm_method = "upperquartile" #TMM | upperquartile
 ################################################################################
-
-# Translate EnsemblID to gene names
-## Version 75 for PDX data
-ensembl75 <- useEnsembl(biomart = "genes",
-                        dataset = "hsapiens_gene_ensembl",
-                        version = 75)#listAttributes(ensembl75, page="feature_page")
-
-annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
-                                        'external_gene_id'), mart = ensembl75)
 
 # Processing and Normalization
 ## CCLE
