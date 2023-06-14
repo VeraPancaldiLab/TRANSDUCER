@@ -176,7 +176,22 @@ dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %
   scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) + #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
   ylim(-250,15)
 #-------------------------------------------------------------------------------
-
 # Plot comparisons with Basal/Classical and ISRact
 ## PAMG vs PC1
 correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "CPTAC")
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Insert here DGEA of low vs high
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Proteomics DPEA
+CPTAC_prot <- read_delim("data/PDAC_LinkedOmics_Data/proteomics_gene_level_MD_abundance_tumor.cct", 
+                                       delim = "\t", escape_double = FALSE, 
+                                       trim_ws = TRUE) %>%
+  dplyr::rename(Gene = ...1)
+
+pivot_longer(CPTAC_prot, -Gene, names_to = "samples") %>% 
+  ggplot(aes(y = value, x = samples)) +
+  geom_boxplot() +
+  rotate_x_text(45)
+#-------------------------------------------------------------------------------
