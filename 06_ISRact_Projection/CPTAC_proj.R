@@ -5,7 +5,6 @@ library(biomaRt)
 library(pdacmolgrad) #devtools::install_github("RemyNicolle/pdacmolgrad")
 library(edgeR)
 library(Hmisc)
-library()
 #library(ggpubr)
 ################################################################################
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
@@ -14,10 +13,18 @@ source("src/correlation_plotter.R")
 
 ## CPTAC (Proteogenomics)
 ### upper quartile normalized and log2 data 
-CPTAC_tumor_raw <- read_delim("data/PDAC_LinkedOmics_Data/mRNA_RSEM_UQ_log2_Tumor.cct", 
+CPTAC_tumor_already_norm <- read_delim("data/PDAC_LinkedOmics_Data/mRNA_RSEM_UQ_log2_Tumor.cct", 
                               delim = "\t", escape_double = FALSE, 
                               trim_ws = TRUE) %>%
   dplyr::rename(Gene = ...1)
+
+## Raw counts obtained by email
+CPTAC_tumor_raw <- read_delim("data/PDAC_LinkedOmics_Data/CPTAC-PDAC-raw-RSEM-expected-counts-gene-level.txt", 
+                              delim = "\t", escape_double = FALSE, trim_ws = TRUE) %>%
+  dplyr::select(idx, matches("tumor")) %>%
+  dplyr::rename_all(~str_remove(., '_tumor')) %>%
+  dplyr::rename(Gene = idx)
+
 
 ### Metadata
 low_purity_samples <- read_delim("data/PDAC_LinkedOmics_Data/low_purity_samples.csv", 
@@ -52,7 +59,7 @@ pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 
 ################################################################################
 # PARAMETERS
-norm_method = "upperquartile" #TMM | upperquartile
+norm_method = "upperquartile" #TMM | upperquartile | upperquartile_ogdata
 #Variables for filter function
 filter = FALSE # exclude just the low purity if FALSE
 estimation_method = "histology" #histology | deconvolution
@@ -61,6 +68,13 @@ acinar_max = 0.05
 islet_max = 1
 tumor_tissue_min = 0.8
 ################################################################################
+# Choose raw / already normalized data
+if (norm_method == "upperquartile_ogdata"){
+  CPTAC_tumor__ <- CPTAC_tumor_already_norm
+} else {
+  CPTAC_tumor__ <- CPTAC_tumor_raw
+}
+  
 
 # Translate EnsemblID to gene names
 #Version 95 for Proteogenimics data
@@ -72,25 +86,35 @@ annot_ensembl95 <- getBM(attributes = c('ensembl_gene_id',
                                         'external_gene_name'), mart = ensembl95)
 
 
-#Add a Ensemble ID column to CPTAC_tumor_raw (Ensembl release 95 according to the paper)
+#Add a Ensemble ID column to CPTAC_tumor__ (Ensembl release 95 according to the paper)
 #https://genome.ucsc.edu/cgi-bin/hgTables?db=hg38&hgta_group=genes&hgta_track=mane&hgta_table=mane&hgta_doSchema=describe+table+schema
 
 reverse_translate = deframe(annot_ensembl95[c("external_gene_name", "ensembl_gene_id")])
 
-# Processing and Normalization
-CPTAC_tumor_raw$EnsemblID <- CPTAC_tumor_raw$Gene %>% 
+# Preprocessing
+## filtering
+if (filter == TRUE){
+  CPTAC_tumor_ <- dataFilter(CPTAC_tumor__, clinical_data, Molecular_phenotype_data, estimation_method, neoplastic_min, acinar_max, islet_max, tumor_tissue_min)
+} else {
+  CPTAC_tumor_ <- dplyr::select(CPTAC_tumor__, -low_purity_samples$case_id)
+}
+
+## normalization and filtering
+if (norm_method == "upperquartile_ogdata"){
+  CPTAC_tumor <- CPTAC_tumor_
+} else {
+  CPTAC_tumor <- column_to_rownames(CPTAC_tumor_, "Gene") %>% DGEList() %>%
+    calcNormFactors(method= norm_method) %>%
+    cpm(log=TRUE) %>% as_tibble(rownames = "Gene")
+}
+
+## translate gene names
+CPTAC_tumor$EnsemblID <- CPTAC_tumor$Gene %>%
   reverse_translate[.] %>%
   make.names(unique = TRUE)
 
-## CPTAC
-### processing
-if (filter == TRUE){
-  CPTAC_tumor <- dataFilter(CPTAC_tumor_raw, clinical_data, Molecular_phenotype_data, estimation_method, neoplastic_min, acinar_max, islet_max, tumor_tissue_min)
-} else {
-  CPTAC_tumor <- dplyr::select(CPTAC_tumor_raw, -low_purity_samples$case_id)
-}
 
-### Create sample_info_CPTAC
+## Create sample_info_CPTAC
 type_pamg <- projectMolGrad(newexp = column_to_rownames(dplyr::select(CPTAC_tumor,-EnsemblID), "Gene"),  geneSymbols = CPTAC_tumor$Gene) %>%
   as_tibble(rownames = "sample")
 
