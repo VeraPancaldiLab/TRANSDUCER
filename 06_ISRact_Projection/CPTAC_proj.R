@@ -185,13 +185,20 @@ correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Proteomics DPEA
+library(DEqMS)
 CPTAC_prot <- read_delim("data/PDAC_LinkedOmics_Data/proteomics_gene_level_MD_abundance_tumor.cct", 
                                        delim = "\t", escape_double = FALSE, 
                                        trim_ws = TRUE) %>%
-  dplyr::rename(Gene = ...1)
+  column_to_rownames("...1")
 
-pivot_longer(CPTAC_prot, -Gene, names_to = "samples") %>% 
+CPTAC_prot.log <- log2(CPTAC_prot) %>% na.omit()
+
+## Boxplot of intensities distribution
+rownames_to_column(CPTAC_prot.log, "Gene") %>%
+  pivot_longer(-Gene, names_to = "samples") %>% 
   ggplot(aes(y = value, x = samples)) +
   geom_boxplot() +
   rotate_x_text(45)
+
+## 
 #-------------------------------------------------------------------------------
