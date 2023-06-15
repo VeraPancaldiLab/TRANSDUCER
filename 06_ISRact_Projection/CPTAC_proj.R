@@ -191,7 +191,7 @@ CPTAC_prot <- read_delim("data/PDAC_LinkedOmics_Data/proteomics_gene_level_MD_ab
                                        trim_ws = TRUE) %>%
   column_to_rownames("...1")
 
-CPTAC_prot.log <- log2(CPTAC_prot) %>% na.omit()
+CPTAC_prot.log <- log2(CPTAC_prot) %>% na.omit() %>% equalMedianNormalization()
 
 ## Boxplot of intensities distribution
 rownames_to_column(CPTAC_prot.log, "Gene") %>%
