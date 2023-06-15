@@ -186,12 +186,17 @@ correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "
 #-------------------------------------------------------------------------------
 # Proteomics DPEA
 library(DEqMS)
+CPTAC_comparison_metadata <- dplyr::filter(CPTAC_PC1, PC1status != "medium_PC1")
 CPTAC_prot <- read_delim("data/PDAC_LinkedOmics_Data/proteomics_gene_level_MD_abundance_tumor.cct", 
                                        delim = "\t", escape_double = FALSE, 
                                        trim_ws = TRUE) %>%
+  dplyr::select(...1, CPTAC_comparison_metadata$sample) %>%
+  dplyr::relocate(...1, CPTAC_comparison_metadata$sample) %>%
   column_to_rownames("...1")
 
-CPTAC_prot.log <- log2(CPTAC_prot) %>% na.omit() %>% equalMedianNormalization()
+CPTAC_prot.log <- log2(CPTAC_prot) %>%
+  na.omit() %>%
+  equalMedianNormalization()
 
 ## Boxplot of intensities distribution
 rownames_to_column(CPTAC_prot.log, "Gene") %>%
@@ -199,6 +204,19 @@ rownames_to_column(CPTAC_prot.log, "Gene") %>%
   ggplot(aes(y = value, x = samples)) +
   geom_boxplot() +
   rotate_x_text(45)
+
+## Define contrast and fit model
+cond <- fct(CPTAC_comparison_metadata$PC1status)
+
+design = model.matrix(~0+cond)
+colnames(design) = gsub("cond","",colnames(design))
+
+x <- c("low_PC1-high_PC1")
+contrast =  makeContrasts(contrasts=x,levels=design)
+fit1 <- lmFit(CPTAC_prot.log, design)
+fit2 <- contrasts.fit(fit1,contrasts = contrast)
+fit3 <- eBayes(fit2)
+
 
 ## 
 #-------------------------------------------------------------------------------
