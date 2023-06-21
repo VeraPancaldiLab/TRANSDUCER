@@ -5,11 +5,12 @@ library(RColorBrewer)
 library(sva)
 library(pheatmap)
 library(biomaRt)
+library(msigdbr)
 ################################################################################
 ################################PARAMETERS######################################
-filter_samples = "Batch_D_17AC" # NULL | 17AC | 02136 | more complex like "17AC_(FAKi|NT)" for FAKi vs NT
+filter_samples = "17AC_(NEAA|NT)" # NULL | 17AC | 02136 | more complex like "17AC_(FAKi|NT)" for FAKi vs NT
 exclude_samples = NULL # NULL | c("Batch_A_17AC_FAKi_Input", "Batch_A_17AC_TGF_F8")
-correct_batch = F # Should correct for batch effect?
+correct_batch = T # Should correct for batch effect?
 sample_sample_corrplot_annot = "manip_info" # manip_info | picard_metrics | tech_info | STAR_info
 ################################################################################
 #################################FUNCTIONS######################################
@@ -214,7 +215,7 @@ signature_dict <- dplyr::select(all_genesets, c(gs_name, gs_id)) %>%
 gsvaRes <- gsva(data.matrix(leverages), msigdbr_list, min.sz = 15)
 
 #### plot of whatever PC Reactome enrichment
-comp = "Dim.1"
+comp = "Dim.6"
 
 gsvaTop <- as_tibble(gsvaRes, rownames = "gene_set") %>% 
   mutate(the_rank = rank(-get(comp), ties.method = "random"),
