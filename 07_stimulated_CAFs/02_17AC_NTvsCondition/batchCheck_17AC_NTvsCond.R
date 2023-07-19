@@ -48,7 +48,34 @@ dataP <-  dplyr::select(counts, Geneid, deframe(manip_info[manip_info$Fraction==
 dataT <-  dplyr::select(counts, Geneid, deframe(manip_info[manip_info$Fraction=="Input","sample_name"]))
 
 lfc <- inner_join(dataP, dataT) %>% 
-  mutate(lfc_Input = Batch_A_17AC_NEAA_Input/Batch_A_17AC_NT_Input -1,
-         lfc_F8 = Batch_A_17AC_NEAA_F8/Batch_A_17AC_NT_F8 -1) %>%
+  mutate(lfc_Input = log2(Batch_A_17AC_NEAA_Input/Batch_A_17AC_NT_Input -1),
+         lfc_F8 = log2(Batch_A_17AC_NEAA_F8/Batch_A_17AC_NT_F8 -1)) %>%
   dplyr::select(Geneid,lfc_Input,lfc_F8)
 
+# add gene names
+## get gene ID with Biomart
+ensembl75 <- useEnsembl(biomart = "genes",
+                        dataset = "hsapiens_gene_ensembl",
+                        version = 75)
+
+#listAttributes(ensembl75, page="feature_page")
+annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_id'), mart = ensembl75)
+
+translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
+
+lfc <- dplyr::mutate(lfc, identifier = translate[Geneid])
+
+# lfc scatter plot
+stimuli_markers <- read_tsv(file = "../00_Data/stimuli_markers.tsv")
+highlight_list <- dplyr::filter(stimuli_markers, stimuli %in% phenoVec) %>% deframe()
+
+tibble(lfc) %>%
+  mutate(highlight = if_else(identifier %in% highlight_list, identifier, "Other") %>% fct(levels = c("Other", highlight_list))) %>% 
+  dplyr::arrange(highlight) %>%
+  ggplot() +
+  aes(x = lfc_Input, y = lfc_F8, color = highlight) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1)+
+  theme_classic() + 
+  labs(title = filter_samples)
