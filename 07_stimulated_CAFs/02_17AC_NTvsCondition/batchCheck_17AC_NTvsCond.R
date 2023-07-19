@@ -48,9 +48,8 @@ dataP <-  dplyr::select(counts, Geneid, deframe(manip_info[manip_info$Fraction==
 dataT <-  dplyr::select(counts, Geneid, deframe(manip_info[manip_info$Fraction=="Input","sample_name"]))
 
 lfc <- inner_join(dataP, dataT) %>% 
-  mutate(lfc_Input = log2(Batch_A_17AC_NEAA_Input/Batch_A_17AC_NT_Input -1),
-         lfc_F8 = log2(Batch_A_17AC_NEAA_F8/Batch_A_17AC_NT_F8 -1)) %>%
-  dplyr::select(Geneid,lfc_Input,lfc_F8)
+  mutate(lfc_Input = log2(Batch_A_17AC_NEAA_Input/Batch_A_17AC_NT_Input ),
+         lfc_F8 = log2(Batch_A_17AC_NEAA_F8/Batch_A_17AC_NT_F8 )) 
 
 # add gene names
 ## get gene ID with Biomart
