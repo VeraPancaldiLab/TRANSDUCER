@@ -46,8 +46,16 @@ all(names(counts)[-1] == manip_info$sample_name) %>% stopifnot()
 # Foldchange calculation
 dataP <-  dplyr::select(counts, Geneid, deframe(manip_info[manip_info$Fraction=="F8","sample_name"]))
 dataT <-  dplyr::select(counts, Geneid, deframe(manip_info[manip_info$Fraction=="Input","sample_name"]))
+phenoVec <- dplyr::filter(manip_info, Fraction=="F8") %>% # just to select one of the fractions
+  dplyr::select(Condition) %>% 
+  deframe()
 
-lfc <- inner_join(dataP, dataT) %>% 
+lfc <- inner_join(dataP, dataT) %>%
+  column_to_rownames("Geneid") %>% 
+  DGEList() %>% 
+  calcNormFactors(method = "TMM") %>%
+  cpm() %>% 
+  as_tibble(rownames = "Geneid") %>% 
   mutate(lfc_Input = log2(Batch_A_17AC_NEAA_Input/Batch_A_17AC_NT_Input ),
          lfc_F8 = log2(Batch_A_17AC_NEAA_F8/Batch_A_17AC_NT_F8 )) 
 
@@ -75,6 +83,10 @@ tibble(lfc) %>%
   ggplot() +
   aes(x = lfc_Input, y = lfc_F8, color = highlight) +
   geom_point() +
-  geom_abline(intercept = 0, slope = 1)+
+  geom_abline(intercept = 0, slope = 1) +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = 0) +
   theme_classic() + 
   labs(title = filter_samples)
+
+
