@@ -2,7 +2,7 @@ library(tidyverse)
 library(anota2seq)
 library(biomaRt)
 ################################PARAMETERS######################################
-filter_samples = "A_17AC_(NT|NEAA)" # (A|B|C)_17AC_(NT|NEAA) | 17AC_(NT|IL1) | (A|B|D)_17AC_(NT|TGF) | 17AC_(NT|FAKi)
+filter_samples = "C_17AC_(NT|NEAA)" # (A|B|C)_17AC_(NT|NEAA) | 17AC_(NT|IL1) | (A|B|D)_17AC_(NT|TGF) | 17AC_(NT|FAKi)
 filter_genes = "allzeros" # custom | allzeros | NULL
 exclude_samples = NULL # NULL c("Batch_A_17AC_FAKi", "Batch_A_17AC_TGF")
 correct_batch = TRUE
@@ -56,8 +56,8 @@ lfc <- inner_join(dataP, dataT) %>%
   calcNormFactors(method = "TMM") %>%
   cpm() %>% 
   as_tibble(rownames = "Geneid") %>% 
-  mutate(lfc_Input = log2(Batch_A_17AC_NEAA_Input/Batch_A_17AC_NT_Input ),
-         lfc_F8 = log2(Batch_A_17AC_NEAA_F8/Batch_A_17AC_NT_F8 )) 
+  mutate(lfc_Input = log2(Batch_C_17AC_NEAA_Input/Batch_C_17AC_NT_Input ),
+         lfc_F8 = log2(Batch_C_17AC_NEAA_F8/Batch_C_17AC_NT_F8 )) 
 
 # add gene names
 ## get gene ID with Biomart
@@ -89,4 +89,20 @@ tibble(lfc) %>%
   theme_classic() + 
   labs(title = filter_samples)
 
+# lfc scatter plot with ATF4 targets
+ATF4_reactome <- c("NFYA","HERPUD1","NFYC","ASNS","EXOSC7","EXOSC5","DIS3","KHSRP","EXOSC3","CCL2",
+                   "ATF6","EXOSC8","NFYB","EXOSC9","ATF4","EXOSC2","PARN","IGFBP1","CEBPG","ATF3",
+                   "CXCL8","EXOSC1","CEBPB","DCP2","DDIT3","EXOSC4","EXOSC6")
 
+
+tibble(lfc) %>%
+  mutate(highlight = if_else(identifier %in% ATF4_reactome, "ATF4_target", "Other") %>% fct(levels = c("Other", "ATF4_target"))) %>% 
+  dplyr::arrange(highlight) %>%
+  ggplot() +
+  aes(x = lfc_Input, y = lfc_F8, color = highlight) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = 0) +
+  theme_classic() + 
+  labs(title = filter_samples)
