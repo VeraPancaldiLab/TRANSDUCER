@@ -186,20 +186,18 @@ correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "
 #-------------------------------------------------------------------------------
 # Proteomics DPEA
 library(DEqMS)
+## load already normalized log transformed and centered data
 CPTAC_comparison_metadata <- dplyr::filter(CPTAC_PC1, PC1status != "medium_PC1")
 CPTAC_prot <- read_delim("data/PDAC_LinkedOmics_Data/proteomics_gene_level_MD_abundance_tumor.cct", 
                                        delim = "\t", escape_double = FALSE, 
                                        trim_ws = TRUE) %>%
   dplyr::select(...1, CPTAC_comparison_metadata$sample) %>%
   dplyr::relocate(...1, CPTAC_comparison_metadata$sample) %>%
-  column_to_rownames("...1")
+  column_to_rownames("...1") %>%
+  na.omit()
 
-CPTAC_prot.log <- log2(CPTAC_prot) %>%
-  na.omit() %>%
-  equalMedianNormalization()
-
-## Boxplot of intensities distribution
-rownames_to_column(CPTAC_prot.log, "Gene") %>%
+### Boxplot of intensities distribution
+rownames_to_column(na.omit(CPTAC_prot), "Gene") %>%
   pivot_longer(-Gene, names_to = "samples") %>% 
   ggplot(aes(y = value, x = samples)) +
   geom_boxplot() +
@@ -213,10 +211,39 @@ colnames(design) = gsub("cond","",colnames(design))
 
 x <- c("low_PC1-high_PC1")
 contrast =  makeContrasts(contrasts=x,levels=design)
-fit1 <- lmFit(CPTAC_prot.log, design)
+fit1 <- lmFit(CPTAC_prot, design)
 fit2 <- contrasts.fit(fit1,contrasts = contrast)
 fit3 <- eBayes(fit2)
 
+### add PTSMs info to fit 3
+library(matrixStats)
+count_columns = seq(16,34,2)
+psm.count.table = read_tsv("data/PDAC_LinkedOmics_Data/CPTAC3_Pancreatic_Ductal_Adenocarcinoma_Proteome.summary.tsv") %>%
+  column_to_rownames("Gene")
+fit3$count = psm.count.table[rownames(fit3$coefficients),"Distinct Peptides"]
+fit4 = spectraCounteBayes(fit3)
 
-## 
-#-------------------------------------------------------------------------------
+
+## Visualize fit curve
+### n=30 limits the boxplot to show only proteins quantified by <= 30 PSMs.
+VarianceBoxplot(fit4,n=30,main="CPTAC TMT proteomics",xlab="PSM count")
+VarianceScatterplot(fit4,main="CPTAC TMT proteomics")
+
+## export results
+DEqMS.results = outputResult(fit4,coef_col = 1)
+
+
+library(ggrepel)
+# Use ggplot2 to plot volcano
+DEqMS.results$log.sca.pval = -log10(DEqMS.results$sca.P.Value)
+ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) + 
+  geom_point(size=0.5 )+
+  theme_bw(base_size = 16) + # change theme
+  xlab(expression("log2(ISRactPCA high/low)")) + # x-axis label
+  ylab(expression(" -log10(P-value)")) + # y-axis label
+  geom_vline(xintercept = c(-1,1), colour = "red") + # Add fold change cutoffs
+  geom_hline(yintercept = 3, colour = "red") + # Add significance cutoffs
+  geom_vline(xintercept = 0, colour = "black") + # Add 0 lines
+  scale_colour_gradient(low = "black", high = "black", guide = FALSE)+
+  geom_text_repel(data=subset(DEqMS.results, abs(logFC)>0.5&log.sca.pval > 3),
+                  aes( logFC, log.sca.pval ,label=gene)) # add gene label
