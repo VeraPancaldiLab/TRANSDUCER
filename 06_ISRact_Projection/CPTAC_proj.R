@@ -9,6 +9,10 @@ library(ggrepel)
 library(DEqMS)
 library(matrixStats)
 library(msigdbr)
+library(fgsea)
+library(data.table)
+library(ggplot2)
+
 ################################################################################
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
 source("src/human_cohort_data_filter.R")
@@ -253,9 +257,9 @@ ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) +
                   aes( logFC, log.sca.pval ,label=gene)) # add gene label
 
 ### GSEA of fold changes
-DEqMS.results
 
-### gene set preparation
+
+#### gene set preparation
 all_genesets <- msigdbr("Homo sapiens")
 all_genesets %>% filter(gs_subcat %in% c("CP:REACTOME")) -> use_genesets
 msigdbr_list = split(x = use_genesets$gene_symbol, f = use_genesets$gs_name)
@@ -263,24 +267,16 @@ msigdbr_list = split(x = use_genesets$gene_symbol, f = use_genesets$gs_name)
 signature_dict <- dplyr::select(all_genesets, c(gs_name, gs_id)) %>%
   distinct(gs_id, .keep_all = T) %>%  deframe()
 
-gsvaRes <- gsva(data.matrix(DEqMS.results["logFC"]), msigdbr_list, min.sz = 15, method = "ssgsea")
+#### Analysis 
+set.seed(42)
+fgseaRes <- fgsea(pathways = msigdbr_list, 
+                  stats    = deframe(rownames_to_column(DEqMS.results["logFC"])),
+                  minSize  = 15,
+                  maxSize  = 500)
 
-### Plot
-
-gsvaTop <- as_tibble(gsvaRes, rownames = "gene_set") %>% 
-  mutate(the_rank = rank(-logFC, ties.method = "random"),
-         #gene_set = if_else(str_count(gene_set, "_") < 10, gene_set, signature_dict[gene_set]),
-         gene_set = str_remove(gene_set, "REACTOME_"),
-         gene_set = fct_reorder(gene_set, the_rank,.desc = T)) %>%
-  pivot_longer(cols = -c(gene_set, the_rank), names_to = "component", values_to = "ES") %>% 
-  dplyr::filter(the_rank < 15 | the_rank > (nrow(gsvaRes)-15)) %>% 
-  dplyr::select(!c(the_rank))
-
-gsva_plot <- ggplot(gsvaTop, aes(x = ES, y = gene_set)) + 
-  geom_point(aes(color = if_else(ES > 0, "blue", "red"))) +
-  theme_bw() +
-  labs(title = "low_PC1-high_PC1", subtitle = "Best Reactome gene sets") +
-  rremove("legend") +
-  rremove("ylab")
-
-gsva_plot
+##### Plot
+topPathwaysUp <- fgseaRes[ES > 0][head(order(pval), n=10), pathway]
+topPathwaysDown <- fgseaRes[ES < 0][head(order(pval), n=10), pathway]
+topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
+plotGseaTable(msigdbr_list[topPathways], deframe(rownames_to_column(DEqMS.results["logFC"])), fgseaRes, 
+              gseaParam=0.5)
