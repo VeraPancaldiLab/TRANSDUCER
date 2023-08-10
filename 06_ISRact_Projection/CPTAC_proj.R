@@ -5,7 +5,10 @@ library(biomaRt)
 library(pdacmolgrad) #devtools::install_github("RemyNicolle/pdacmolgrad")
 library(edgeR)
 library(Hmisc)
-#library(ggpubr)
+library(ggrepel)
+library(DEqMS)
+library(matrixStats)
+library(msigdbr)
 ################################################################################
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
 source("src/human_cohort_data_filter.R")
@@ -185,7 +188,6 @@ correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Proteomics DPEA
-library(DEqMS)
 ## load already normalized log transformed and centered data
 CPTAC_comparison_metadata <- dplyr::filter(CPTAC_PC1, PC1status != "medium_PC1")
 CPTAC_prot <- read_delim("data/PDAC_LinkedOmics_Data/proteomics_gene_level_MD_abundance_tumor.cct", 
@@ -216,7 +218,6 @@ fit2 <- contrasts.fit(fit1,contrasts = contrast)
 fit3 <- eBayes(fit2)
 
 ### add PTSMs info to fit 3
-library(matrixStats)
 count_columns = seq(16,34,2)
 psm.count.table = read_tsv("data/PDAC_LinkedOmics_Data/CPTAC3_Pancreatic_Ductal_Adenocarcinoma_Proteome.summary.tsv") %>%
   column_to_rownames("Gene")
@@ -229,12 +230,15 @@ fit4 = spectraCounteBayes(fit3)
 VarianceBoxplot(fit4,n=30,main="CPTAC TMT proteomics",xlab="PSM count")
 VarianceScatterplot(fit4,main="CPTAC TMT proteomics")
 
-## export results
+## Analysis
 DEqMS.results = outputResult(fit4,coef_col = 1)
 
+### Export data
+# write.table(DEqMS.results,"data/",sep = "\t",
+#             row.names = F,quote=F)
 
-library(ggrepel)
-# Use ggplot2 to plot volcano
+
+### Use ggplot2 to plot volcano
 DEqMS.results$log.sca.pval = -log10(DEqMS.results$sca.P.Value)
 ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) + 
   geom_point(size=0.5 )+
@@ -247,3 +251,36 @@ ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) +
   scale_colour_gradient(low = "black", high = "black", guide = FALSE)+
   geom_text_repel(data=subset(DEqMS.results, abs(logFC)>0.5&log.sca.pval > 3),
                   aes( logFC, log.sca.pval ,label=gene)) # add gene label
+
+### GSEA of fold changes
+DEqMS.results
+
+### gene set preparation
+all_genesets <- msigdbr("Homo sapiens")
+all_genesets %>% filter(gs_subcat %in% c("CP:REACTOME")) -> use_genesets
+msigdbr_list = split(x = use_genesets$gene_symbol, f = use_genesets$gs_name)
+
+signature_dict <- dplyr::select(all_genesets, c(gs_name, gs_id)) %>%
+  distinct(gs_id, .keep_all = T) %>%  deframe()
+
+gsvaRes <- gsva(data.matrix(DEqMS.results["logFC"]), msigdbr_list, min.sz = 15, method = "ssgsea")
+
+### Plot
+
+gsvaTop <- as_tibble(gsvaRes, rownames = "gene_set") %>% 
+  mutate(the_rank = rank(-logFC, ties.method = "random"),
+         #gene_set = if_else(str_count(gene_set, "_") < 10, gene_set, signature_dict[gene_set]),
+         gene_set = str_remove(gene_set, "REACTOME_"),
+         gene_set = fct_reorder(gene_set, the_rank,.desc = T)) %>%
+  pivot_longer(cols = -c(gene_set, the_rank), names_to = "component", values_to = "ES") %>% 
+  dplyr::filter(the_rank < 15 | the_rank > (nrow(gsvaRes)-15)) %>% 
+  dplyr::select(!c(the_rank))
+
+gsva_plot <- ggplot(gsvaTop, aes(x = ES, y = gene_set)) + 
+  geom_point(aes(color = if_else(ES > 0, "blue", "red"))) +
+  theme_bw() +
+  labs(title = "low_PC1-high_PC1", subtitle = "Best Reactome gene sets") +
+  rremove("legend") +
+  rremove("ylab")
+
+gsva_plot
