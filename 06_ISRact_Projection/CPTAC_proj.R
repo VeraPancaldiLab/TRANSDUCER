@@ -10,6 +10,7 @@ library(DEqMS)
 library(matrixStats)
 library(msigdbr)
 library(fgsea)
+library(ggpubr)
 library(data.table)
 library(ggplot2)
 
@@ -256,6 +257,25 @@ ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) +
   scale_colour_gradient(low = "black", high = "black", guide = FALSE)+
   geom_text_repel(data=subset(DEqMS.results, abs(logFC)>0.5&log.sca.pval > 3),
                   aes( logFC, log.sca.pval ,label=gene)) # add gene label
+
+### same volcano but highlighting some genes
+highlight = c("PHGDH","IL18", "IDO1",
+              "APP")
+
+ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) + 
+  geom_point(size=0.5 )+
+  theme_bw(base_size = 16) + # change theme
+  xlab(expression("log2(ISRactPCA high/low)")) + # x-axis label
+  ylab(expression(" -log10(P-value)")) + # y-axis label
+  geom_vline(xintercept = c(-1,1), colour = "red") + # Add fold change cutoffs
+  geom_hline(yintercept = 3, colour = "red") + # Add significance cutoffs
+  geom_vline(xintercept = 0, colour = "black") + # Add 0 lines
+  scale_colour_gradient(low = "black", high = "black", guide = FALSE) +
+  geom_point(data= DEqMS.results[rownames(DEqMS.results) %in% highlight,],
+             aes( logFC, log.sca.pval), color="red") + 
+  geom_label_repel(data= DEqMS.results[rownames(DEqMS.results) %in% highlight,],
+                  aes( logFC, log.sca.pval ,label=gene)) # add gene label
+
 
 ### GSEA of fold changes
 all_genesets <- msigdbr("Homo sapiens")
