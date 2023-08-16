@@ -202,8 +202,9 @@ CPTAC_prot <- read_delim("data/PDAC_LinkedOmics_Data/proteomics_gene_level_MD_ab
   column_to_rownames("...1") %>%
   na.omit()
 
+
 ### Boxplot of intensities distribution
-rownames_to_column(na.omit(CPTAC_prot), "Gene") %>%
+rownames_to_column(CPTAC_prot, "Gene") %>%
   pivot_longer(-Gene, names_to = "samples") %>% 
   ggplot(aes(y = value, x = samples)) +
   geom_boxplot() +
@@ -257,26 +258,34 @@ ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) +
                   aes( logFC, log.sca.pval ,label=gene)) # add gene label
 
 ### GSEA of fold changes
-
-
-#### gene set preparation
 all_genesets <- msigdbr("Homo sapiens")
-all_genesets %>% filter(gs_subcat %in% c("CP:REACTOME")) -> use_genesets
-msigdbr_list = split(x = use_genesets$gene_symbol, f = use_genesets$gs_name)
-
-signature_dict <- dplyr::select(all_genesets, c(gs_name, gs_id)) %>%
-  distinct(gs_id, .keep_all = T) %>%  deframe()
-
-#### Analysis 
+#### reactome
 set.seed(42)
-fgseaRes <- fgsea(pathways = msigdbr_list, 
+reactome <- all_genesets %>% filter(gs_subcat %in% c("CP:REACTOME"))
+reactome_list = split(x = reactome$gene_symbol, f = reactome$gs_name)
+fgseaReactome <- fgsea(pathways = reactome_list, 
                   stats    = deframe(rownames_to_column(DEqMS.results["logFC"])),
                   minSize  = 15,
                   maxSize  = 500)
 
 ##### Plot
-topPathwaysUp <- fgseaRes[ES > 0][head(order(pval), n=10), pathway]
-topPathwaysDown <- fgseaRes[ES < 0][head(order(pval), n=10), pathway]
+topPathwaysUp <- fgseaReactome[ES > 0][head(order(pval), n=10), pathway]
+topPathwaysDown <- fgseaReactome[ES < 0][head(order(pval), n=10), pathway]
 topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
-plotGseaTable(msigdbr_list[topPathways], deframe(rownames_to_column(DEqMS.results["logFC"])), fgseaRes, 
+plotGseaTable(reactome_list[topPathways], deframe(rownames_to_column(DEqMS.results["logFC"])), fgseaReactome, 
+              gseaParam=0.5)
+
+#### Kegg
+kegg <- all_genesets %>% filter(gs_subcat %in% c("CP:KEGG"))
+kegg_list = split(x = kegg$gene_symbol, f = kegg$gs_name)
+fgseaKegg <- fgsea(pathways = kegg_list, 
+                  stats    = deframe(rownames_to_column(DEqMS.results["logFC"])),
+                  minSize  = 15,
+                  maxSize  = 500)
+
+##### Plot
+topPathwaysUp <- fgseaKegg[ES > 0][head(order(pval), n=10), pathway]
+topPathwaysDown <- fgseaKegg[ES < 0][head(order(pval), n=10), pathway]
+topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
+plotGseaTable(kegg_list[topPathways], deframe(rownames_to_column(DEqMS.results["logFC"])), fgseaKegg, 
               gseaParam=0.5)
