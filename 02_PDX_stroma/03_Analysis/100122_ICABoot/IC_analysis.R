@@ -41,6 +41,7 @@ if (component_reorientation == TRUE){
 ## Norm_data
 cyt_m <- read_tsv("../../00_Data/Processed_data/normHost_Cyt.tsv")
 pol_m <- read_tsv("../../00_Data/Processed_data/normHost_Pol.tsv")
+TEs_m <- read_tsv("../081221_TranslationEfficacy/02_Output/TEs.tsv")
 
 ## Metadata 
 annotations <- read_tsv("../../00_Data/Processed_data/sample_info.tsv") %>%
@@ -481,3 +482,26 @@ mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
            annotation_colors = annot_colors,
            cluster_rows = T, show_rownames = TRUE,
            show_colnames= FALSE, main = "Stromal transcription of Verginadis et al. 2022 murine CAF markers")
+
+# Analysis of RNPs 2023
+RBPs <- read_tsv("01_Input/RBPs_mm.csv") %>%
+  dplyr::select(-...1) %>%
+  rename(gene_symbol = `Gene Symbol`, ensembl_gene = `Annotation ID`)
+
+list_of_RBPs <- dplyr::select(RBPs, gene_symbol,ensembl_gene)
+
+## analysis of correlation
+RBPs_corrs <- dplyr::filter(TEs_m, EnsemblID %in% list_of_RBPs$ensembl_gene) %>%
+  mutate(gene_symbol = ensembl_to_gene[EnsemblID]) %>%
+  dplyr::select(gene_symbol, A_TEs$sample) %>% 
+  relocate(gene_symbol, all_of(order_by)) %>%
+  pivot_longer(-gene_symbol, names_to = "sample") %>%
+  pivot_wider(values_from = value, names_from = gene_symbol) %>%
+  inner_join(A_TEs, by = "sample") %>%
+  column_to_rownames("sample") %>%
+  formatted_cors(cor.stat = "spearman") %>%
+  filter(measure1 %in% list_of_RBPs$gene_symbol,
+         measure2 %in% names(A_TEs)) %>%
+  mutate(FDR = p.adjust(p = p, method = "BH"),
+         sig_FDR = FDR < 0.05)
+
