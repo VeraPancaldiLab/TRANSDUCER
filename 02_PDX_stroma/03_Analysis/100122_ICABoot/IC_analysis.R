@@ -504,7 +504,8 @@ RBPs_corrs <- dplyr::filter(TEs_m, EnsemblID %in% list_of_RBPs$ensembl_gene) %>%
          measure2 %in% names(A_TEs)) %>%
   mutate(FDR = p.adjust(p = p, method = "BH"),
          sig_FDR = FDR < 0.05)
-
+write_tsv(RBPs_corrs, "02_Output/RBPs.TEs_vs_IC.TEs.tsv")
+## Plots
 ### n of significant deregulated RBPs per IC
 dplyr::filter(RBPs_corrs, sig_FDR) %>% 
   ggplot(aes(measure2)) +
