@@ -484,7 +484,7 @@ mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
            show_colnames= FALSE, main = "Stromal transcription of Verginadis et al. 2022 murine CAF markers")
 
 # Analysis of RNPs 2023
-RBPs <- read_tsv("01_Input/RBPs_mm.csv") %>%
+RBPs <- read_tsv("01_Input/RBPs_mm.csv") %>% # rbp.db mus musculus database Aug 2023
   dplyr::select(-...1) %>%
   rename(gene_symbol = `Gene Symbol`, ensembl_gene = `Annotation ID`)
 
@@ -505,3 +505,9 @@ RBPs_corrs <- dplyr::filter(TEs_m, EnsemblID %in% list_of_RBPs$ensembl_gene) %>%
   mutate(FDR = p.adjust(p = p, method = "BH"),
          sig_FDR = FDR < 0.05)
 
+### n of significant deregulated RBPs per IC
+dplyr::filter(RBPs_corrs, sig_FDR) %>% 
+  ggplot(aes(measure2)) +
+  geom_bar(stat = "count") +
+  ggtitle("number of RBPs whos TEs is significantly correlated to an IC.") +
+  theme_bw()
