@@ -511,3 +511,24 @@ dplyr::filter(RBPs_corrs, sig_FDR) %>%
   geom_bar(stat = "count") +
   ggtitle("number of RBPs whos TEs is significantly correlated to an IC.") +
   theme_bw()
+
+### component specific significantly correlated components
+interest_IC = "IC.6.TEs"
+
+dplyr::filter(RBPs_corrs, sig_FDR,
+              measure2 == interest_IC) %>%
+  arrange(r) %>%
+  mutate(measure1 = as_factor(measure1)) %>%
+  arrange(abs(r)) %>%
+  slice_tail(n=50) %>%
+  ggplot(aes(x = r, y = measure1, fill = FDR)) +
+  geom_bar(stat="identity") +
+  scale_fill_gradient(low = "red", high = "blue", guide=guide_colourbar(reverse = TRUE))+
+  theme_bw() +
+  xlim(-1,1) +
+  labs(title = paste0(interest_IC," top 50 most correlated RBPs")) +
+  xlab("Spearman correlation") +
+  ylab("")
+  
+
+
