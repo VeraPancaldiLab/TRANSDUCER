@@ -497,8 +497,17 @@ RBPs <- read_tsv("01_Input/RBPs_mm.csv") %>% # rbp.db mus musculus database Aug 
 
 list_of_RBPs <- dplyr::select(RBPs, gene_symbol,ensembl_gene)
 
+## parameters
+omic <- "cyt" # cyt, TEs
+interest_IC = "IC.6.TEs"
+
+if (omic == "TEs"){
+  expression_m <- TEs_m
+} else if (omic == "cyt"){
+  expression_m <- cyt_m
+}
 ## analysis of correlation
-RBPs_corrs <- dplyr::filter(TEs_m, EnsemblID %in% list_of_RBPs$ensembl_gene) %>%
+RBPs_corrs <- dplyr::filter(expression_m, EnsemblID %in% list_of_RBPs$ensembl_gene) %>%
   mutate(gene_symbol = ensembl_to_gene[EnsemblID]) %>%
   dplyr::select(gene_symbol, A_TEs$sample) %>% 
   relocate(gene_symbol, all_of(order_by)) %>%
@@ -508,21 +517,20 @@ RBPs_corrs <- dplyr::filter(TEs_m, EnsemblID %in% list_of_RBPs$ensembl_gene) %>%
   column_to_rownames("sample") %>%
   formatted_cors(cor.stat = "spearman") %>%
   filter(measure1 %in% list_of_RBPs$gene_symbol,
-         measure2 %in% names(A_TEs)) %>%
+         measure2 %in% names(A_mat)) %>%
   mutate(FDR = p.adjust(p = p, method = "BH"),
          sig_FDR = FDR < 0.05)
-write_tsv(RBPs_corrs, "02_Output/RBPs.TEs_vs_IC.TEs.tsv")
+
+write_tsv(RBPs_corrs, paste0("02_Output/RBPs.",omic,"_vs_IC.TEs.tsv"))
 ## Plots
 ### n of significant deregulated RBPs per IC
 dplyr::filter(RBPs_corrs, sig_FDR) %>% 
   ggplot(aes(measure2)) +
   geom_bar(stat = "count") +
-  ggtitle("number of RBPs whos TEs is significantly correlated to an IC.") +
+  ggtitle(paste0("number of RBPs whos ", omic, " is significantly correlated to an IC.")) +
   theme_bw()
 
 ### component specific significantly correlated components
-interest_IC = "IC.6.TEs"
-
 dplyr::filter(RBPs_corrs, sig_FDR,
               measure2 == interest_IC) %>%
   arrange(r) %>%
@@ -534,7 +542,7 @@ dplyr::filter(RBPs_corrs, sig_FDR,
   scale_fill_gradient(low = "red", high = "blue", guide=guide_colourbar(reverse = TRUE))+
   theme_bw() +
   xlim(-1,1) +
-  labs(title = paste0(interest_IC," top 50 most correlated RBPs")) +
+  labs(title = paste0(interest_IC," top 50 most correlated RBPs ", omic)) +
   xlab("Spearman correlation") +
   ylab("")
   
