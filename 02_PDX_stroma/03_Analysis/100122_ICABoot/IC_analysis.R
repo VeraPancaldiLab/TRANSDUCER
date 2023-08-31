@@ -2,6 +2,10 @@
 library(tidyverse)
 library(biomaRt)
 library(ggVennDiagram)
+library(msigdbr)
+library(pheatmap)
+library(Hmisc)
+library(ggrepel)
 source("functions.R")
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
@@ -10,6 +14,7 @@ setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICA
 #-------------------------------------------------------------------------------
 component_reorientation = TRUE
 reorient_cyt <- c(1, 1, 1, -1, 1, 1)
+reorient_TEs <- c(1, 1, 1, 1, 1, -1)
 #-------------------------------------------------------------------------------
 
 # load annotation with Biomart
@@ -36,6 +41,8 @@ ICA_TEs <- read_rds("02_Output/ICA_TEs.RDS")
 if (component_reorientation == TRUE){
   ICA_cyt[["A"]] <- t(t(ICA_cyt[["A"]]) * reorient_cyt)
   ICA_cyt[["S"]] <- t(t(ICA_cyt[["S"]]) * reorient_cyt)
+  ICA_TEs[["A"]] <- t(t(ICA_TEs[["A"]]) * reorient_TEs)
+  ICA_TEs[["S"]] <- t(t(ICA_TEs[["S"]]) * reorient_TEs)
 }
 
 ## Norm_data
@@ -442,7 +449,7 @@ scatterplot_with_stats <- function(data, varx, vary, label, type, title){
 
 scatterplot_with_stats(to_corr, "ISRact", "ENSMUSG00000014599", "sample", "spearman", "Csf1 mRNA levels as Samain et al. 2021 activation marker")
 
-## Houcong et al 2022
+#scatterplot_with_stats# Houcong et al 2022
 ### gene weight check
 Houcong <- read_tsv("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/01_Input/apCAF_Huocong.tsv", col_names = "apCAF_Huocong")
 S_cyt_Huocong_apCAFs <- dplyr::filter(S_cyt, EnsemblID %in% gene_to_ensembl[Houcong$apCAF_Huocong])
