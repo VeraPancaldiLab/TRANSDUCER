@@ -517,7 +517,7 @@ RBPs_corrs <- dplyr::filter(expression_m, EnsemblID %in% list_of_RBPs$ensembl_ge
   column_to_rownames("sample") %>%
   formatted_cors(cor.stat = "spearman") %>%
   filter(measure1 %in% list_of_RBPs$gene_symbol,
-         measure2 %in% names(A_mat)) %>%
+         measure2 %in% names(A_TEs)) %>%
   mutate(FDR = p.adjust(p = p, method = "BH"),
          sig_FDR = FDR < 0.05)
 
