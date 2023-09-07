@@ -339,14 +339,18 @@ PlotNetwork(nodes, edges, S_mat,valid_comp = 1:6, main_name = "MID_ICATE")
 
 # FIGURE SPECIFIC PLOTS: Clinical and technical data
 #-------------------------------------------------------------------------------
+columns_multiqc = c("CITID", "Dups_R1", "GC_R1")
+multiqc_sp <- dplyr::inner_join(dplyr::select(multiqc_cyt, all_of(columns_multiqc)),
+                                dplyr::select(multiqc_pol, all_of(columns_multiqc)),
+                                by="CITID", suffix = c("_cyt", "_pol"))
 
 clinical_technical_corrplot <- complete_annotation %>%
   as_tibble(rownames = "CITID") %>%
-  inner_join(multiqc) %>%
-  dplyr::select(CITID, matches("IC."), ISRact, PAMG, Dups_R1, GC_R1) %>%
+  inner_join(multiqc_sp) %>%
+  dplyr::select(CITID, matches("IC."), ISRact, PAMG, matches("Dups_R1"), matches("GC_R1")) %>%
   column_to_rownames("CITID") %>%
   formatted_cors("spearman") %>%
-  filter(measure1 %in% c("ISRact", "PAMG", "Dups_R1", "GC_R1"),
+  filter(measure1 %in% c("ISRact", "PAMG", "Dups_R1_cyt", "GC_R1_cyt", "Dups_R1_pol", "GC_R1_pol"),
          measure2 %in% names(A_mat)) %>% #not square corr
   ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
   geom_tile() +
@@ -359,7 +363,7 @@ clinical_technical_corrplot <- complete_annotation %>%
   scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
   ggpubr::rotate_x_text(angle = 90)
 
-ggsave(file="02_Output/Figures/clinical_technical_corrplot.svg", plot=clinical_technical_corrplot, width=4, height=6)
+ggsave(file="02_Output/Figures/clinical_technical_corrplot_TEs.svg", plot=clinical_technical_corrplot, width=4, height=6)
 sed -i "s/ textLength='[^']*'//" file.svg
 #-------------------------------------------------------------------------------
 
