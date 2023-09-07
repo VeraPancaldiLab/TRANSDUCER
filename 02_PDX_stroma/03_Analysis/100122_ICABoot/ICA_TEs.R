@@ -395,7 +395,7 @@ deconvolution_corrplot <- ggplot(deconvolution_corr, aes(measure1, measure2, fil
   scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
   ggpubr::rotate_x_text(angle = 90)
 
-ggsave(file="02_Output/Figures/deconvolution_corrplot.svg", plot=deconvolution_corrplot, width=8, height=6)
+ggsave(file="02_Output/Figures/deconvolution_corrplot_TEs.svg", plot=deconvolution_corrplot, width=8, height=6)
 #-------------------------------------------------------------------------------
 
 # FIGURE SPECIFIC PLOTS: Most correlated stromal TF activities
