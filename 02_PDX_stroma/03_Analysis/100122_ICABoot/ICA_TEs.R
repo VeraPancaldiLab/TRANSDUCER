@@ -429,4 +429,4 @@ stroma_tf_corrplot <- ggplot(stroma_tf_corr, aes(measure1, measure2, fill=r, lab
   scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
   ggpubr::rotate_x_text(angle = 90)
 
-ggsave(file="02_Output/Figures/stroma_tf_corrplot.svg", plot=stroma_tf_corrplot, width=10, height=6)
+ggsave(file="02_Output/Figures/stroma_tf_corrplot_TEs.svg", plot=stroma_tf_corrplot, width=10, height=6)
