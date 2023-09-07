@@ -23,7 +23,7 @@ boot.perc <- 0.95
 # Analysis
 elected_ncomp <- 6 # 4 if looking at distribution, 6 for standar, like in tumour way
 component_reorientation = TRUE
-reorient <- c(1, 1, 1, 1, 1, -1)
+reorient <- c(1, 1, -1, 1, 1, -1)
 #-------------------------------------------------------------------------------
 
 # DATA LOADING/PROCESSING
@@ -430,3 +430,10 @@ stroma_tf_corrplot <- ggplot(stroma_tf_corr, aes(measure1, measure2, fill=r, lab
   ggpubr::rotate_x_text(angle = 90)
 
 ggsave(file="02_Output/Figures/stroma_tf_corrplot_TEs.svg", plot=stroma_tf_corrplot, width=10, height=6)
+
+#-------------------------------------------------------------------------------
+
+# FIGURE SPECIFIC PLOTS: all the correlation plots of above together
+#-------------------------------------------------------------------------------
+sampleweight_corrplots <- ggarrange(plotlist = list(clinical_technical_corrplot, deconvolution_corrplot, stroma_tf_corrplot), ncol = 3, common.legend = T, align = "h", widths = c(0.165, 0.4, 0.5), legend = "right")
+ggsave(file="02_Output/Figures/sampleweight_corrplots_TEs.svg", plot=sampleweight_corrplots, width=20, height=6)
