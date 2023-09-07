@@ -334,3 +334,95 @@ edges <- mutate(MID,
   dplyr::select(source, target, interaction)
 
 PlotNetwork(nodes, edges, S_mat,valid_comp = 1:6, main_name = "MID_ICATE")
+
+#-------------------------------------------------------------------------------
+
+# FIGURE SPECIFIC PLOTS: Clinical and technical data
+#-------------------------------------------------------------------------------
+
+clinical_technical_corrplot <- complete_annotation %>%
+  as_tibble(rownames = "CITID") %>%
+  inner_join(multiqc) %>%
+  dplyr::select(CITID, matches("IC."), ISRact, PAMG, Dups_R1, GC_R1) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% c("ISRact", "PAMG", "Dups_R1", "GC_R1"),
+         measure2 %in% names(A_mat)) %>% #not square corr
+  ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICAcyt ~ multiqc",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0)) +
+  scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
+  ggpubr::rotate_x_text(angle = 90)
+
+ggsave(file="02_Output/Figures/clinical_technical_corrplot.svg", plot=clinical_technical_corrplot, width=4, height=6)
+sed -i "s/ textLength='[^']*'//" file.svg
+#-------------------------------------------------------------------------------
+
+# FIGURE SPECIFIC PLOTS: MCPCounter deconvolution
+#-------------------------------------------------------------------------------
+deconvolution_corr <- A_mat %>%
+  as_tibble(rownames = "CITID") %>%
+  inner_join(as_tibble(mMCPcounter_res, rownames = "CITID")) %>%
+  dplyr::select(CITID, names(A_mat), names(mMCPcounter_res)) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% names(mMCPcounter_res),
+         measure2 %in% names(A_mat))
+
+clust <- dplyr::select(deconvolution_corr, measure1, measure2, r) %>% 
+  pivot_wider(names_from=measure2, values_from = r) %>%
+  column_to_rownames("measure1") %>%
+  dist() %>%
+  hclust()
+
+deconvolution_corrplot <- ggplot(deconvolution_corr, aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICAcyt ~ MCPCounter",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0),limits = clust$labels[clust$order]) +
+  scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
+  ggpubr::rotate_x_text(angle = 90)
+
+ggsave(file="02_Output/Figures/deconvolution_corrplot.svg", plot=deconvolution_corrplot, width=8, height=6)
+#-------------------------------------------------------------------------------
+
+# FIGURE SPECIFIC PLOTS: Most correlated stromal TF activities
+#-------------------------------------------------------------------------------
+stroma_mostvar_TF <- Get_mostvar(stroma_tf, 20) %>% rownames_to_column() %>% pivot_longer(-rowname) %>% 
+  pivot_wider(names_from=rowname, values_from=value)
+
+stroma_tf_corr <- A_mat %>%
+  as_tibble(rownames = "CITID") %>%
+  inner_join(as_tibble(t(stroma_tf), rownames = "CITID")) %>%
+  dplyr::select(CITID, names(A_mat), names(stroma_mostvar_TF)[-1]) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% names(stroma_mostvar_TF)[-1],
+         measure2 %in% names(A_mat))
+
+clust <- dplyr::select(stroma_tf_corr, measure1, measure2, r) %>% 
+  pivot_wider(names_from=measure2, values_from = r) %>%
+  column_to_rownames("measure1") %>%
+  dist() %>%
+  hclust()
+
+stroma_tf_corrplot <- ggplot(stroma_tf_corr, aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICAcyt ~ MCPCounter",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0),limits = clust$labels[clust$order]) +
+  scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
+  ggpubr::rotate_x_text(angle = 90)
+
+ggsave(file="02_Output/Figures/stroma_tf_corrplot.svg", plot=stroma_tf_corrplot, width=10, height=6)
