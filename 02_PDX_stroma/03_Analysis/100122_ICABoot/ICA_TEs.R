@@ -437,3 +437,4 @@ ggsave(file="02_Output/Figures/stroma_tf_corrplot_TEs.svg", plot=stroma_tf_corrp
 #-------------------------------------------------------------------------------
 sampleweight_corrplots <- ggarrange(plotlist = list(clinical_technical_corrplot, deconvolution_corrplot, stroma_tf_corrplot), ncol = 3, common.legend = T, align = "h", widths = c(0.165, 0.4, 0.5), legend = "right")
 ggsave(file="02_Output/Figures/sampleweight_corrplots_TEs.svg", plot=sampleweight_corrplots, width=20, height=6)
+

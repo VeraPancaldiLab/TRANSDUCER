@@ -14,7 +14,7 @@ setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICA
 #-------------------------------------------------------------------------------
 component_reorientation = TRUE
 reorient_cyt <- c(1, 1, 1, -1, 1, 1)
-reorient_TEs <- c(1, 1, 1, 1, 1, -1)
+reorient_TEs <- c(1, 1, -1, 1, 1, -1)
 #-------------------------------------------------------------------------------
 
 # load annotation with Biomart
