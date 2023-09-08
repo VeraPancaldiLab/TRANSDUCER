@@ -493,7 +493,7 @@ mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
 # Analysis of RNPs 2023
 RBPs <- read_tsv("01_Input/RBPs_mm.csv") %>% # rbp.db mus musculus database Aug 2023
   dplyr::select(-...1) %>%
-  rename(gene_symbol = `Gene Symbol`, ensembl_gene = `Annotation ID`)
+  dplyr::rename(gene_symbol = `Gene Symbol`, ensembl_gene = `Annotation ID`)
 
 list_of_RBPs <- dplyr::select(RBPs, gene_symbol,ensembl_gene)
 
