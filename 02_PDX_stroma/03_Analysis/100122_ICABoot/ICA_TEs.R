@@ -494,3 +494,29 @@ density_heatmap_IC6 <- ggarrange(densplot + rremove("xylab"), heatmap, heights =
                                  ncol = 2, nrow = 1)
 
 ggsave(file="02_Output/Figures/density_heatmap_IC6_TEs.svg", plot=density_heatmap_IC6, width=10, height=6)
+
+#-------------------------------------------------------------------------------
+
+# FIGURE SPECIFIC PLOTS: IC.4 GSVA bottom and top genes
+#-------------------------------------------------------------------------------
+gsvaRes[order(gsvaRes[,"IC.6"]),]
+
+gsvaTop <- as_tibble(gsvaRes, rownames = "gene_set") %>% 
+  mutate(the_rank = rank(-IC.6, ties.method = "random"),
+         #gene_set = if_else(str_count(gene_set, "_") < 10, gene_set, signature_dict[gene_set]),
+         gene_set = str_remove(gene_set, "REACTOME_"),
+         gene_set = fct_reorder(gene_set, the_rank,.desc = T)) %>%
+  pivot_longer(cols = -c(gene_set, the_rank), names_to = "component", values_to = "ES") %>% 
+  dplyr::filter(the_rank < 25 | the_rank > (nrow(gsvaRes)-25)) %>% 
+  mutate(component = if_else(component == "IC.6", "IC.6", "Other")) %>% 
+  dplyr::select(!c(the_rank))
+
+gsva_IC6 <- ggplot(gsvaTop, aes(x = ES, y = gene_set)) + 
+  geom_point(aes(alpha = if_else(component == "IC.6", 0.9, 0.3),
+                 color = if_else(ES > 0, "blue", "red"))) +
+  theme_bw() +
+  labs(title = "IC.6", subtitle = "Best Reactome gene sets") +
+  rremove("legend") +
+  rremove("ylab")
+
+ggsave(file="02_Output/Figures/gsva_IC6_TEs.svg", plot=gsva_IC6, width=10, height=6)
