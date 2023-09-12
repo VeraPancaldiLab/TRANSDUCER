@@ -527,8 +527,9 @@ write_tsv(RBPs_corrs, paste0("02_Output/RBPs.",omic,"_vs_IC.TEs.tsv"))
 dplyr::filter(RBPs_corrs, sig_FDR) %>% 
   ggplot(aes(measure2)) +
   geom_bar(stat = "count") +
-  ggtitle(paste0("number of RBPs whos ", omic, " is significantly correlated to an IC.")) +
-  theme_bw()
+  ggtitle(paste0("RBPs ", omic, " is significantly correlated to an IC.")) +
+  theme_bw() +
+  rotate_x_text(angle = 90)
 
 ### component specific significantly correlated components
 dplyr::filter(RBPs_corrs, sig_FDR,
