@@ -130,3 +130,30 @@ uorf_strong <- uorf_analysis(geneList = TEs_5perc_l, #instead of anota2seq objec
                              unitOut = "number",
                              pdfName = "results/extremeTEs/5percabs")
 
+# # Run de novo sequence analysis
+# deNovo <- motifAnalysis(annot = annot,
+#                         memePath = "/home/jacobo/meme/bin/",
+#                         geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
+#                         customBg = TEs_subset$geneID, # like so we need to give some background
+#                         regulation = c("translationUp", "translationDown"),
+#                         contrast = c(1,1), 
+#                         region = c('UTR5', 'CDS', 'UTR3'),
+#                         subregion = NULL,
+#                         subregionSel=NULL)
+# 
+# # Quantify presence of motifs
+# motifs <- contentMotifs(annot = annot,
+#                         geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
+#                         customBg = TEs_subset$geneID, # like so we need to give some background
+#                         regulation = c("translationUp", "translationDown"),
+#                         contrast = c(1,1),
+#                         motifsIn = deNovo[[1]]$motifsOut,
+#                         region = "UTR3",
+#                         dist = 1,
+#                         selection = "longest",
+#                         annot = annot,
+#                         comparisons = list(c(1,2)),
+#                         unitOut = "number",
+#                         pdfName = "results/extremeTEs/5percabs"
+# )
+
