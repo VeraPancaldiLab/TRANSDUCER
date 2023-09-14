@@ -157,3 +157,42 @@ uorf_strong <- uorf_analysis(geneList = TEs_5perc_l, #instead of anota2seq objec
 #                         pdfName = "results/extremeTEs/5percabs"
 # )
 
+# Folding Energies
+feOut <- foldingEnergyAnalysis(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
+                               customBg = TEs_subset$geneID, # like so we need to give some background
+                               species = 'mouse',
+                               regulation = c("translationUp", "translationDown"),
+                               contrast = c(1,1), 
+                               region = c('UTR5', 'CDS', 'UTR3'),
+                               selection = 'longuest', 
+                               annot = annot,
+                               plotType = 'ecdf',
+                               pdfName = "results/extremeTEs/5percabs",
+                               residFE = TRUE,
+                               plotOut = TRUE)
+# Codon Analysis
+codonOut <- codonUsage(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
+                       customBg = TEs_subset$geneID, # like so we need to give some background
+                       analysis = "codon",
+                       regulation = c("translationUp", "translationDown"),
+                       contrast = c(1,1),
+                       type = "sequence",
+                       comparisons = list(c(1,2)),
+                       annotType = 'ccds',
+                       sourceCod = "load",
+                       selection = "longest",
+                       pAdj=0.01,
+                       plotHeatmap = TRUE,
+                       pdfName = "results/extremeTEs/5percabs",
+                       species = "mouse")
+
+# selCodonOut <- codonCalc(codonIn = codonOut[['codonAll']], analysis = "codon",
+#                          featsel = codonOut[[1]], 
+#                          unit = "freq", 
+#                          regulation = c("translationUp", "translationDown"),
+#                          contrast = c(1,1),
+#                          geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
+#                          customBg = TEs_subset$geneID, # like so we need to give some background
+#                          pdfName = 'Up',
+#                          plotOut = T,
+#                          plotType = 'ecdf')
