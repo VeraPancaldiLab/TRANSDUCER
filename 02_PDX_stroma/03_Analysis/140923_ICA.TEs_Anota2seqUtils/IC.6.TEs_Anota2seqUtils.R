@@ -102,3 +102,31 @@ len <- lengthAnalysis(geneList = TEs_5perc_l, #instead of anota2seq object  you 
                       annot = annot,
                       plotType = 'boxplot',
                       pdfName = "results/extremeTEs/5percabs")
+
+
+# Compare difference in nucleotide composition
+content <- contentAnalysis(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
+                           customBg = TEs_subset$geneID, # like so we need to give some background
+                           regulation = c("translationUp", "translationDown"),
+                           contrast = c(1,1), 
+                           region = c('UTR5', 'CDS', 'UTR3'),
+                           selection = 'longest', 
+                           annot = annot, 
+                           comparisons = list(c(0,1),c(0,2),c(1,2)),
+                           contentIn = c("G", "C", "A", "T"),
+                           plotType = 'boxplot',
+                           pdfName = "results/extremeTEs/5percabs")
+
+# Compare presence of uORFs
+uorf_strong <- uorf_analysis(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
+                             customBg = TEs_subset$geneID, # like so we need to give some background
+                             regulation = c("translationUp", "translationDown"),
+                             contrast = c(1,1),
+                             onlyUTR5 = F,
+                             startCodon = "ATG",
+                             KozakContext = "strong",
+                             selection = "longest",
+                             annot = annot,
+                             unitOut = "number",
+                             pdfName = "results/extremeTEs/5percabs")
+
