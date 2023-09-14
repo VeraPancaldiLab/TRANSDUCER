@@ -56,7 +56,7 @@ S_TEs <- as_tibble(ICA_TEs$S, rownames = "EnsemblID") %>%
   dplyr::select(geneID, matches("IC."))
 
 
-# Anota2seqUtils of the Group of high samples
+# Anota2seqUtils of the TE of IC.6 high samples
 A_TEs <- as_tibble(ICA_TEs$A, rownames = "sample")
 
 ## selection of high and low samples
@@ -84,3 +84,17 @@ TEs_subset_mean <- dplyr::mutate(TEs_subset, IC.6high = rowMeans(TEs_subset[-1])
 TEs_5perc <- tail(TEs_subset_mean, n = dim(TEs_subset_mean)[1]*5/100)
 
 ## anota2seqUtils
+library(anota2seqUtils)
+
+annot <- retrieveFormatData(source = "load", species = "mouse")
+
+### length
+len <- lengthAnalysis(geneList = TEs_5perc$geneID, #instead of anota2seq object  you input geneList and effect_measures
+                      customBg = TEs_subset$geneID, # like so we need to give some background
+                      contrast = c(1,1), 
+                      region = c('UTR5', 'CDS', 'UTR3'),
+                      selection = 'longest', 
+                      annot = annot,
+                      plotType = 'boxplot',
+                      pdfName = "results/extremeTEs/5percabs")
+
