@@ -82,19 +82,23 @@ TEs_subset_mean <- dplyr::mutate(TEs_subset, IC.6high = rowMeans(TEs_subset[-1])
   dplyr::arrange(abs(IC.6high))
 
 TEs_5perc <- tail(TEs_subset_mean, n = dim(TEs_subset_mean)[1]*5/100)
-
+TEs_5perc_up <- dplyr::filter(TEs_5perc, IC.6high > 0)
+TEs_5perc_down <- dplyr::filter(TEs_5perc, IC.6high < 0)
+  
+TEs_5perc_l <- list(translationUp = TEs_5perc_up$geneID,
+                   translationDown = TEs_5perc_down$geneID)
 ## anota2seqUtils
 library(anota2seqUtils)
 
 annot <- retrieveFormatData(source = "load", species = "mouse")
 
 ### length
-len <- lengthAnalysis(geneList = TEs_5perc$geneID, #instead of anota2seq object  you input geneList and effect_measures
+len <- lengthAnalysis(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
                       customBg = TEs_subset$geneID, # like so we need to give some background
+                      regulation = c("translationUp", "translationDown"),
                       contrast = c(1,1), 
                       region = c('UTR5', 'CDS', 'UTR3'),
                       selection = 'longest', 
                       annot = annot,
                       plotType = 'boxplot',
                       pdfName = "results/extremeTEs/5percabs")
-
