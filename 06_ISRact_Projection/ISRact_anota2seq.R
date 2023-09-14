@@ -132,18 +132,29 @@ ads <- anota2seqDataSetFromMatrix(
   transformation = "TMM-log2",
   varCutOff = NULL)
 
+ads <- anota2seqPerformQC(ads,
+                          generateSingleGenePlots = TRUE, 
+                          fileStem = "results/Anota2seq/ISRacthighlow")
+
 ads <- anota2seqResidOutlierTest(ads)
 
 ## Analysis
+phenoLev <- unique(phenoVec)
+myContrast <- matrix(nrow =length(phenoLev),ncol=length(phenoLev)-1)
+rownames(myContrast) <- sort(phenoLev)
+myContrast[,1] = c(1,-1)
+
+
+
 ads <- anota2seqAnalyze(ads,
-                        correctionMethod = "BH", useProgBar = TRUE, fileStem = "results/Anota2seq/",
+                        correctionMethod = "BH", contrasts = myContrast, useProgBar = TRUE, fileStem = "results/Anota2seq/ISRacthighlow",
                         analysis = c("translation", "buffering", "translated mRNA", "total mRNA"))
 
-ads<-anota2seqSelSigGenes(ads,maxPAdj = 0.15,
-                          selDeltaPT = log(1.2),
-                          selDeltaTP = log(1.2),
-                          selDeltaP = 0,
-                          selDeltaT = 0,
+ads<-anota2seqSelSigGenes(ads,maxPAdj = 0.25,
+                          #selDeltaPT = log(1.2),
+                          #selDeltaTP = log(1.2),
+                          #selDeltaP = 0,
+                          #selDeltaT = 0,
                           minSlopeTranslation = -1,
                           maxSlopeTranslation = 2,
                           minSlopeBuffering = -2,
@@ -155,3 +166,179 @@ anota2seqPlotPvalues(ads, selContrast = 1, useRVM = TRUE, plotToFile = FALSE, co
 ads <- anota2seqRegModes(ads, c(TRUE, TRUE))
 par(mfrow = c(1, 1))
 anota2seqPlotFC(ads, selContrast = 1, plotToFile = FALSE,  contrastName = paste(unique(phenoVec), collapse = " vs. "))
+
+anota2seqGetOutput(object = ads, output="regModes",
+                   selContrast = 1, analysis="translation",
+                   getRVM = TRUE)
+
+
+################################################################################
+# Anota2seqUtils
+################################################################################
+
+# RNA features
+library(devtools)
+#load_all('anota2sequtils-main/')
+#install('anota2sequtils-main/')
+library(anota2seqUtils)
+
+
+# load required annotation file
+annot <- retrieveFormatData(source = "load", species = "human")
+
+#Compare lengths
+len <- lengthAnalysis(ads = ads,
+                      regulation = c("translationUp", "translationDown"),
+                      contrast = c(1,1), 
+                      region = c('UTR5', 'CDS', 'UTR3'),
+                      selection = 'random', 
+                      annot = annot, 
+                      comparisons = list(c(0,1),c(0,2),c(1,2)),
+                      plotType = 'boxplot',
+                      pdfName = "results/Anota2seq/ISRacthighlow")
+
+# Compare difference in nucleotide composition
+content <- contentAnalysis(ads = ads,
+                           regulation = c("translationUp", "translationDown"),
+                           contrast = c(1,1), 
+                           region = c('UTR5', 'CDS', 'UTR3'),
+                           selection = 'random', 
+                           annot = annot, 
+                           comparisons = list(c(0,1),c(0,2),c(1,2)),
+                           contentIn = c("G", "C", "A", "T"),
+                           plotType = 'boxplot',
+                           pdfName = "results/Anota2seq/ISRacthighlow")
+
+# Compare presence of uORFs
+uorf_strong <- uorf_analysis(ads = ads,
+                             regulation = c("translationUp", "translationDown"),
+                             contrast = c(1,1),
+                             onlyUTR5 = F,
+                             startCodon = "ATG",
+                             KozakContext = "strong",
+                             selection = "random",
+                             annot = annot,
+                             comparisons = list(c(0,1),c(0,2), c(1,2)),
+                             unitOut = "number",
+                             pdfName = "results/Anota2seq/ISRacthighlow")
+
+# # Run de novo sequence analysis
+deNovo <- motifAnalysis(annot = annot,
+                        memePath = "/home/jacobo/meme/bin/",
+                        ads=ads,
+                        regulation = c("translationUp", "translationDown"),
+                        contrast = c(1,1),
+                        region = "UTR5",
+                        subregion = NULL,
+                        subregionSel=NULL)
+
+# Quantify presence of motifs
+motifs <- contentMotifs(ads = ads,
+                        regulation = c("translationUp", "translationDown"),
+                        contrast = c(1,1),
+                        motifsIn = deNovo[[1]]$motifsOut,
+                        region = "UTR3",
+                        dist = 1,
+                        selection = "random",
+                        annot = annot,
+                        comparisons = list(c(1,2)),
+                        unitOut = "number",
+                        pdfName = "results/Anota2seq/ISRacthighlow"
+)
+
+# Folding Energies
+feOut <- foldingEnergyAnalysis(ads = ads,
+                               species = 'human',
+                               regulation = c("translationUp", "translationDown"),
+                               contrast = c(1,1), 
+                               region = c('UTR5', 'CDS', 'UTR3'),
+                               selection = 'random', 
+                               annot = annot, 
+                               comparisons = list(c(0,1),c(0,2),c(1,2)),
+                               plotType = 'ecdf',
+                               pdfName = "results/Anota2seq/ISRacthighlow",
+                               residFE = TRUE,
+                               plotOut = TRUE)
+# Codon Analysis
+codonOut <- codonUsage(ads = ads,
+                       analysis = "codon",
+                       regulation = c("translationUp", "translationDown"),
+                       contrast = c(1,1),
+                       type = "sequence",
+                       comparisons = list(c(1,2)),
+                       annotType = 'ccds',
+                       sourceCod = "load",
+                       selection = "longuest",
+                       pAdj=0.01,
+                       plotHeatmap = TRUE,
+                       pdfName = "results/Anota2seq/ISRacthighlow",
+                       species = "human")
+
+selCodonOut <- codonCalc(codonIn = codonOut[['codonAll']], analysis = "codon",
+                         featsel = codonOut[[1]], unit = "freq", regulation = c("translationUp", "translationDown"),
+                         contrast = c(1,1),
+                         comparisons = list(c(1,2)),
+                         ads = ads,
+                         pdfName = 'Up',
+                         plotOut = T,
+                         plotType = 'ecdf')
+
+################################################################################
+data("humanSignatures")
+
+# Identify genes with slopes outside of the threshold to filter them out
+genesSlopeFiltOut <- slopeFilt(ads = ads,
+                               regulationGen = "translation", 
+                               contrastSel = 1, 
+                               minSlope = -1,
+                               maxSlope = 2)
+
+
+sign <- signCalc(ads = ads, addSign = humanSignatures, annot = annot)
+
+# analysis of miRNAs
+miRNAOut <- miRNAanalysis(annot=annot,
+                          miRNATargetScanFile = "Predicted_Targets_Context_Scores.txt",
+                          genesSlopeFiltOut = genesSlopeFiltOut,
+                          ads=ads,
+                          regulationGen = "translation",
+                          contrastSel = 1)
+
+# Feature Integration
+features <- c(len,
+              content,
+              uorf_strong,
+              motifs,
+              feOut,
+              #selCodonOut, 
+              sign)
+
+featureIntegration(ads = ads,
+                   contrastSel = 1,
+                   features = features,
+                   pdfName = "results/Anota2seq/ISRacthighlow",
+                   regOnly = T,
+                   allFeat = F,
+                   regulationGen = "translation",
+                   analysis_type = "lm")
+
+################################################################################
+# Signatures
+#visualize signature enrichments in the data based in colors
+################################################################################
+
+# create object with signatures of your choice
+signatures <- list()
+#signatures[["Larsson_etal_2007_high4E"]] <- humanSignatures$Larsson_etal_2007_high4E
+signatures[["Guan_etal_2017_Tg1_transDown"]] <- humanSignatures$Guan_etal_2017_Tg1_transDown
+# Run the analysis
+signatureFunction(signatureList = humanSignatures,
+                  generalName = 'ISRact',
+                  dataName = 'ISRactlow vs high',
+                  colours = c("firebrick1"),
+                  ads = ads,
+                  contrast = 1,
+                  pdfName = "results/Anota2seq/ISRacthighlow",
+                  xlim = c(-3,3),
+                  scatterXY = 5, tableCex = 1)
+
