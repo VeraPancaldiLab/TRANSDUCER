@@ -529,11 +529,12 @@ dplyr::filter(RBPs_corrs, sig_FDR) %>%
   geom_bar(stat = "count") +
   ggtitle(paste0("RBPs ", omic, " is significantly correlated to an IC.")) +
   theme_bw() +
+  scale_y_continuous(breaks=seq(0,12,2)) +
   rotate_x_text(angle = 90)
 
 ### component specific significantly correlated components
-dplyr::filter(RBPs_corrs, sig_FDR,
-              measure2 == interest_IC) %>%
+plot_IC6_RBPstotal <- dplyr::filter(RBPs_corrs, sig_FDR,
+                                    measure2 == interest_IC) %>%
   arrange(r) %>%
   mutate(measure1 = as_factor(measure1)) %>%
   arrange(abs(r)) %>%
@@ -547,5 +548,6 @@ dplyr::filter(RBPs_corrs, sig_FDR,
   xlab("Spearman correlation") +
   ylab("")
   
+ggsave(file="02_Output/Figures/plot_IC6TE_RBPstotal.svg", plot=plot_IC6_RBPstotal, width=5, height=5)
 
 
