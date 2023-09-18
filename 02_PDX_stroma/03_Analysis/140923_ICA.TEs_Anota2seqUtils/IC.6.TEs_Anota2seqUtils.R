@@ -87,6 +87,7 @@ annot <- retrieveFormatData(source = "load", species = "mouse")
 ### length
 len_perc <- lengthAnalysis(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
                       customBg = TEs_subset$geneID, # like so we need to give some background
+                      geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
                       regulation = c("translationUp", "translationDown"),
                       contrast = c(1,1), 
                       region = c('UTR5', 'CDS', 'UTR3'),
@@ -99,6 +100,7 @@ len_perc <- lengthAnalysis(geneList = TEs_5perc_l, #instead of anota2seq object 
 ### Compare difference in nucleotide composition
 content_perc <- contentAnalysis(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
                            customBg = TEs_subset$geneID, # like so we need to give some background
+                           geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
                            regulation = c("translationUp", "translationDown"),
                            contrast = c(1,1), 
                            region = c('UTR5', 'CDS', 'UTR3'),
@@ -112,6 +114,7 @@ content_perc <- contentAnalysis(geneList = TEs_5perc_l, #instead of anota2seq ob
 ### Compare presence of uORFs
 uorf_strong_perc <- uorf_analysis(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
                              customBg = TEs_subset$geneID, # like so we need to give some background
+                             geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
                              regulation = c("translationUp", "translationDown"),
                              contrast = c(1,1),
                              onlyUTR5 = F,
@@ -134,20 +137,20 @@ uorf_strong_perc <- uorf_analysis(geneList = TEs_5perc_l, #instead of anota2seq 
 #                         subregionSel=NULL)
 # 
 # ###  Quantify presence of motifs
-# motifs <- contentMotifs(annot = annot,
-#                         geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
-#                         customBg = TEs_subset$geneID, # like so we need to give some background
-#                         regulation = c("translationUp", "translationDown"),
-#                         contrast = c(1,1),
-#                         motifsIn = deNovo[[1]]$motifsOut,
-#                         region = "UTR3",
-#                         dist = 1,
-#                         selection = "longest",
-#                         annot = annot,
-#                         comparisons = list(c(1,2)),
-#                         unitOut = "number",
-#                         pdfName = "results/extremeTEs/5percabs"
-# )
+motifs_perc <- contentMotifs(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
+                        customBg = TEs_subset$geneID, # like so we need to give some background
+                        geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                        regulation = c("translationUp", "translationDown"),
+                        contrast = c(1,1),
+                        motifsIn = "DRACH", #deNovo[[1]]$motifsOut
+                        region = c("UTR5", "CDS","UTR3"),
+                        dist = 1,
+                        selection = "longest",
+                        annot = annot,
+                        comparisons = list(c(1,2)),
+                        unitOut = "number",
+                        pdfName = "results/extremeTEs/5percabs_"
+)
 
 ### Folding Energies
 feOut_perc <- foldingEnergyAnalysis(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
@@ -198,7 +201,7 @@ feOut_perc <- foldingEnergyAnalysis(geneList = TEs_5perc_l, #instead of anota2se
 features_perc <- c(len_perc,
               content_perc,
               uorf_strong_perc,
-              #motifs_perc,
+              motifs_perc,
               feOut_perc #,
               #selCodonOut, 
               #sign
@@ -245,6 +248,7 @@ S_TEs_ext_l <- list(translationUp = S_TEs_extup$geneID,
 ### length
 len_ext <- lengthAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                       customBg = S_TEs$geneID, # like so we need to give some background
+                      geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
                       regulation = c("translationUp", "translationDown"),
                       contrast = c(1,1), 
                       region = c('UTR5', 'CDS', 'UTR3'),
@@ -257,6 +261,7 @@ len_ext <- lengthAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object  
 ### Compare difference in nucleotide composition
 content_ext <- contentAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                            customBg = S_TEs$geneID, # like so we need to give some background
+                           geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
                            regulation = c("translationUp", "translationDown"),
                            contrast = c(1,1), 
                            region = c('UTR5', 'CDS', 'UTR3'),
@@ -270,6 +275,7 @@ content_ext <- contentAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq obj
 ### Compare presence of uORFs
 uorf_strong_ext <- uorf_analysis(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                              customBg = S_TEs$geneID, # like so we need to give some background
+                             geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
                              regulation = c("translationUp", "translationDown"),
                              contrast = c(1,1),
                              onlyUTR5 = F,
@@ -291,27 +297,28 @@ uorf_strong_ext <- uorf_analysis(geneList = S_TEs_ext_l, #instead of anota2seq o
 #                          subregion = NULL,
 #                          subregionSel=NULL)
 #
-# ###  Quantify presence of motifs #BUG?
-# motifs <- contentMotifs(annot = annot,
-#                         geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
-#                         customBg = S_TEs$geneID, # like so we need to give some background
-#                         regulation = c("translationUp", "translationDown"),
-#                         contrast = c(1,1),
-#                         motifsIn = deNovo[[1]]$motifsOut,
-#                         region = "UTR3",
-#                         dist = 1,
-#                         selection = "longest",
-#                         annot = annot,
-#                         comparisons = list(c(1,2)),
-#                         unitOut = "number",
-#                         pdfName = "results/extremeIC.6GW/abs1"
-# )
+###  Quantify presence of motifs #BUG?
+motifs_ext <- contentMotifs(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
+                        customBg = S_TEs$geneID, # like so we need to give some background
+                        geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                        regulation = c("translationUp", "translationDown"),
+                        contrast = c(1,1),
+                        motifsIn = "DRACH", #deNovo[[1]]$motifsOut
+                        region = c("UTR5", "CDS","UTR3"),
+                        dist = 1,
+                        selection = "longest",
+                        annot = annot,
+                        comparisons = list(c(1,2)),
+                        unitOut = "number",
+                        pdfName = "results/extremeIC.6GW/abs1"
+)
 
 ### Folding Energies
 feOut_ext <- foldingEnergyAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                                     customBg = S_TEs$geneID, # like so we need to give some background
                                     species = 'mouse',
-                                    regulation = c("translationUp", "translationDown"),
+                                   geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                                   regulation = c("translationUp", "translationDown"),
                                     contrast = c(1,1), 
                                     region = c('UTR5', 'CDS', 'UTR3'),
                                     selection = 'longuest', 
@@ -357,7 +364,7 @@ feOut_ext <- foldingEnergyAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq
 features_ext <- c(len_ext,
                    content_ext,
                    uorf_strong_ext,
-                   #motifs_perc,
+                   motifs_ext,
                    feOut_ext #,
                    #selCodonOut, 
                    #sign
