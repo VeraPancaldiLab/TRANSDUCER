@@ -6,6 +6,7 @@ library(msigdbr)
 library(pheatmap)
 library(Hmisc)
 library(ggrepel)
+library(ReactomePA)
 source("../100122_ICABoot/functions.R")
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/140923_ICA.TEs_Anota2seqUtils/")
@@ -153,8 +154,8 @@ motifs_perc <- contentMotifs(geneList = TEs_5perc_l, #instead of anota2seq objec
 )
 
 ### Folding Energies
-feOut_perc <- foldingEnergyAnalysis(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
-                               customBg = TEs_subset$geneID, # like so we need to give some background
+feOut_perc <- foldingEnergyAnalysis(geneList = TEs_5perc_l, 
+                               customBg = TEs_subset$geneID,
                                species = 'mouse',
                                regulation = c("translationUp", "translationDown"),
                                contrast = c(1,1), 
@@ -195,16 +196,22 @@ feOut_perc <- foldingEnergyAnalysis(geneList = TEs_5perc_l, #instead of anota2se
 
 
 
-### No human signatures, thus not straightforward testing
+### Mice signatures given by Inci
+load("mouseSignatures.RData")
+
+sign_perc <- signCalc(geneList = TEs_5perc_l,
+                 customBg = TEs_subset$geneID,
+                 addSign = mouseSignatures,
+                 annot = annot)
 
 ## Feature Integration
 features_perc <- c(len_perc,
               content_perc,
               uorf_strong_perc,
               motifs_perc,
-              feOut_perc #,
+              feOut_perc,
               #selCodonOut, 
-              #sign
+              sign_perc
               )
 
 featureIntegration(geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
@@ -217,6 +224,7 @@ featureIntegration(geneList = TEs_5perc_l, #instead of anota2seq object  you inp
                    allFeat = F,
                    regulationGen = "translation",
                    analysis_type = "lm")
+
 
 ################################################################################
 # Anota2seqUtils of the Gene weights
@@ -358,16 +366,22 @@ feOut_ext <- foldingEnergyAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq
 
 
 
-### No human signatures, thus not straightforward testing
+### Mice signatures given by Inci
+sign_ext <- signCalc(geneList = S_TEs_ext_l,
+                      customBg = S_TEs$geneID,
+                      addSign = mouseSignatures,
+                      annot = annot)
+
+
 
 ## Feature Integration
 features_ext <- c(len_ext,
                    content_ext,
                    uorf_strong_ext,
                    motifs_ext,
-                   feOut_ext #,
+                   feOut_ext ,
                    #selCodonOut, 
-                   #sign
+                   sign_ext
 )
 
 featureIntegration(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
