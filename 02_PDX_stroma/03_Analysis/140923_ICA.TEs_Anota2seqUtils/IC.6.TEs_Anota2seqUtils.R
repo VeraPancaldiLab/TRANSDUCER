@@ -11,6 +11,28 @@ source("../100122_ICABoot/functions.R")
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/140923_ICA.TEs_Anota2seqUtils/")
 
+# Functions 
+## Alternative plotting as fuction do not work
+convert_to_numeric <- function(x) {
+  parts <- strsplit(x, "/")[[1]]
+  as.numeric(parts[1]) / as.numeric(parts[2])
+}
+
+plot_bar_enrich <- function(x, p.adjust_th, Title) {
+  mutate(x, GeneRatioNum = sapply(GeneRatio, convert_to_numeric)) %>%
+    arrange(GeneRatioNum) %>%
+    mutate(Description = as_factor(Description)) %>% 
+    dplyr::filter(p.adjust < p.adjust_th) %>%
+    slice_tail(n=20) %>%
+    ggplot(aes(x = GeneRatioNum, y = Description, fill = p.adjust)) +
+    geom_bar(stat="identity") +
+    scale_fill_gradient(low = "red", high = "blue", guide=guide_colourbar(reverse = TRUE))+
+    theme_bw() +
+    labs(title = Title) +
+    xlab("Gene Ratio") +
+    ylab("")
+}
+
 # PARAMETERS
 #-------------------------------------------------------------------------------
 component_reorientation = TRUE
@@ -31,7 +53,7 @@ annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
 
 gene_to_ensembl = deframe(annot_ensembl75[c( "external_gene_id", "ensembl_gene_id")])
 ensembl_to_gene = setNames(names(gene_to_ensembl), gene_to_ensembl)
-
+gene_to_entrez = deframe(annot_ensembl75[c( "external_gene_id", "entrezgene")])
 # Data loading
 ## ICs
 ICA_TEs <- read_rds("../100122_ICABoot/02_Output/ICA_TEs.RDS")
@@ -225,6 +247,20 @@ featureIntegration(geneList = TEs_5perc_l, #instead of anota2seq object  you inp
                    regulationGen = "translation",
                    analysis_type = "lm")
 
+## Enrichment
+TEs_5perc_up_enrich <- enrichPathway(gene= as.character(na.exclude(gene_to_entrez[TEs_5perc_l$translationUp])),
+                                     universe = as.character(na.exclude(gene_to_entrez[TEs_subset$geneID])),
+                                            pvalueCutoff = 0.05, readable=TRUE, organism = "mouse")
+
+TEs_5perc_down_enrich <- enrichPathway(gene= as.character(na.exclude(gene_to_entrez[TEs_5perc_l$translationDown])),
+                                       universe = as.character(na.exclude(gene_to_entrez[TEs_subset$geneID])),
+                                              pvalueCutoff = 0.05, readable=TRUE, organism = "mouse")
+
+TEs_5perc_up_enrich@result %>%  
+  plot_bar_enrich(0.05,"Reactome Upregulated in IC.6 (extreme mean residuals)")
+
+TEs_5perc_down_enrich@result %>%  
+  plot_bar_enrich(0.05,"Reactome Downregulated in IC.6 (extreme mean residuals)")
 
 ################################################################################
 # Anota2seqUtils of the Gene weights
