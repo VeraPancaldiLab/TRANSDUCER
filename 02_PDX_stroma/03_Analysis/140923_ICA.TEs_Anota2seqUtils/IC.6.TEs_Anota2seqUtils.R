@@ -7,6 +7,7 @@ library(pheatmap)
 library(Hmisc)
 library(ggrepel)
 library(ReactomePA)
+library(clusterProfiler)
 source("../100122_ICABoot/functions.R")
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/140923_ICA.TEs_Anota2seqUtils/")
@@ -248,19 +249,39 @@ featureIntegration(geneList = TEs_5perc_l, #instead of anota2seq object  you inp
                    analysis_type = "lm")
 
 ## Enrichment
-TEs_5perc_up_enrich <- enrichPathway(gene= as.character(na.exclude(gene_to_entrez[TEs_5perc_l$translationUp])),
+### Reactome
+TEs_5perc_up_enrich_PA <- enrichPathway(gene= as.character(na.exclude(gene_to_entrez[TEs_5perc_l$translationUp])),
                                      universe = as.character(na.exclude(gene_to_entrez[TEs_subset$geneID])),
                                             pvalueCutoff = 0.05, readable=TRUE, organism = "mouse")
 
-TEs_5perc_down_enrich <- enrichPathway(gene= as.character(na.exclude(gene_to_entrez[TEs_5perc_l$translationDown])),
+TEs_5perc_down_enrich_PA <- enrichPathway(gene= as.character(na.exclude(gene_to_entrez[TEs_5perc_l$translationDown])),
                                        universe = as.character(na.exclude(gene_to_entrez[TEs_subset$geneID])),
                                               pvalueCutoff = 0.05, readable=TRUE, organism = "mouse")
-
-TEs_5perc_up_enrich@result %>%  
+#### plots
+TEs_5perc_up_enrich_PA@result %>%  
   plot_bar_enrich(0.05,"Reactome Upregulated in IC.6 (extreme mean residuals)")
 
-TEs_5perc_down_enrich@result %>%  
+TEs_5perc_down_enrich_PA@result %>%  
   plot_bar_enrich(0.05,"Reactome Downregulated in IC.6 (extreme mean residuals)")
+
+### GO
+ont = "MF"
+TEs_5perc_up_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[TEs_5perc_l$translationUp])),
+         universe = as.character(na.exclude(gene_to_entrez[TEs_subset$geneID])),
+         ont      = ont,
+         pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Mm.eg.db)
+
+TEs_5perc_down_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[TEs_5perc_l$translationDown])),
+                                   universe = as.character(na.exclude(gene_to_entrez[TEs_subset$geneID])),
+                                   ont      = ont,
+                                   pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Mm.eg.db)
+
+#### plots
+TEs_5perc_up_enrich_GO@result %>%  
+  plot_bar_enrich(0.05,paste0("GO-", ont," Upregulated in IC.6 (extreme mean residuals)"))
+
+TEs_5perc_down_enrich_GO@result %>%  
+  plot_bar_enrich(0.05, paste0("GO-", ont," Downregulated in IC.6 (extreme mean residuals)"))
 
 ################################################################################
 # Anota2seqUtils of the Gene weights
