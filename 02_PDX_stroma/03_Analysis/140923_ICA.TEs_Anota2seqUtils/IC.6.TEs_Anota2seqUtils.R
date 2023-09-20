@@ -20,12 +20,12 @@ convert_to_numeric <- function(x) {
 }
 
 plot_bar_enrich <- function(x, p.adjust_th, Title) {
-  mutate(x, GeneRatioNum = sapply(GeneRatio, convert_to_numeric)) %>%
-    arrange(GeneRatioNum) %>%
+  mutate(x, GeneRatioNum = sapply(GeneRatio, convert_to_numeric)) %>% 
+    arrange(GeneRatioNum) %>% 
     mutate(Description = as_factor(Description)) %>% 
     dplyr::filter(p.adjust < p.adjust_th) %>%
     slice_tail(n=20) %>%
-    ggplot(aes(x = GeneRatioNum, y = Description, fill = p.adjust)) +
+    ggplot(aes(x = GeneRatioNum, y = Description, fill = ount)) +
     geom_bar(stat="identity") +
     scale_fill_gradient(low = "red", high = "blue", guide=guide_colourbar(reverse = TRUE))+
     theme_bw() +
@@ -451,3 +451,39 @@ featureIntegration(geneList = S_TEs_ext_l, #instead of anota2seq object  you inp
                    allFeat = F,
                    regulationGen = "translation",
                    analysis_type = "lm")
+
+## Enrichment
+### Reactome
+TEs_5perc_up_enrich_PA <- enrichPathway(gene= as.character(na.exclude(gene_to_entrez[S_TEs_ext_l$translationUp])),
+                                        universe = as.character(na.exclude(gene_to_entrez[S_TEs$geneID])),
+                                        pvalueCutoff = 0.05, readable=TRUE, organism = "mouse")
+
+TEs_5perc_down_enrich_PA <- enrichPathway(gene= as.character(na.exclude(gene_to_entrez[S_TEs_ext_l$translationDown])),
+                                          universe = as.character(na.exclude(gene_to_entrez[S_TEs$geneID])),
+                                          pvalueCutoff = 0.05, readable=TRUE, organism = "mouse")
+#### plots
+TEs_5perc_up_enrich_PA@result %>%  
+  plot_bar_enrich(0.05,"Reactome Upregulated in IC.6 (extreme gene weights)")
+
+TEs_5perc_down_enrich_PA@result %>%  
+  plot_bar_enrich(0.05,"Reactome Downregulated in IC.6 (extreme gene weights)")
+
+### GO
+ont = "CC"
+TEs_5perc_up_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[S_TEs_ext_l$translationUp])),
+                                   universe = as.character(na.exclude(gene_to_entrez[S_TEs$geneID])),
+                                   ont      = ont,
+                                   pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Mm.eg.db)
+
+TEs_5perc_down_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[S_TEs_ext_l$translationDown])),
+                                     universe = as.character(na.exclude(gene_to_entrez[S_TEs$geneID])),
+                                     ont      = ont,
+                                     pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Mm.eg.db)
+
+#### plots
+TEs_5perc_up_enrich_GO@result %>%  
+  plot_bar_enrich(0.05,paste0("GO-", ont," Upregulated in IC.6 (extreme gene weights)"))
+
+TEs_5perc_down_enrich_GO@result %>%  
+  plot_bar_enrich(0.05, paste0("GO-", ont," Downregulated in IC.6 (extreme gene weights)"))
+
