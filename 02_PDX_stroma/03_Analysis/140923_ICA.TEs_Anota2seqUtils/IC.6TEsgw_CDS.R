@@ -163,18 +163,10 @@ motifs_quant <- contentMotifs(geneList = S_TEs_ext_l, #instead of anota2seq obje
 #                          plotOut = T,
 #                          plotType = 'ecdf')
 
-## Mice signatures given by Inci
-load("mouseSignatures.RData")
-signEnrch <- signCalc(geneList = S_TEs_ext_l,
-                     customBg = S_TEs$geneID,
-                     addSign = mouseSignatures,
-                     annot = annot)
-
 # Feature integration
 features <- c(content,
-              motifs_quant,
+              motifs_quant
               # selCodonOut, # To be fixed
-              signEnrch
 )
 
 featureIntegration(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures

@@ -172,20 +172,12 @@ feOut <- foldingEnergyAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq obj
                                    residFE = TRUE,
                                    plotOut = TRUE)
 
-## Mice signatures given by Inci
-load("mouseSignatures.RData")
-signEnrch <- signCalc(geneList = S_TEs_ext_l,
-                     customBg = S_TEs$geneID,
-                     addSign = mouseSignatures,
-                     annot = annot)
-
 # Feature integration
 features <- c(len5UTR,
                   content,
                   uorf_strong,
                   motifs_quant,
-                  feOut,
-                  signEnrch
+                  feOut
 )
 
 featureIntegration(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
