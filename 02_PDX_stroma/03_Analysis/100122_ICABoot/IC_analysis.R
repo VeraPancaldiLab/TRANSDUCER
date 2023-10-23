@@ -527,9 +527,13 @@ write_tsv(RBPs_corrs, paste0("02_Output/RBPs.",omic,"_vs_IC.TEs.tsv"))
 
 ## Plots
 ### n of significant deregulated RBPs per IC
-random_genes <- sample_n(expression_m, nrow(list_of_RBPs))
-random_corr <- random_genes %>%
-  dplyr::select(EnsemblID, A_TEs$sample) %>% 
+for (n in 1:100)
+{
+  print(n)
+  random_genes <- sample_n(expression_m, nrow(list_of_RBPs))
+  
+  random_corr <- random_genes %>%
+  dplyr::select(EnsemblID, A_TEs$sample) %>%
   relocate(EnsemblID, all_of(order_by)) %>%
   pivot_longer(-EnsemblID, names_to = "sample") %>%
   pivot_wider(values_from = value, names_from = EnsemblID) %>%
@@ -540,6 +544,13 @@ random_corr <- random_genes %>%
          measure2 %in% names(A_TEs)) %>%
   mutate(FDR = p.adjust(p = p, method = "BH"),
          sig_FDR = FDR < 0.05)
+  if (n < 2){
+    random_correlations <- dplyr::mutate(random_corr, iteration = n)
+  } else{
+    random_correlations <- dplyr::mutate(random_corr, iteration = n) %>%
+      rbind(random_correlations)
+  }
+  }
 
 dplyr::filter(random_corr, sig_FDR) %>% 
   ggplot(aes(measure2)) +
