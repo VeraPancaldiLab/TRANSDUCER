@@ -495,7 +495,8 @@ RBPs <- read_tsv("01_Input/RBPs_mm.csv") %>% # rbp.db mus musculus database Aug 
   dplyr::select(-...1) %>%
   dplyr::rename(gene_symbol = `Gene Symbol`, ensembl_gene = `Annotation ID`)
 
-list_of_RBPs <- dplyr::select(RBPs, gene_symbol,ensembl_gene)
+list_of_RBPs <- dplyr::select(RBPs, gene_symbol,ensembl_gene) %>% 
+  dplyr::filter(ensembl_gene %in% expression_m$EnsemblID)
 
 ## parameters
 omic <- "cyt" # cyt, TEs
@@ -507,7 +508,7 @@ if (omic == "TEs"){
   expression_m <- cyt_m
 }
 ## analysis of correlation
-RBPs_corrs <- dplyr::filter(expression_m, EnsemblID %in% list_of_RBPs$ensembl_gene) %>%
+RBPs_corrs <-  dplyr::filter(expression_m, EnsemblID %in% list_of_RBPs$ensembl_gene) %>%
   mutate(gene_symbol = ensembl_to_gene[EnsemblID]) %>%
   dplyr::select(gene_symbol, A_TEs$sample) %>% 
   relocate(gene_symbol, all_of(order_by)) %>%
@@ -521,10 +522,26 @@ RBPs_corrs <- dplyr::filter(expression_m, EnsemblID %in% list_of_RBPs$ensembl_ge
   mutate(FDR = p.adjust(p = p, method = "BH"),
          sig_FDR = FDR < 0.05)
 
-write_tsv(RBPs_corrs, paste0("02_Output/RBPs.",omic,"_vs_IC.TEs.tsv"))
+write_tsv(RBPs_corrs, paste0("02_Output/RBPs.",omic,"_vs_IC.TEs.tsv")) 
+  
+
 ## Plots
 ### n of significant deregulated RBPs per IC
-dplyr::filter(RBPs_corrs, sig_FDR) %>% 
+random_genes <- sample_n(expression_m, nrow(list_of_RBPs))
+random_corr <- random_genes %>%
+  dplyr::select(EnsemblID, A_TEs$sample) %>% 
+  relocate(EnsemblID, all_of(order_by)) %>%
+  pivot_longer(-EnsemblID, names_to = "sample") %>%
+  pivot_wider(values_from = value, names_from = EnsemblID) %>%
+  inner_join(A_TEs, by = "sample") %>%
+  column_to_rownames("sample") %>%
+  formatted_cors(cor.stat = "spearman") %>%
+  filter(measure1 %in% random_genes$EnsemblID,
+         measure2 %in% names(A_TEs)) %>%
+  mutate(FDR = p.adjust(p = p, method = "BH"),
+         sig_FDR = FDR < 0.05)
+
+dplyr::filter(random_corr, sig_FDR) %>% 
   ggplot(aes(measure2)) +
   geom_bar(stat = "count") +
   ggtitle(paste0("RBPs ", omic, " is significantly correlated to an IC.")) +
