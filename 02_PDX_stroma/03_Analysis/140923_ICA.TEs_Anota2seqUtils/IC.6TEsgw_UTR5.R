@@ -137,6 +137,8 @@ motif_list <- motifAnalysis( geneList = S_TEs_ext_l,
                          subregion = NULL,
                          subregionSel=NULL)
 } else {
+  attract <- read_tsv("Input/ATtRACT_db.tsv") %>% filter(Organism == "Mus_musculus")
+  motif_list <- c()
   motif_list <- c("DRACH")
 }
 
