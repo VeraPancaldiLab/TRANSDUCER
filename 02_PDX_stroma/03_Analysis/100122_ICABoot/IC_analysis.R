@@ -135,7 +135,33 @@ dplyr::select(Scomparison, ends_with(c("cyt", "pol"))) %>%
   scale_y_discrete(expand=c(0,0)) +
   rotate_x_text(angle = 45)
 
+## 3d Scatterplot comparison
+library(plotly)
+axx <- list(
+  title = "ISRact"
+)
 
+axy <- list(
+  title = "IC.4 Total RNA"
+)
+
+axz <- list(
+  title = "IC.6 TE"
+)
+
+colorscale <- list(c(0, 1), c("#FF7F00", "#377DB8"))
+
+fig <- plot_ly(Acomparison, x=~ISRact, y=~IC.4.cyt, z=~IC.6.TEs, 
+               marker = list(color = ~PAMG, colorscale = colorscale, showscale = TRUE))
+fig <- fig %>% add_markers() 
+fig <- fig %>% layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz),
+                      annotations = list(x = 1.09,
+                                         y = 1.02,
+                                         text = 'Basal/Classical',
+                                         xref = 'paper',
+                                         yref = 'paper',
+                                         showarrow = FALSE))
+fig
 # Reactome pathways cyt/pol vs. ICA.TEs
 all_genesets <- msigdbr("Mus musculus")
 reactome <- dplyr::filter(all_genesets, gs_subcat == "CP:REACTOME")
