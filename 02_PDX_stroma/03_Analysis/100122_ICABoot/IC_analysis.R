@@ -151,7 +151,7 @@ axz <- list(
 
 colorscale <- list(c(0, 1), c("#FF7F00", "#377DB8"))
 
-fig <- plot_ly(Acomparison, x=~ISRact, y=~IC.4.cyt, z=~IC.6.TEs, 
+fig <- plot_ly(rownames_to_column(Acomparison, "sample"), x=~ISRact, y=~IC.4.cyt, z=~IC.6.TEs, text =~sample, 
                marker = list(color = ~PAMG, colorscale = colorscale, showscale = TRUE))
 fig <- fig %>% add_markers() 
 fig <- fig %>% layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz),
