@@ -491,13 +491,6 @@ mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
            show_colnames= FALSE, main = "Stromal transcription of Verginadis et al. 2022 murine CAF markers")
 
 # Analysis of RNPs 2023
-RBPs <- read_tsv("01_Input/RBPs_mm.csv") %>% # rbp.db mus musculus database Aug 2023
-  dplyr::select(-...1) %>%
-  dplyr::rename(gene_symbol = `Gene Symbol`, ensembl_gene = `Annotation ID`)
-
-list_of_RBPs <- dplyr::select(RBPs, gene_symbol,ensembl_gene) %>% 
-  dplyr::filter(ensembl_gene %in% expression_m$EnsemblID)
-
 ## parameters
 omic <- "cyt" # cyt, TEs
 interest_IC = "IC.6.TEs"
@@ -507,6 +500,14 @@ if (omic == "TEs"){
 } else if (omic == "cyt"){
   expression_m <- cyt_m
 }
+
+RBPs <- read_tsv("01_Input/RBPs_mm.csv") %>% # rbp.db mus musculus database Aug 2023
+  dplyr::select(-...1) %>%
+  dplyr::rename(gene_symbol = `Gene Symbol`, ensembl_gene = `Annotation ID`)
+
+list_of_RBPs <- dplyr::select(RBPs, gene_symbol,ensembl_gene) %>% 
+  dplyr::filter(ensembl_gene %in% expression_m$EnsemblID)
+
 ## analysis of correlation
 RBPs_corrs <-  dplyr::filter(expression_m, EnsemblID %in% list_of_RBPs$ensembl_gene) %>%
   mutate(gene_symbol = ensembl_to_gene[EnsemblID]) %>%
@@ -527,9 +528,7 @@ write_tsv(RBPs_corrs, paste0("02_Output/RBPs.",omic,"_vs_IC.TEs.tsv"))
 
 ## Plots
 ### n of significant deregulated RBPs per IC
-for (n in 1:100)
-{
-  print(n)
+for (i in 1:500){
   random_genes <- sample_n(expression_m, nrow(list_of_RBPs))
   
   random_corr <- random_genes %>%
@@ -544,19 +543,38 @@ for (n in 1:100)
          measure2 %in% names(A_TEs)) %>%
   mutate(FDR = p.adjust(p = p, method = "BH"),
          sig_FDR = FDR < 0.05)
-  if (n < 2){
-    random_correlations <- dplyr::mutate(random_corr, iteration = n)
-  } else{
-    random_correlations <- dplyr::mutate(random_corr, iteration = n) %>%
+  
+  if (i == 1)
+    {
+    print(max(random_corr$r))
+    random_correlations <- dplyr::mutate(random_corr, iteration = i)
+  } else
+    {
+      print(i)
+    random_correlations <- dplyr::mutate(random_corr, iteration = i) %>%
       rbind(random_correlations)
   }
-  }
+}
 
-dplyr::filter(random_corr, sig_FDR) %>% 
+random_significant <- dplyr::filter(random_correlations, sig_FDR) %>% 
+  group_by(iteration) %>%
+  group_by(measure2, .add = TRUE) %>%
+  dplyr::summarise(count = n()) %>%
+  group_by(measure2) %>%
+  dplyr::summarise(mean = mean(count), sd = sd(count))
+
+
+dplyr::filter(RBPs_corrs, sig_FDR) %>% 
   ggplot(aes(measure2)) +
   geom_bar(stat = "count") +
-  ggtitle(paste0("RBPs ", omic, " is significantly correlated to an IC.")) +
+  geom_point(inherit.aes = FALSE, random_significant, mapping = aes(x = measure2, y = mean), color = "red") +
+  geom_point(inherit.aes = FALSE, random_significant, mapping = aes(x = measure2, y = mean + sd), shape = 2) +
+  geom_point(inherit.aes = FALSE, random_significant, mapping = aes(x = measure2, y = mean - sd), shape = 6) +
+  ggtitle(label = paste0("RBPs ", omic, " is significantly correlated to an IC."),
+          subtitle = " vs. 500 random lists of genes mean & sd") +
+  
   theme_bw() +
+  labs(x = "component", y = "count") +
   scale_y_continuous(breaks=seq(0,12,2)) +
   rotate_x_text(angle = 90)
 
@@ -577,5 +595,3 @@ plot_IC6_RBPstotal <- dplyr::filter(RBPs_corrs, sig_FDR,
   ylab("")
   
 ggsave(file="02_Output/Figures/plot_IC6TE_RBPstotal.svg", plot=plot_IC6_RBPstotal, width=5, height=5)
-
-
