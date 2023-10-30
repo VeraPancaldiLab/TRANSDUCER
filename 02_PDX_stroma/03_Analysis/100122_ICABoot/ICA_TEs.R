@@ -314,6 +314,7 @@ for (comp in 1:elected_ncomp){
 system(paste(c("cd 02_Output/ \n convert", concat_pdf, "ICA_TEs.pdf"), collapse = " "))
 
 # Network analysis
+## Protein Protein Intreraction
 MID <- read_csv("01_Input/MID2022.csv")
 
 trans_mgi_name <- deframe(annot_ensembl75[c("mgi_id", "external_gene_id")])
@@ -335,6 +336,24 @@ edges <- mutate(MID,
 
 PlotNetwork(nodes, edges, S_mat,valid_comp = 1:6, main_name = "MID_ICAcyt")
 
+## POSTARS3 mice RBP-target
+POSTARS3 <- read_tsv("01_Input/POSTARS3/POSTARS3_mapped.tsv")
+
+nodes <- as_tibble(S_mat, rownames = "ensembl_id") %>%
+  mutate(id = trans_ensembl_name[ensembl_id]) %>% 
+  inner_join(dplyr::select(POSTARS3, gene_name, gene_biotype) %>% distinct() %>% rename(id = gene_name)) %>%
+  relocate(ensembl_id, .after = "id")
+
+edges <- mutate(POSTARS3,
+                RBP_name = str_to_title(RBP_name)) %>%
+  dplyr::filter(RBP_name %in% nodes$id, 
+                gene_name %in% nodes$id) %>%
+  dplyr::rename(source = RBP_name,
+                target = gene_name) %>%
+  dplyr::select(source, target, experimentplussoftware, sample_origin)
+
+network <- createNetworkFromDataFrames(nodes, edges, title = "POSTARS3")
+setNodeLabelMapping("id")
 #-------------------------------------------------------------------------------
 
 # FIGURE SPECIFIC PLOTS: Clinical and technical data
