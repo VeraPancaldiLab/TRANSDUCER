@@ -334,4 +334,24 @@ ggsurvplot(fit,
            palette = c("#E7B800", "#2E9FDF"))
 
 ## Cox Proportional hazzards model
+cox.mod <- coxph(Surv(follow_up_days, status) ~ PC1, 
+                 data = as.data.frame(surv_data))
+### assumption checking
+#### Linearity
+plot(predict(cox.mod),
+     residuals(cox.mod, type = "martingale"),
+     xlab = "fitted", ylab = "Martingale residuals",
+     main = "Residuals Plot", las = 1)
+abline(h=0)
+lines(smooth.spline(predict(cox.mod),
+                    residuals(cox.mod, type = "martingale")),
+                    col="red")
 
+#### Proportional Hazzards
+par(mfrow = c(1,1))
+plot(cox.zph(cox.mod)) # if failed, Proportional
+abline(h=0, col =2)
+
+### Model plotting
+ggforest(cox.mod)
+ggadjustedcurves(cox.mod, data=as.data.frame(surv_data))
