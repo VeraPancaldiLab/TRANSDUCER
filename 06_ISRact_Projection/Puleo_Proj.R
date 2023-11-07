@@ -76,11 +76,11 @@ pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ################################################################################
 # PARAMETERS
 ################################################################################
-## Choose normalization method (to be implemented?)
+# Choose normalization method (to be implemented?)
 Puleo_gene <- Puleo_Shiny_Jeromme_gene
 Puleo_ensembl <- Puleo_Shiny_Jeromme_ensembl
 
-## Create sample_info_Puleo
+# Calculate PAMG
 type_pamg <- projectMolGrad(newexp = column_to_rownames(Puleo_gene, "Gene"),  geneSymbols = Puleo_gene$Gene) %>%
   as_tibble(rownames = "sample")
 
