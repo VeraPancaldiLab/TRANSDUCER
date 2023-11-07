@@ -138,6 +138,12 @@ dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %
   ggplot(aes(x=PC1, y=PC2, color = ISRact, shape = dataset)) +
   geom_point() +
   scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "Puleo")) +
-  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))  #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
-
+  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) +  #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
+  geom_rect(xmin = min(projection_Puleo$PC1),
+            xmax = quantile(projection_Puleo$PC1, probs = 0.3333), 
+            ymin = min(projection_Puleo$PC2), ymax = max(projection_Puleo$PC2), linewidth = 0, fill = "red", alpha =0.002) +
+  
+  geom_rect(xmin = quantile(projection_Puleo$PC1, probs = 0.6666),
+           xmax = max(projection_Puleo$PC1),
+           ymin = min(projection_Puleo$PC2), ymax = max(projection_Puleo$PC2), linewidth = 0, fill = "green", alpha =0.002)
 #-------------------------------------------------------------------------------
