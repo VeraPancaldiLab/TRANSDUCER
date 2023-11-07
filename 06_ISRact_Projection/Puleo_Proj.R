@@ -87,3 +87,57 @@ type_pamg <- projectMolGrad(newexp = column_to_rownames(Puleo_gene, "Gene"),  ge
 sample_info_Puleo <- dplyr::select(type_pamg, sample, Puleo) %>% 
   dplyr::rename(PAMG = Puleo) %>% 
   left_join(clinical_data, "sample")
+
+# Projecting datasets on this PCA
+## CPTAC
+### transpose human data for projection
+human_data <- Puleo_ensembl %>%
+  pivot_longer(cols = -EnsemblID, names_to = "case_id", values_to = "Expression") %>% 
+  dplyr::filter(!str_detect(EnsemblID, 'NA')) %>% #remove eventual NA for gene Ensembl
+  pivot_wider(names_from = EnsemblID, values_from = Expression, names_repair = "minimal") %>%
+  column_to_rownames("case_id") 
+
+### remove missing genes from the PCA before projection
+filter_pca <- function(.data, objective){
+  as_tibble(.data, rownames = "tmp") %>% 
+    dplyr::filter(tmp %in% objective) %>% 
+    column_to_rownames("tmp") %>%
+    data.matrix()
+}
+pca_pdx$rotation <- filter_pca(pca_pdx$rotation, names(human_data)[-1])
+pca_pdx$center <- filter_pca(pca_pdx$center, names(human_data)[-1])
+pca_pdx$scale <- filter_pca(pca_pdx$scale, names(human_data)[-1])
+
+projection_Puleo <-  predict(pca_pdx, human_data) %>% 
+  as_tibble(rownames = "sample")
+
+
+Puleo_PC1 <- arrange(projection_Puleo, PC1) %>%
+  mutate(PC1status = if_else(PC1 < quantile(projection_Puleo$PC1, probs = 0.3333), "low_PC1",
+                             if_else(PC1 < quantile(projection_Puleo$PC1, probs = 0.6666), "medium_PC1", "high_PC1"))) %>%
+  dplyr::select(sample, PC1,  PC1status) %>%
+  left_join(sample_info_Puleo, by = "sample")
+
+#Plot pca and projections
+#Add ISR status to PCA df
+pca_full_df <- pca_pdx[["x"]] %>%
+  as.data.frame() %>%
+  rownames_to_column("sample") %>%
+  inner_join(top_samples[,c("sample","ISRact")])
+
+#-------------------------------------------------------------------------------
+# Plot projecion PacaOmics and then projection Proteogenomics
+
+show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Sauyeun PDX"),
+                             as_tibble(projection_Puleo) %>% mutate(ISRact = "Unknown",
+                                                                    dataset = "Puleo"))
+
+dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
+  dplyr::filter(dataset %in% c("Sauyeun PDX","PACAOMICS PDX", "Puleo"), # "Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"
+                ISRact %in% c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) %>% 
+  ggplot(aes(x=PC1, y=PC2, color = ISRact, shape = dataset)) +
+  geom_point() +
+  scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "Puleo")) +
+  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))  #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
+
+#-------------------------------------------------------------------------------
