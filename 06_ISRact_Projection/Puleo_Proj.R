@@ -52,7 +52,8 @@ Puleo_Shiny_Jeromme_gene <- Puleo_Shiny_Jeromme %>%
 
 ### Metadata
 Survival_availability <- NULL
-clinical_data <- read_rds("data/Puleo/Puleo_survival_repair.rds")
+clinical_data <- read_rds("data/Puleo/Puleo_survival_repair.rds") %>%
+  dplyr::rename(sample = ID)
 
 
 ### inherited sample info and top samples from Sauyeun_PDX
@@ -70,3 +71,19 @@ top_samples <- arrange(sample_info, ICA3) %>%
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 
 
+
+
+################################################################################
+# PARAMETERS
+################################################################################
+## Choose normalization method (to be implemented?)
+Puleo_gene <- Puleo_Shiny_Jeromme_gene
+Puleo_ensembl <- Puleo_Shiny_Jeromme_ensembl
+
+## Create sample_info_Puleo
+type_pamg <- projectMolGrad(newexp = column_to_rownames(Puleo_gene, "Gene"),  geneSymbols = Puleo_gene$Gene) %>%
+  as_tibble(rownames = "sample")
+
+sample_info_Puleo <- dplyr::select(type_pamg, sample, Puleo) %>% 
+  dplyr::rename(PAMG = Puleo) %>% 
+  left_join(clinical_data, "sample")
