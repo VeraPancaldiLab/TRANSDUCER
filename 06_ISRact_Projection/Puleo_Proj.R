@@ -15,25 +15,44 @@ library(data.table)
 library(ggplot2)
 library(survival)
 library(survminer)
+library("AnnotationDbi")
+library("hgu219.db")  
 
 ################################################################################
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
 source("src/human_cohort_data_filter.R")
 source("src/correlation_plotter.R")
 
-## CPTAC (Proteogenomics)
-### upper quartile normalized and log2 data 
-Puleo_already_norm2 <- read_rds("data/Puleo/Puleo2.rds") %>%
+# Data loading
+## Data
+Puleo_Shiny_Jeromme <- read_rds("data/Puleo/Puleo2.rds") %>%
   as_tibble(rownames = "Gene") %>%
   mutate(Gene = strsplit(as.character(Gene), " /// ")) %>%
   unnest(Gene) %>%
   filter(Gene != "", 
          Gene != "---")
 
+## Translate EnsemblID to gene names
+probe_info <- AnnotationDbi::select(hgu219.db,
+                                    Puleo_Shiny_Jeromme$Gene,
+                                    c("SYMBOL", "ENSEMBL"),
+                                    keytype = "SYMBOL") %>%
+  dplyr::rename(Gene = SYMBOL,
+                EnsemblID = ENSEMBL)
+
+## Deal with Duplicated EnsemblIDs and Gene names 
+Puleo_Shiny_Jeromme_ensembl <- left_join(Puleo_Shiny_Jeromme, probe_info,by = "Gene") %>%
+  dplyr::select(-"Gene") %>%
+  group_by(EnsemblID) %>%
+  summarise_all(mean)
+
+Puleo_Shiny_Jeromme_gene <- Puleo_Shiny_Jeromme %>%
+  group_by(Gene) %>%
+  summarise_all(mean)
 
 ### Metadata
 Survival_availability <- NULL
-clinical_data <- read_rds("data/Puleo/Puleo_survival.rds")
+clinical_data <- read_rds("data/Puleo/Puleo_survival_repair.rds")
 
 
 ### inherited sample info and top samples from Sauyeun_PDX
@@ -50,6 +69,4 @@ top_samples <- arrange(sample_info, ICA3) %>%
 ## ISRactPCA
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 
-################################################################################
-# PARAMETERS
-norm_method = "upperquartile" #TMM | upperquartile | upperquartile_ogdata
+
