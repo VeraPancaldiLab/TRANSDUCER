@@ -15,7 +15,8 @@ library(data.table)
 library(ggplot2)
 library(survival)
 library(survminer)
-
+library("AnnotationDbi")
+library("illuminaHumanv4.db") 
 
 ################################################################################
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
@@ -24,7 +25,7 @@ source("src/correlation_plotter.R")
 
 # Data loading
 ## Data
-ICGC <- read_rds("data/ICGC/ICGC_AU.rds")
+ICGC <- read_rds("data/ICGC/ICGC_AU.rds") %>% as_tibble(rownames = "Gene")
   
 ### Metadata
 ICGC_clinical <- read_rds("data/ICGC/ICGC_AU_survival.rds")
@@ -46,3 +47,33 @@ pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ################################################################################
 # PARAMETERS
 ################################################################################
+
+# Translate EnsemblID to gene names
+probe_info <- AnnotationDbi::select(illuminaHumanv4.db,
+                                    ICGC$Gene,
+                                    c("SYMBOL", "ENSEMBL", "PROBEID"),
+                                    keytype = "SYMBOL") %>%
+  dplyr::rename(Gene = SYMBOL,
+                EnsemblID = ENSEMBL)
+
+
+# load annotation with Biomart
+# ensembl <- useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
+# 
+# #listAttributes(ensembl75, page="feature_page")
+# annot_ensembl <- getBM(attributes = c('ensembl_gene_id',
+#                                         'external_gene_name'), mart = ensembl)
+# 
+# gene_to_ensembl = deframe(annot_ensembl[c( "external_gene_name", "ensembl_gene_id")])
+# ensembl_to_gene = setNames(names(gene_to_ensembl), gene_to_ensembl)
+
+## Deal with Duplicated EnsemblIDs and Gene names 
+ICGC_ensembl <- left_join(ICGC, probe_info,by = "Gene") %>%
+  dplyr::select(-c("Gene", "PROBEID")) %>%
+  group_by(EnsemblID) %>%
+  summarise_all(mean)
+
+ICGC_gene <- ICGC %>%
+  group_by(Gene) %>%
+  summarise_all(mean)
+
