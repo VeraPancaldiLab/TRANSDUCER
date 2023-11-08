@@ -32,29 +32,21 @@ Puleo_Shiny_Jeromme <- read_rds("data/Puleo/Puleo2.rds") %>%
   filter(Gene != "", 
          Gene != "---")
 
-## Translate EnsemblID to gene names
-probe_info <- AnnotationDbi::select(hgu219.db,
-                                    Puleo_Shiny_Jeromme$Gene,
-                                    c("SYMBOL", "ENSEMBL"),
-                                    keytype = "SYMBOL") %>%
-  dplyr::rename(Gene = SYMBOL,
-                EnsemblID = ENSEMBL)
+Puleo_Shiny_Jeromme_treatedOnly <- read_rds("data/Puleo/Puleo_treatedOnly.rds") %>%
+  as_tibble(rownames = "Gene") %>%
+  mutate(Gene = strsplit(as.character(Gene), " /// ")) %>%
+  unnest(Gene) %>%
+  filter(Gene != "", 
+         Gene != "---")
 
-## Deal with Duplicated EnsemblIDs and Gene names 
-Puleo_Shiny_Jeromme_ensembl <- left_join(Puleo_Shiny_Jeromme, probe_info,by = "Gene") %>%
-  dplyr::select(-"Gene") %>%
-  group_by(EnsemblID) %>%
-  summarise_all(mean)
-
-Puleo_Shiny_Jeromme_gene <- Puleo_Shiny_Jeromme %>%
-  group_by(Gene) %>%
-  summarise_all(mean)
 
 ### Metadata
 Survival_availability <- NULL
-clinical_data <- read_rds("data/Puleo/Puleo_Survival_treatedOnly.rds") %>%
-  dplyr::rename(sample = ID)
+Puleo_survival <- read_rds("data/Puleo/Puleo_survival.rds") %>%
+  rownames_to_column("sample")
 
+Puleo_survival_treatedOnly <- read_rds("data/Puleo/Puleo_Survival_treatedOnly.rds") %>%
+  rownames_to_column("sample")
 
 ### inherited sample info and top samples from Sauyeun_PDX
 sample_info <- read_delim("data/Sauyeun_PDX/sample_info.tsv", 
@@ -71,14 +63,32 @@ top_samples <- arrange(sample_info, ICA3) %>%
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 
 
-
-
 ################################################################################
 # PARAMETERS
+TreatedOnly = TRUE
 ################################################################################
-# Choose normalization method (to be implemented?)
-Puleo_gene <- Puleo_Shiny_Jeromme_gene
-Puleo_ensembl <- Puleo_Shiny_Jeromme_ensembl
+# Choose depending on treatment
+if (TreatedOnly == TRUE) {
+  Puleo_Shiny_Jeromme <- Puleo_Shiny_Jeromme_treatedOnly
+  Puleo_survival <- Puleo_survival_treatedOnly
+}
+## Translate EnsemblID to gene names
+probe_info <- AnnotationDbi::select(hgu219.db,
+                                    Puleo_Shiny_Jeromme$Gene,
+                                    c("SYMBOL", "ENSEMBL"),
+                                    keytype = "SYMBOL") %>%
+  dplyr::rename(Gene = SYMBOL,
+                EnsemblID = ENSEMBL)
+
+## Deal with Duplicated EnsemblIDs and Gene names 
+Puleo_ensembl <- left_join(Puleo_Shiny_Jeromme, probe_info,by = "Gene") %>%
+  dplyr::select(-"Gene") %>%
+  group_by(EnsemblID) %>%
+  summarise_all(mean)
+
+Puleo_gene <- Puleo_Shiny_Jeromme %>%
+  group_by(Gene) %>%
+  summarise_all(mean)
 
 # Calculate PAMG
 type_pamg <- projectMolGrad(newexp = column_to_rownames(Puleo_gene, "Gene"),  geneSymbols = Puleo_gene$Gene) %>%
@@ -86,7 +96,7 @@ type_pamg <- projectMolGrad(newexp = column_to_rownames(Puleo_gene, "Gene"),  ge
 
 sample_info_Puleo <- dplyr::select(type_pamg, sample, Puleo) %>% 
   dplyr::rename(PAMG = Puleo) %>% 
-  left_join(clinical_data, "sample")
+  left_join(Puleo_survival, "sample")
 
 # Projecting datasets on this PCA
 ## CPTAC
@@ -173,7 +183,7 @@ ggsurvplot(fit,
            palette = c("green", "red"))
 
 ## Cox Proportional hazzards model
-cox.mod <- coxph(Surv(OS, OS_event) ~ PC1, 
+cox.mod <- coxph(Surv(OS, OS_event) ~ PAMG, 
                  data = as.data.frame(surv_data))
 ### assumption checking
 #### Linearity
