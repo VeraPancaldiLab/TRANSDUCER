@@ -45,3 +45,23 @@ pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ################################################################################
 # PARAMETERS
 ################################################################################
+
+# Translate EnsemblID to gene names
+ensembl <- useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl", version = "GRCh37")
+
+#listAttributes(ensembl75, page="feature_page")
+annot_ensembl <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_name'), mart = ensembl)
+
+gene_to_ensembl = deframe(annot_ensembl[c( "external_gene_name", "ensembl_gene_id")])
+ensembl_to_gene = setNames(names(gene_to_ensembl), gene_to_ensembl)
+
+## Deal with Duplicated EnsemblIDs and Gene names 
+TCGA_ensembl <- mutate(TCGA, EnsemblID = gene_to_ensembl[Gene]) %>%
+  dplyr::select(-c("Gene")) %>%
+  group_by(EnsemblID) %>%
+  summarise_all(mean)
+
+TCGA_gene <- TCGA %>%
+  group_by(Gene) %>%
+  summarise_all(mean)
