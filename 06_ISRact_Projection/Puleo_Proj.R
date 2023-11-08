@@ -65,7 +65,7 @@ pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 
 ################################################################################
 # PARAMETERS
-TreatedOnly = TRUE
+TreatedOnly = FALSE
 ################################################################################
 # Choose depending on treatment
 if (TreatedOnly == TRUE) {
@@ -166,13 +166,13 @@ correlation_plotter(data = Puleo_PC1, col1 = "PAMG", col2 = "PC1", data_name = "
 #-------------------------------------------------------------------------------
 # Survival curves regarding ISR status
 surv_data <- dplyr::rename(Puleo_PC1, case_id = sample)
-
-## Kaplan Meyer 33up vs 33down
+## OS
+### Kaplan Meyer 33up vs 33down
 fit <-  survfit(Surv(OS, OS_event) ~ PC1status, 
                 data = dplyr::filter(surv_data, PC1status != "medium_PC1"))
 print(fit)
 
-### Change color, linetype by strata, risk.table color by strata
+#### Change color, linetype by strata, risk.table color by strata
 ggsurvplot(fit,
            pval = TRUE, conf.int = TRUE,
            risk.table = TRUE, # Add risk table
@@ -182,11 +182,11 @@ ggsurvplot(fit,
            ggtheme = theme_bw(), # Change ggplot2 theme
            palette = c("green", "red"))
 
-## Cox Proportional hazzards model
+### Cox Proportional hazzards model
 cox.mod <- coxph(Surv(OS, OS_event) ~ PAMG, 
                  data = as.data.frame(surv_data))
-### assumption checking
-#### Linearity
+#### assumption checking
+##### Linearity
 plot(predict(cox.mod),
      residuals(cox.mod, type = "martingale"),
      xlab = "fitted", ylab = "Martingale residuals",
@@ -196,12 +196,51 @@ lines(smooth.spline(predict(cox.mod),
                     residuals(cox.mod, type = "martingale")),
       col="red")
 
-#### Proportional Hazzards
+##### Proportional Hazzards
 par(mfrow = c(1,1))
 plot(cox.zph(cox.mod)) # if failed, Proportional
 abline(h=0, col =2)
 
-### Model plotting
+#### Model plotting
 ggforest(cox.mod)
 ggadjustedcurves(cox.mod, data=as.data.frame(surv_data))
 
+
+## PFS
+### Kaplan Meyer 33up vs 33down
+fit <-  survfit(Surv(PFS, PFS_event) ~ PC1status, 
+                data = dplyr::filter(surv_data, PC1status != "medium_PC1"))
+print(fit)
+
+#### Change color, linetype by strata, risk.table color by strata
+ggsurvplot(fit,
+           pval = TRUE, conf.int = TRUE,
+           risk.table = TRUE, # Add risk table
+           risk.table.col = "strata", # Change risk table color by groups
+           linetype = "strata", # Change line type by groups
+           surv.median.line = "hv", # Specify median survival
+           ggtheme = theme_bw(), # Change ggplot2 theme
+           palette = c("green", "red"))
+
+### Cox Proportional hazzards model
+cox.mod <- coxph(Surv(PFS, PFS_event) ~ PC1, 
+                 data = as.data.frame(surv_data))
+#### assumption checking
+##### Linearity
+plot(predict(cox.mod),
+     residuals(cox.mod, type = "martingale"),
+     xlab = "fitted", ylab = "Martingale residuals",
+     main = "Residuals Plot", las = 1)
+abline(h=0)
+lines(smooth.spline(predict(cox.mod),
+                    residuals(cox.mod, type = "martingale")),
+      col="red")
+
+##### Proportional Hazzards
+par(mfrow = c(1,1))
+plot(cox.zph(cox.mod)) # if failed, Proportional
+abline(h=0, col =2)
+
+#### Model plotting
+ggforest(cox.mod)
+ggadjustedcurves(cox.mod, data=as.data.frame(surv_data))
