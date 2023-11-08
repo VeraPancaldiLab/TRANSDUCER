@@ -77,3 +77,10 @@ ICGC_gene <- ICGC %>%
   group_by(Gene) %>%
   summarise_all(mean)
 
+# Calculate PAMG
+type_pamg <- projectMolGrad(newexp = column_to_rownames(ICGC_gene, "Gene"),  geneSymbols = ICGC_gene$Gene) %>%
+  as_tibble(rownames = "sample")
+
+sample_info_Puleo <- dplyr::select(type_pamg, sample, ICGCarray) %>% 
+  dplyr::rename(PAMG = ICGCarray) %>% 
+  left_join(rownames_to_column(ICGC_clinical, "sample"), "sample")
