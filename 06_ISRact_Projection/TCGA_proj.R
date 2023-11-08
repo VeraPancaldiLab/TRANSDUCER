@@ -65,3 +65,76 @@ TCGA_ensembl <- mutate(TCGA, EnsemblID = gene_to_ensembl[Gene]) %>%
 TCGA_gene <- TCGA %>%
   group_by(Gene) %>%
   summarise_all(mean)
+
+# Calculate PAMG
+type_pamg <- projectMolGrad(newexp = column_to_rownames(TCGA_gene, "Gene"),  geneSymbols = TCGA_gene$Gene) %>%
+  as_tibble(rownames = "sample")
+
+sample_info_TCGA <- dplyr::select(type_pamg, sample, ICGCrnaseq) %>% 
+  dplyr::rename(PAMG = ICGCrnaseq) %>% 
+  left_join(rownames_to_column(TCGA_clinical, "sample"), "sample")
+
+# Projecting datasets on this PCA
+## TCGA
+### transpose human data for projection
+human_data <- TCGA_ensembl %>%
+  pivot_longer(cols = -EnsemblID, names_to = "case_id", values_to = "Expression") %>% 
+  dplyr::filter(!str_detect(EnsemblID, 'NA')) %>% #remove eventual NA for gene Ensembl
+  pivot_wider(names_from = EnsemblID, values_from = Expression, names_repair = "minimal") %>%
+  column_to_rownames("case_id") 
+
+### remove missing genes from the PCA before projection
+filter_pca <- function(.data, objective){
+  as_tibble(.data, rownames = "tmp") %>% 
+    dplyr::filter(tmp %in% objective) %>% 
+    column_to_rownames("tmp") %>%
+    data.matrix()
+}
+pca_pdx$rotation <- filter_pca(pca_pdx$rotation, names(human_data)[-1])
+pca_pdx$center <- filter_pca(pca_pdx$center, names(human_data)[-1])
+pca_pdx$scale <- filter_pca(pca_pdx$scale, names(human_data)[-1])
+
+projection_TCGA <-  predict(pca_pdx, human_data) %>% 
+  as_tibble(rownames = "sample")
+
+
+TCGA_PC1 <- arrange(projection_TCGA, PC1) %>%
+  mutate(PC1status = if_else(PC1 < quantile(projection_TCGA$PC1, probs = 0.3333), "low_PC1",
+                             if_else(PC1 < quantile(projection_TCGA$PC1, probs = 0.6666), "medium_PC1", "high_PC1"))) %>%
+  dplyr::select(sample, PC1,  PC1status) %>%
+  left_join(sample_info_TCGA, by = "sample")
+
+#Plot pca and projections
+#Add ISR status to PCA df
+pca_full_df <- pca_pdx[["x"]] %>%
+  as.data.frame() %>%
+  rownames_to_column("sample") %>%
+  inner_join(top_samples[,c("sample","ISRact")])
+
+#-------------------------------------------------------------------------------
+# Plot projecion PacaOmics and then projection Proteogenomics
+
+show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Sauyeun PDX"),
+                             as_tibble(projection_TCGA) %>% mutate(ISRact = "Unknown",
+                                                                   dataset = "TCGA"))
+
+dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
+  dplyr::filter(dataset %in% c("Sauyeun PDX","PACAOMICS PDX", "TCGA"), # "Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"
+                ISRact %in% c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) %>% 
+  ggplot(aes(x=PC1, y=PC2, color = ISRact, shape = dataset)) +
+  geom_point() +
+  scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "TCGA")) +
+  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) +  #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
+  geom_rect(xmin = min(projection_TCGA$PC1),
+            xmax = quantile(projection_TCGA$PC1, probs = 0.3333), 
+            ymin = min(projection_TCGA$PC2), ymax = max(projection_TCGA$PC2), linewidth = 0, fill = "red", alpha =0.002) +
+  
+  geom_rect(xmin = quantile(projection_TCGA$PC1, probs = 0.6666),
+            xmax = max(projection_TCGA$PC1),
+            ymin = min(projection_TCGA$PC2), ymax = max(projection_TCGA$PC2), linewidth = 0, fill = "green", alpha =0.002)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Plot comparisons with Basal/Classical and ISRact
+## PAMG vs PC1
+correlation_plotter(data = TCGA_PC1, col1 = "PAMG", col2 = "PC1", data_name = "TCGA")
+#-------------------------------------------------------------------------------
