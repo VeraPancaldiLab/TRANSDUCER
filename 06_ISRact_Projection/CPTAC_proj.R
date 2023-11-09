@@ -15,6 +15,7 @@ library(data.table)
 library(ggplot2)
 library(survival)
 library(survminer)
+library(pheatmap)
 
 ################################################################################
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
@@ -189,13 +190,11 @@ dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Check relation with original PDX samples
+## Preparatives
 PDX_original <- read_tsv("data/Sauyeun_PDX/PDX_PCA_input_data.tsv")
 
-## Genome wide
 similarity_df <- inner_join(PDX_original ,dplyr::select(CPTAC_tumor, - Gene)) %>% 
   drop_na()
-similarity_corr_hm <- formatted_cors(dplyr::select(similarity_df,-EnsemblID), "pearson", 0) %>% 
-  pivot_wider(dplyr::select(similarity_corr, measure1, measure2, r), values_from = r, names_from = measure1, id_cols = measure2)
 
 ### Annotation
 annot_ref = left_join(sample_info, dplyr::select(top_samples, sample, ISRact)) %>%
@@ -209,13 +208,27 @@ annot_colors <- list(ISRact = c(`high_ISRact` = "brown", `medium_ISRact` = "grey
                      PAMG = c("#FF7F00", "white", "#377DB8"),
                      df = c(Sauyeun = "grey", CPTAC ="grey2")) 
 
-### Plot
-heatmap <- similarity_corr_hm %>% column_to_rownames("measure2") %>% 
+## Genome wide
+gw_corr_hm <- formatted_cors(dplyr::select(similarity_df,-EnsemblID), "pearson", 0) %>% 
+  dplyr::select(measure1, measure2, r) %>% 
+  pivot_wider(values_from = r, names_from = measure1, id_cols = measure2)
+
+heatmap <- gw_corr_hm %>% column_to_rownames("measure2") %>% 
   pheatmap(scale = "none", color = colorRampPalette(c("#FBFEF9", "#A63446"))(100),
            annotation_row = annot, annotation_col = annot, annotation_colors = annot_colors,
            cluster_rows = T, cluster_cols = T, show_colnames = TRUE) 
 
 ## Subset
+subset_corr_hm <- dplyr::filter(similarity_df, EnsemblID %in% rownames(pca_pdx$rotation)) %>%
+  dplyr::select(-EnsemblID) %>% 
+  formatted_cors("pearson", 0) %>% 
+  dplyr::select(measure1, measure2, r) %>%
+  pivot_wider(values_from = r, names_from = measure1, id_cols = measure2)
+
+heatmap <- subset_corr_hm %>% column_to_rownames("measure2") %>% 
+  pheatmap(scale = "none", color = colorRampPalette(c("#FBFEF9", "#A63446"))(100),
+           annotation_row = annot, annotation_col = annot, annotation_colors = annot_colors,
+           cluster_rows = T, cluster_cols = T, show_colnames = TRUE) 
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
