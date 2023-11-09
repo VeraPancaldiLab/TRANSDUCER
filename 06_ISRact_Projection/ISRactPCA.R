@@ -132,8 +132,12 @@ Sauyeun_norm_ <- dplyr::select(Sauyeun_raw, -Genenames) %>%
   column_to_rownames( "EnsemblID") %>%
   DGEList() %>%
   calcNormFactors(method= norm_method) %>%
-  cpm(log=TRUE) 
+  cpm(log=TRUE)
 
+## Export version for comparison
+as_tibble(Sauyeun_norm_, rownames = "EnsemblID") %>% write_tsv("data/Sauyeun_PDX/PDX_PCA_input_data.tsv")
+
+## prepare for PCA
 Sauyeun_norm <- Sauyeun_norm_ %>%
   t() %>%
   as_tibble(rownames = "sample")
