@@ -20,6 +20,7 @@ library(survminer)
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
 source("src/human_cohort_data_filter.R")
 source("src/correlation_plotter.R")
+source("src/formatted_cors.R")
 
 ## CPTAC (Proteogenomics)
 ### upper quartile normalized and log2 data 
@@ -185,14 +186,42 @@ dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %
   scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "CPTAC", "CCLE")) +
   scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) + #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
   ylim(-250,15)
+#-------------------------------------------------------------------------------
+# Check relation with original PDX samples
+PDX_original <- read_tsv("data/Sauyeun_PDX/PDX_PCA_input_data.tsv")
 
+## Genome wide
+similarity_df <- inner_join(PDX_original ,dplyr::select(CPTAC_tumor, - Gene)) %>% 
+  drop_na()
+similarity_corr <- formatted_cors(dplyr::select(similarity_df,-EnsemblID), "pearson", 0)
+
+clust <- dplyr::select(similarity_corr, measure1, measure2, r) %>% 
+  pivot_wider(names_from=measure2, values_from = r) %>%
+  column_to_rownames("measure1") %>%
+  dist() %>%
+  hclust()
+
+ggplot(similarity_corr, aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Pearson's\nCorrelation",
+       title="Similarity based in common genome",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(low="#FBFEF9",high="#A63446",
+                       midpoint = min(similarity_corr$r),
+                       limits=c(min(similarity_corr$r),1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0),limits = clust$labels[clust$order]) +
+  scale_x_discrete(expand=c(0,0),limits = clust$labels[clust$order]) +
+  ggpubr::rotate_x_text(angle = 90)
+
+## Subset
+
+#-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Plot comparisons with Basal/Classical and ISRact
 ## PAMG vs PC1
 correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "CPTAC")
-#-------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------
-# Insert here DGEA of low vs high
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Proteomics DPEA
