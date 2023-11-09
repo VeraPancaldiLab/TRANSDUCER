@@ -5,14 +5,14 @@ cors <- function(df, cor.stat) {
   return(Mdf)
 }
 
-formatted_cors <- function(df, cor.stat){
+formatted_cors <- function(df, cor.stat, sig_th = 0.05){
   cors(df, cor.stat) %>%
     map(~rownames_to_column(.x, var="measure1")) %>%
     map(~pivot_longer(.x, -measure1, names_to = "measure2")) %>%
     bind_rows(.id = "id") %>%
     pivot_wider(names_from = id, values_from = value) %>%
     dplyr::rename(p = P) %>%
-    mutate(sig_p = ifelse(p < .05, T, F),
+    mutate(sig_p = ifelse(p < sig_th, T, F),
            p_if_sig = ifelse(sig_p, p, NA),
            r_if_sig = ifelse(sig_p, r, NA)) 
 }
