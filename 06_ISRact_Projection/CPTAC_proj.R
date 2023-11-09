@@ -61,7 +61,7 @@ sample_info <- read_delim("data/Sauyeun_PDX/sample_info.tsv",
 
 top_samples <-arrange(sample_info, ICA3) %>%
   dplyr::slice( unique(c(1:5, n() - 0:4)) ) %>%
-  mutate(ISRact = ifelse(ICA3 < 0, "low_ICA3", "high_ICA3")) %>%
+  mutate(ISRact = ifelse(ICA3 < 0, "low_ISRact", "high_ISRact")) %>%
   arrange(sample)
 
 # Import the projection
@@ -159,8 +159,8 @@ projection_CPTAC <-  predict(pca_pdx, human_data) %>%
 
 
 CPTAC_PC1 <- arrange(projection_CPTAC, PC1) %>%
-  mutate(PC1status = if_else(PC1 < quantile(projection_CPTAC$PC1, probs = 0.3333), "low_PC1",
-                             if_else(PC1 < quantile(projection_CPTAC$PC1, probs = 0.6666), "medium_PC1", "high_PC1"))) %>%
+  mutate(PC1status = if_else(PC1 < quantile(projection_CPTAC$PC1, probs = 0.3333), "low_ISRact",
+                             if_else(PC1 < quantile(projection_CPTAC$PC1, probs = 0.6666), "medium_ISRact", "high_ISRact"))) %>%
   dplyr::select(sample, PC1,  PC1status) %>%
   left_join(sample_info_CPTAC, by = "sample")
 
@@ -187,33 +187,31 @@ dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %
   scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) + #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
   ylim(-250,15)
 #-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Check relation with original PDX samples
 PDX_original <- read_tsv("data/Sauyeun_PDX/PDX_PCA_input_data.tsv")
 
 ## Genome wide
 similarity_df <- inner_join(PDX_original ,dplyr::select(CPTAC_tumor, - Gene)) %>% 
   drop_na()
-similarity_corr <- formatted_cors(dplyr::select(similarity_df,-EnsemblID), "pearson", 0)
+similarity_corr_hm <- formatted_cors(dplyr::select(similarity_df,-EnsemblID), "pearson", 0) %>% 
+  pivot_wider(dplyr::select(similarity_corr, measure1, measure2, r), values_from = r, names_from = measure1, id_cols = measure2)
 
-clust <- dplyr::select(similarity_corr, measure1, measure2, r) %>% 
-  pivot_wider(names_from=measure2, values_from = r) %>%
-  column_to_rownames("measure1") %>%
-  dist() %>%
-  hclust()
+### Annotation
 
-ggplot(similarity_corr, aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
-  geom_tile() +
-  labs(x = NULL, y = NULL, fill = "Pearson's\nCorrelation",
-       title="Similarity based in common genome",
-       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
-  scale_fill_gradient2(low="#FBFEF9",high="#A63446",
-                       midpoint = min(similarity_corr$r),
-                       limits=c(min(similarity_corr$r),1)) +
-  geom_text() +
-  theme_classic() +
-  scale_x_discrete(expand=c(0,0),limits = clust$labels[clust$order]) +
-  scale_x_discrete(expand=c(0,0),limits = clust$labels[clust$order]) +
-  ggpubr::rotate_x_text(angle = 90)
+annot_ref = dplyr::select(top_samples, sample, ISRact, PAMG) %>% dplyr::mutate(df = "Sauyeun")
+annot_proj = dplyr::rename(CPTAC_PC1,  ISRact = PC1status) %>% dplyr::select(sample, ISRact, PAMG) %>% dplyr::mutate(df = "CPTAC")
+annot = bind_rows(annot_ref, annot_proj) %>% column_to_rownames("sample")
+
+annot_colors <- list(ISRact = c(`high_ISRact` = "brown", `medium_ISRact` = "grey", `low_ISRact` = "#006837"),
+                     PAMG = c("#FF7F00", "white", "#377DB8"),
+                     df = c(Sauyeun = "grey", CPTAC ="grey2")) 
+
+### Plot
+heatmap <- similarity_corr_hm %>% column_to_rownames("measure2") %>% 
+  pheatmap(scale = "row", color = colorRampPalette(c("#FBFEF9", "#A63446"))(100),
+           annotation_row = annot, annotation_col = annot, annotation_colors = annot_colors,
+           cluster_rows = T, cluster_cols = T, show_colnames = TRUE) 
 
 ## Subset
 
@@ -226,7 +224,7 @@ correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "
 #-------------------------------------------------------------------------------
 # Proteomics DPEA
 ## load already normalized log transformed and centered data
-CPTAC_comparison_metadata <- dplyr::filter(CPTAC_PC1, PC1status != "medium_PC1")
+CPTAC_comparison_metadata <- dplyr::filter(CPTAC_PC1, PC1status != "medium_ISRact")
 CPTAC_prot <- read_delim("data/PDAC_LinkedOmics_Data/proteomics_gene_level_MD_abundance_tumor.cct", 
                                        delim = "\t", escape_double = FALSE, 
                                        trim_ws = TRUE) %>%
@@ -249,7 +247,7 @@ cond <- fct(CPTAC_comparison_metadata$PC1status)
 design = model.matrix(~0+cond)
 colnames(design) = gsub("cond","",colnames(design))
 
-x <- c("low_PC1-high_PC1")
+x <- c("low_ISRact-high_ISRact")
 contrast =  makeContrasts(contrasts=x,levels=design)
 fit1 <- lmFit(CPTAC_prot, design)
 fit2 <- contrasts.fit(fit1,contrasts = contrast)
@@ -349,7 +347,7 @@ surv_data <- dplyr::rename(CPTAC_PC1, case_id = sample) %>%
 
 ## Kaplan Meyer 33up vs 33down
 fit <-  survfit(Surv(follow_up_days, status) ~ PC1status, 
-                data = dplyr::filter(surv_data, PC1status != "medium_PC1"))
+                data = dplyr::filter(surv_data, PC1status != "medium_ISRact"))
 print(fit)
 
 ### Change color, linetype by strata, risk.table color by strata
