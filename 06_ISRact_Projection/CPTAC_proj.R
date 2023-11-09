@@ -198,8 +198,10 @@ similarity_corr_hm <- formatted_cors(dplyr::select(similarity_df,-EnsemblID), "p
   pivot_wider(dplyr::select(similarity_corr, measure1, measure2, r), values_from = r, names_from = measure1, id_cols = measure2)
 
 ### Annotation
+annot_ref = left_join(sample_info, dplyr::select(top_samples, sample, ISRact)) %>%
+  dplyr:: select(sample, ISRact, PAMG) %>% 
+  dplyr::mutate(ISRact = if_else(is.na(ISRact), "medium_ISRact", ISRact))
 
-annot_ref = dplyr::select(top_samples, sample, ISRact, PAMG) %>% dplyr::mutate(df = "Sauyeun")
 annot_proj = dplyr::rename(CPTAC_PC1,  ISRact = PC1status) %>% dplyr::select(sample, ISRact, PAMG) %>% dplyr::mutate(df = "CPTAC")
 annot = bind_rows(annot_ref, annot_proj) %>% column_to_rownames("sample")
 
@@ -209,7 +211,7 @@ annot_colors <- list(ISRact = c(`high_ISRact` = "brown", `medium_ISRact` = "grey
 
 ### Plot
 heatmap <- similarity_corr_hm %>% column_to_rownames("measure2") %>% 
-  pheatmap(scale = "row", color = colorRampPalette(c("#FBFEF9", "#A63446"))(100),
+  pheatmap(scale = "none", color = colorRampPalette(c("#FBFEF9", "#A63446"))(100),
            annotation_row = annot, annotation_col = annot, annotation_colors = annot_colors,
            cluster_rows = T, cluster_cols = T, show_colnames = TRUE) 
 
