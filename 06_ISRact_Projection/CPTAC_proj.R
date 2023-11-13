@@ -359,7 +359,7 @@ plotGseaTable(kegg_list[topPathways], deframe(rownames_to_column(DEqMS.results["
               gseaParam=0.5)
 
 #-------------------------------------------------------------------------------
-# Survival curves reguarding ISR status
+# Survival curves regarding ISR status
 surv_data <- dplyr::rename(CPTAC_PC1, case_id = sample) %>%
   inner_join(clinical_data, by = "case_id")
 
@@ -400,3 +400,45 @@ abline(h=0, col =2)
 ### Model plotting
 ggforest(cox.mod)
 ggadjustedcurves(cox.mod, data=as.data.frame(surv_data))
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Survival curves regarding PHGDH/CBS status
+surv_data <- as_tibble(human_data, rownames = "case_id") %>% 
+  dplyr::select(case_id, reverse_translate[c("CBS", "PHGDH")]) %>%
+  inner_join(clinical_data, by = "case_id")
+
+measure = "overlap" # overlap | mean
+## Calculate the measure to split samples
+if(measure == "mean"){
+### min mean
+surv_data <- dplyr::mutate(surv_data, 
+                           meanPHGDHCBS = rowMeans(surv_data[c("PHGDH", "CBS")]),
+                           stratPHGDHCBS = if_else(meanPHGDHCBS < quantile(meanPHGDHCBS, probs = 0.3333), "low_PHGDHCBS",
+                                                   if_else(meanPHGDHCBS < quantile(meanPHGDHCBS, probs = 0.6666), "medium_PHGDHCBS", "high_PHGDHCBS")))
+} else if(measure == "overlap"){
+### overlap min and overlap max
+surv_data <- dplyr::mutate(surv_data,
+                           ismaxPHGDH = if_else(PHGDH > median(PHGDH), "high_PHGDHCBS", "low_PHGDHCBS"),
+                           ismaxCBS = if_else(CBS > median(CBS), "high_PHGDHCBS", "low_PHGDHCBS"),
+                           stratPHGDHCBS = if_else(ismaxPHGDH == ismaxCBS, ismaxPHGDH, "indetermined")
+)
+}
+## Visualize stratification
+ggplot(surv_data, aes(PHGDH, CBS, color = stratPHGDHCBS)) +
+  geom_point()
+
+## Kaplan Meyer of the selected measure
+fit <-  survfit(Surv(follow_up_days, status) ~ stratPHGDHCBS, 
+                data = dplyr::filter(surv_data, !stratPHGDHCBS %in% c("medium_PHGDHCBS", "indetermined")))
+print(fit)
+
+### Change color, linetype by strata, risk.table color by strata
+ggsurvplot(fit,
+           pval = TRUE, conf.int = TRUE,
+           risk.table = TRUE, # Add risk table
+           risk.table.col = "strata", # Change risk table color by groups
+           linetype = "strata", # Change line type by groups
+           surv.median.line = "hv", # Specify median survival
+           ggtheme = theme_bw(), # Change ggplot2 theme
+           palette = c("tomato3", "seagreen")) +
+  labs(title = paste0(measure, " split of PHGDH | CBS expression"))
