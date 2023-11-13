@@ -199,7 +199,8 @@ similarity_df <- inner_join(PDX_original ,dplyr::select(CPTAC_tumor, - Gene)) %>
 ### Annotation
 annot_ref = left_join(sample_info, dplyr::select(top_samples, sample, ISRact)) %>%
   dplyr:: select(sample, ISRact, PAMG) %>% 
-  dplyr::mutate(ISRact = if_else(is.na(ISRact), "medium_ISRact", ISRact))
+  dplyr::mutate(ISRact = if_else(is.na(ISRact), "medium_ISRact", ISRact),
+                df = "Sauyeun")
 
 annot_proj = dplyr::rename(CPTAC_PC1,  ISRact = PC1status) %>% dplyr::select(sample, ISRact, PAMG) %>% dplyr::mutate(df = "CPTAC")
 annot = bind_rows(annot_ref, annot_proj) %>% column_to_rownames("sample")
@@ -216,7 +217,8 @@ gw_corr_hm <- formatted_cors(dplyr::select(similarity_df,-EnsemblID), "pearson",
 heatmap <- gw_corr_hm %>% column_to_rownames("measure2") %>% 
   pheatmap(scale = "none", color = colorRampPalette(c("#FBFEF9", "#A63446"))(100),
            annotation_row = annot, annotation_col = annot, annotation_colors = annot_colors,
-           cluster_rows = T, cluster_cols = T, show_colnames = TRUE) 
+           cluster_rows = T, cluster_cols = T,
+           show_colnames = FALSE, show_rownames = FALSE) 
 
 ## Subset
 subset_corr_hm <- dplyr::filter(similarity_df, EnsemblID %in% rownames(pca_pdx$rotation)) %>%
@@ -228,7 +230,8 @@ subset_corr_hm <- dplyr::filter(similarity_df, EnsemblID %in% rownames(pca_pdx$r
 heatmap <- subset_corr_hm %>% column_to_rownames("measure2") %>% 
   pheatmap(scale = "none", color = colorRampPalette(c("#FBFEF9", "#A63446"))(100),
            annotation_row = annot, annotation_col = annot, annotation_colors = annot_colors,
-           cluster_rows = T, cluster_cols = T, show_colnames = TRUE) 
+           cluster_rows = T, cluster_cols = T,
+           show_colnames = FALSE, show_rownames = FALSE)  
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -373,7 +376,7 @@ ggsurvplot(fit,
            linetype = "strata", # Change line type by groups
            surv.median.line = "hv", # Specify median survival
            ggtheme = theme_bw(), # Change ggplot2 theme
-           palette = c("#E7B800", "#2E9FDF"))
+           palette = c("tomato3", "seagreen"))
 
 ## Cox Proportional hazzards model
 cox.mod <- coxph(Surv(follow_up_days, status) ~ PC1, 
