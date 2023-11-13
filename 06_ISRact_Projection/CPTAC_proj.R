@@ -442,3 +442,4 @@ ggsurvplot(fit,
            ggtheme = theme_bw(), # Change ggplot2 theme
            palette = c("tomato3", "seagreen")) +
   labs(title = paste0(measure, " split of PHGDH | CBS expression"))
+#-------------------------------------------------------------------------------
