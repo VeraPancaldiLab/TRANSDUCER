@@ -155,7 +155,7 @@ ggsurvplot(fit,
            linetype = "strata", # Change line type by groups
            surv.median.line = "hv", # Specify median survival
            ggtheme = theme_bw(), # Change ggplot2 theme
-           palette = c("green", "red"))
+           palette = c("tomato3", "seagreen"))
 
 ### Cox Proportional hazzards model
 cox.mod <- coxph(Surv(OS, OS_event) ~ PC1, 
@@ -195,7 +195,7 @@ ggsurvplot(fit,
            linetype = "strata", # Change line type by groups
            surv.median.line = "hv", # Specify median survival
            ggtheme = theme_bw(), # Change ggplot2 theme
-           palette = c("green", "red"))
+           palette = c("tomato3", "seagreen"))
 
 ### Cox Proportional hazzards model
 cox.mod <- coxph(Surv(PFS, PFS_event) ~ PC1, 

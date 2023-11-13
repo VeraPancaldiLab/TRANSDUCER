@@ -65,7 +65,7 @@ pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 
 ################################################################################
 # PARAMETERS
-TreatedOnly = FALSE
+TreatedOnly = TRUE
 ################################################################################
 # Choose depending on treatment
 if (TreatedOnly == TRUE) {
@@ -180,7 +180,7 @@ ggsurvplot(fit,
            linetype = "strata", # Change line type by groups
            surv.median.line = "hv", # Specify median survival
            ggtheme = theme_bw(), # Change ggplot2 theme
-           palette = c("green", "red"))
+           palette = c("tomato3", "seagreen"))
 
 ### Cox Proportional hazzards model
 cox.mod <- coxph(Surv(OS, OS_event) ~ PAMG, 
@@ -220,7 +220,7 @@ ggsurvplot(fit,
            linetype = "strata", # Change line type by groups
            surv.median.line = "hv", # Specify median survival
            ggtheme = theme_bw(), # Change ggplot2 theme
-           palette = c("green", "red"))
+           palette = c("tomato3", "seagreen"))
 
 ### Cox Proportional hazzards model
 cox.mod <- coxph(Surv(PFS, PFS_event) ~ PC1, 
