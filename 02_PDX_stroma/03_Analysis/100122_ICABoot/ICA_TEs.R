@@ -342,7 +342,7 @@ POSTARS3 <- read_tsv("01_Input/POSTARS3/POSTARS3_mapped.tsv") %>%
   mutate(RBP_name = str_to_title(RBP_name),
          RBP_id = trans_name_ensembl[RBP_name])
 
-### calculate node features
+### calculate node features 
 cyt_m <- read_tsv("../../00_Data/Processed_data/normHost_Cyt.tsv")
 
 RBPs_corrs <-  dplyr::filter(cyt_m, EnsemblID %in% POSTARS3$RBP_id) %>%
@@ -358,21 +358,25 @@ RBPs_corrs <-  dplyr::filter(cyt_m, EnsemblID %in% POSTARS3$RBP_id) %>%
   mutate(FDR = p.adjust(p = p, method = "BH"),
          sig_FDR = FDR < 0.05)
 
+absent_RBPs <- na.omit(deframe(distinct(POSTARS3, RBP_id))[!deframe(distinct(POSTARS3, RBP_id)) %in% cyt_m$EnsemblID])
+
 RBPs_to_net <- dplyr::select(RBPs_corrs, measure1, measure2, r, sig_FDR) %>%
   pivot_wider(id_cols = measure1,
               names_from = measure2,
               values_from = c(r, sig_FDR),
               names_sep = "_") %>%
-  dplyr::rename(id = measure1)
+  dplyr::rename(id = measure1) %>% 
+  dplyr::add_row(id = absent_RBPs) # Fix this to include all the RBPs
 
-### Build Cytoscape object
+### Build Cytoscape object -> Function
 nodes <- as_tibble(S_mat, rownames = "ensembl_id") %>%
   mutate(id = trans_ensembl_name[ensembl_id],) %>% 
-  inner_join(dplyr::select(POSTARS3, gene_name, gene_biotype) %>%
+  full_join(dplyr::select(POSTARS3, gene_name, gene_biotype) %>%
                distinct() %>%
                rename(id = gene_name)) %>%
   left_join(RBPs_to_net) %>%
-  relocate(id, gene_biotype, .after = "ensembl_id")
+  relocate(id, gene_biotype, .after = "ensembl_id") %>%
+  distinct(id, .keep_all = T)
 
 edges <- dplyr::filter(POSTARS3,
                        RBP_name %in% nodes$id, 
@@ -381,6 +385,13 @@ edges <- dplyr::filter(POSTARS3,
                 target = gene_name) %>%
   dplyr::select(source, target, experimentplussoftware, sample_origin)
 
+### Clean self loops and duplicated edges
+
+### Calculate network measures
+#### out-degree
+#### density
+
+### Build network
 network <- createNetworkFromDataFrames(nodes, edges, title = "POSTARS3")
 setNodeLabelMapping("id")
 #-------------------------------------------------------------------------------
