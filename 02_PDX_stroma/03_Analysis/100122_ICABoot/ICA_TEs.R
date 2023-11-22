@@ -369,6 +369,7 @@ RBPs_to_net <- dplyr::select(RBPs_corrs, measure1, measure2, r, sig_FDR) %>%
   dplyr::add_row(id = absent_RBPs) # Fix this to include all the RBPs
 
 ### Build Cytoscape object -> Function
+#### nodes
 nodes <- as_tibble(S_mat, rownames = "ensembl_id") %>%
   mutate(id = trans_ensembl_name[ensembl_id],) %>% 
   full_join(dplyr::select(POSTARS3, gene_name, gene_biotype) %>%
@@ -378,6 +379,20 @@ nodes <- as_tibble(S_mat, rownames = "ensembl_id") %>%
   relocate(id, gene_biotype, .after = "ensembl_id") %>%
   distinct(id, .keep_all = T)
 
+#### Is the gene best for any component?
+thresholds <- apply(S_mat, 2, function(x) quantile(abs(x), 0.95))
+bestgenes <- lapply(names(thresholds), function(x)
+  rownames(dplyr::filter(S_mat, abs(get(x)) > thresholds[x])))
+names(bestgenes) <- names(thresholds)
+
+is_bestgene <- lapply(names(bestgenes), function(x) nodes$ensembl_id %in% bestgenes[[x]]) %>% 
+  as_tibble(.name_repair= "universal" ) %>% 
+  rename_all(~paste0("best_IC.",1:6)) %>%
+  mutate(best_any = rowSums(.), 
+         best_for = ifelse(best_any == 1, apply(., 1, function(x) colnames(.)[as.logical(x)][1]), ifelse(best_any == 0, 0, "many")))
+
+nodes_IC_info <- bind_cols(nodes, is_bestgene)
+
 edges <- dplyr::filter(POSTARS3,
                        RBP_name %in% nodes$id, 
                        gene_name %in% nodes$id) %>%
@@ -385,15 +400,33 @@ edges <- dplyr::filter(POSTARS3,
                 target = gene_name) %>%
   dplyr::select(source, target, experimentplussoftware, sample_origin)
 
-### Clean self loops and duplicated edges
-
-### Calculate network measures
-#### out-degree
-#### density
+### Clean and account for duplicated edges
+edges_clean <- dplyr::group_by(edges, source, target, .add = TRUE) %>%
+  summarise(n_peaks = n()) %>%
+  dplyr::left_join(dplyr::select(nodes_IC_info, id, best_for) %>%
+                     dplyr::rename(target=id))
+  
+### Calculate general network measures
+#### general and component specific out degree
+general_node_stats <- group_by(edges_clean, source, best_for, .add=T) %>%
+  summarise(out_degree=n(),
+            total_peaks=sum(n_peaks)) %>% 
+  pivot_wider(id_cols = source,
+              names_from = best_for,
+              values_from = c(out_degree, total_peaks),
+              names_sep = "_") %>%
+  ungroup() %>%
+  dplyr::mutate_all(~ifelse(is.na(.), 0, .)) %>%
+  dplyr::mutate(out_degree_total = reduce(dplyr::select(., starts_with("out_degree")), `+`),
+                total_peaks_absolute = reduce(dplyr::select(., starts_with("total_peaks")), `+`)) %>%
+  rename(id=source) %>%
+  right_join(nodes)
 
 ### Build network
-network <- createNetworkFromDataFrames(nodes, edges, title = "POSTARS3")
+network <- createNetworkFromDataFrames(general_node_stats, edges_clean, title = "POSTARS3")
 setNodeLabelMapping("id")
+
+### Density specific to subnetworks
 #-------------------------------------------------------------------------------
 
 # FIGURE SPECIFIC PLOTS: Clinical and technical data
