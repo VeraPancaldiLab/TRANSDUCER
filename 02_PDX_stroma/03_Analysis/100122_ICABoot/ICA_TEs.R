@@ -391,7 +391,7 @@ is_bestgene <- lapply(names(bestgenes), function(x) nodes$ensembl_id %in% bestge
   mutate(best_any = rowSums(.), 
          best_for = ifelse(best_any == 1, apply(., 1, function(x) colnames(.)[as.logical(x)][1]), ifelse(best_any == 0, 0, "many")))
 
-nodes_IC_info <- bind_cols(nodes, is_bestgene)
+nodes <- bind_cols(nodes, is_bestgene)
 
 edges <- dplyr::filter(POSTARS3,
                        RBP_name %in% nodes$id, 
@@ -403,7 +403,7 @@ edges <- dplyr::filter(POSTARS3,
 ### Clean and account for duplicated edges
 edges_clean <- dplyr::group_by(edges, source, target, .add = TRUE) %>%
   summarise(n_peaks = n()) %>%
-  dplyr::left_join(dplyr::select(nodes_IC_info, id, best_for) %>%
+  dplyr::left_join(dplyr::select(nodes, id, best_for) %>%
                      dplyr::rename(target=id))
   
 ### Calculate general network measures
@@ -426,7 +426,6 @@ general_node_stats <- group_by(edges_clean, source, best_for, .add=T) %>%
 network <- createNetworkFromDataFrames(general_node_stats, edges_clean, title = "POSTARS3")
 setNodeLabelMapping("id")
 
-### Density specific to subnetworks
 #-------------------------------------------------------------------------------
 
 # FIGURE SPECIFIC PLOTS: Clinical and technical data
