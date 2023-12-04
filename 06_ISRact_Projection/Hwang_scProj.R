@@ -59,5 +59,11 @@ seurat_object[['UMAP']] <- CreateDimReducObject(embeddings = UMAP_coordinates_ma
 
 ## Celltype plot
 DimPlot(seurat_object, reduction = "UMAP", group.by ="new_celltypes")
+DimPlot(seurat_object, reduction = "UMAP", group.by ="pid")
+DimPlot(seurat_object, reduction = "UMAP", group.by ="Level 1 Annotation")
+DimPlot(seurat_object, reduction = "UMAP", group.by ="Level 2 Annotation")
+DimPlot(seurat_object, reduction = "UMAP", group.by ="Level 3 Annotation")
+
+
 
 
