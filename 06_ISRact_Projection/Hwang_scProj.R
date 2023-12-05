@@ -64,6 +64,76 @@ DimPlot(seurat_object, reduction = "UMAP", group.by ="Level 1 Annotation")
 DimPlot(seurat_object, reduction = "UMAP", group.by ="Level 2 Annotation")
 DimPlot(seurat_object, reduction = "UMAP", group.by ="Level 3 Annotation")
 
+# ISRact Projection
+## Load ISRAct signature to explore in the snRNAseq
+pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 
+ISRact_contributions <- sort(pca_pdx$rotation[,"PC1"])
+ISRact_high <- names(ISRact_contributions[ISRact_contributions > 0])
+ISRact_low <- names(ISRact_contributions[ISRact_contributions < 0])
 
+## subset scRNAseq data for matching bulk composition
+seurat_object <- subset(x = seurat_object, 
+                  subset = new_celltypes == "Epithelial-Malignant")
 
+table(seurat_object$new_celltypes)
+table(seurat_object$treatment_status)
+
+### create new identity status (what you want to stratify based on)
+identity <- "treatment_status" # treatment_status | 
+Idents(seurat_object) <- identity
+Idents(seurat_object) <- factor(Idents(seurat_object),levels = sort(levels(seurat_object)))
+
+### Normalize, find variable genes, scale and center
+seurat_object <- NormalizeData(seurat_object, normalization.method = "LogNormalize", scale.factor = 10000)
+seurat_object <- FindVariableFeatures(seurat_object, selection.method = "vst", nfeatures = 2000) 
+seurat_object <- ScaleData(seurat_object) 
+
+### PCA + UMAP & tSNE
+seurat_object <- RunPCA(seurat_object)
+ElbowPlot(seurat_object, ndims = 50)
+
+seurat_object <- RunTSNE(seurat_object, dims = 1:40)
+seurat_object <- RunUMAP(seurat_object, dims = 1:40)
+
+#### plot
+library(cowplot)
+library(patchwork)
+library(ggplot2)
+
+cols <- c("limegreen", #CRT
+          "steelblue", #CRTl
+          "mediumorchid4", #CRTln
+          "yellow3", #CRTn
+          "firebrick2", #CRTx
+          "magenta", #GART
+          "tan2", #RT
+          "gray52") #Untreated
+
+pca_plot <- DimPlot(seurat_object, reduction = "pca",pt.size = 0.1, label = T, cols = cols)
+tsne_plot <- DimPlot(seurat_object, reduction = "tsne",pt.size = 0.1, label = T, cols = cols)
+umap_plot <- DimPlot(seurat_object, reduction = "umap",pt.size = 0.1, label = T, cols = cols)
+
+legend <- get_legend(umap_plot)
+layout <- c (area(1, 1, 1, 2), #PCA
+             area(1, 3, 1, 4), #tSNE
+             area(1, 5, 1, 6), #UMAP
+             area(1, 7)) #Legend
+
+fig1 <- pca_plot + tsne_plot + umap_plot + legend + plot_layout(design = layout) & NoLegend()
+fig1
+
+##### plot alternative factors
+factor = "batch"  # "response | pid
+pca_plot <- DimPlot(seurat_object, reduction = "pca",pt.size = 0.1, label = T, group.by = factor)
+tsne_plot <- DimPlot(seurat_object, reduction = "tsne",pt.size = 0.1, label = T,group.by = factor)
+umap_plot <- DimPlot(seurat_object, reduction = "umap",pt.size = 0.1, label = T, group.by = factor)
+
+legend <- get_legend(umap_plot)
+layout <- c (area(1, 1, 1, 2), #PCA
+             area(1, 3, 1, 4), #tSNE
+             area(1, 5, 1, 6), #UMAP
+             area(1, 7)) #Legend
+
+fig1 <- pca_plot + tsne_plot + umap_plot + legend + plot_layout(design = layout) & NoLegend()
+fig1
