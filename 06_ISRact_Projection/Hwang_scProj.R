@@ -1,6 +1,6 @@
 library(Seurat)
 library(tidyverse)
-
+library(biomaRt)
 ################################################################################
 # Load data and build Seurat Object
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
@@ -67,10 +67,37 @@ DimPlot(seurat_object, reduction = "UMAP", group.by ="Level 3 Annotation")
 # ISRact Projection
 ## Load ISRAct signature to explore in the snRNAseq
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
-
 ISRact_contributions <- sort(pca_pdx$rotation[,"PC1"])
-ISRact_high <- names(ISRact_contributions[ISRact_contributions > 0])
-ISRact_low <- names(ISRact_contributions[ISRact_contributions < 0])
+### translate to Gene ID
+# Translate EnsemblID to gene names
+## Version 75 for PDX data
+ensembl75 <- useEnsembl(biomart = "genes",
+                        dataset = "hsapiens_gene_ensembl",
+                        version = 75)#listAttributes(ensembl75, page="feature_page")
+
+annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_id'), mart = ensembl75)
+
+translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
+
+ISRact_info <- tibble(EnsemblID = names(ISRact_contributions),
+                      gene_name = translate[names(ISRact_contributions)],
+                      PC1_score = ISRact_contributions,
+                      class = if_else(ISRact_contributions > 0, "ISRac_high", "ISRac_low"))
+
+ggplot(ISRact_info, aes(x = PC1_score)) +
+  geom_density() +
+  geom_rug(aes(color = class)) +
+  theme_bw()
+### extract genes
+
+ISRact_high <- dplyr::filter(ISRact_info, class == "ISRac_high") %>%
+  dplyr::select("gene_name") %>% 
+  deframe()
+
+ISRact_low <- dplyr::filter(ISRact_info, class == "ISRac_low") %>%
+  dplyr::select("gene_name") %>% 
+  deframe()
 
 ## subset scRNAseq data for matching bulk composition
 seurat_object <- subset(x = seurat_object, 
@@ -137,3 +164,25 @@ layout <- c (area(1, 1, 1, 2), #PCA
 
 fig1 <- pca_plot + tsne_plot + umap_plot + legend + plot_layout(design = layout) & NoLegend()
 fig1
+
+## Perform the deconvolution of cell-type-specific signal in bulk-tissue RNA-seq top DEGs using single-cell RNA-seq reference
+### get the gene intersection between both lists
+sc_gene_names <- rownames(seurat_object)
+ISRact_low <- ISRact_low[ISRact_low %in% sc_gene_names]
+ISRact_high <- ISRact_high[ISRact_high %in% sc_gene_names]
+
+### equal to gene sets of the same size
+min_size = min(length(ISRact_low), length(ISRact_high))
+
+ISRact_low <- head(ISRact_low, min_size)
+ISRact_high <- rev(tail(ISRact_high, min_size))
+
+dplyr::mutate(ISRact_info, new_class = if_else(gene_name %in% c(ISRact_low, ISRact_high), class, NA)) %>% 
+  ggplot(aes(x = PC1_score)) +
+  geom_density() +
+  geom_rug(aes(color = new_class)) +
+  theme_bw()
+
+### select top_DEG for detection
+top_DEG = ISRact_high # ISRact_high | ISRact_low
+
