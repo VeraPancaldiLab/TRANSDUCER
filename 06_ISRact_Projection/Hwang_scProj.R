@@ -183,6 +183,52 @@ dplyr::mutate(ISRact_info, new_class = if_else(gene_name %in% c(ISRact_low, ISRa
   geom_rug(aes(color = new_class)) +
   theme_bw()
 
-### select top_DEG for detection
-top_DEG = ISRact_high # ISRact_high | ISRact_low
+### select top_DEG for detection + filter and process scRNAseq
+topDEGs_list = ISRact_high # ISRact_high | ISRact_low
 
+seurat_object <- ScaleData(seurat_object, features = topDEGs_list)
+seurat_object <- RunPCA(seurat_object, features = topDEGs_list)
+topDEGs_list <- rownames(seurat_object@reductions[["pca"]]@feature.loadings)
+
+### Generate dimensionality reduction Plot only with these genes
+pca_plot <- DimPlot(seurat_object, reduction = "pca", pt.size = 0.1, label = F, cols = cols)
+legend <- get_legend(pca_plot)
+
+pca_plot <- pca_plot & NoLegend()
+pca_plot
+plot(legend)
+
+### Pairwise correlations and hierarchical clustering
+#### random matrix creation
+random.matrix <- matrix(runif(500, min = -1, max = 1), nrow = 50)
+
+#### sample quantiles corresponding to probabilities
+quantile.range <- quantile(random.matrix, probs = seq(0, 1, 0.01))
+
+#### plot details like palette break definition
+palette.breaks <- seq(quantile.range["35%"], quantile.range["83%"], 0.06)
+color.palette <- colorRampPalette(c("#0571b0","#f7f7f7","#ca0020"))(length(palette.breaks)-1)
+
+library(gplots)
+
+clustFunction <- function(x)
+  
+  hclust(as.dist(1-cor(t(as.matrix(x)),method = "pearson")), method = "average")
+
+heatmapPearson <- function(correlations)
+  
+  heatmap.2(x = correlations,
+            
+            col = color.palette,
+            
+            breaks = palette.breaks,
+            
+            trace = "none", symm = T,
+            
+            hclustfun = clustFunction)
+
+correlations_DEGs_log <- cor(method = "pearson",
+                             
+                             log2(t(as.matrix(FetchData(object = seurat_object, vars = c(topDEGs_list), layer = "data")))+1))
+
+heatmapPearson(correlations_DEGs_log)
