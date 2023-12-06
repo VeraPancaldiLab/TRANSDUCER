@@ -165,6 +165,10 @@ layout <- c (area(1, 1, 1, 2), #PCA
 fig1 <- pca_plot + tsne_plot + umap_plot + legend + plot_layout(design = layout) & NoLegend()
 fig1
 
+### Save and reload object for later
+saveRDS(seurat_object, "data/Hwang_Nature_2022/Snapshot_Hwang_Processed.RDS")
+seurat_object <- readRDS("data/Hwang_Nature_2022/Snapshot_Hwang_Processed.RDS")
+
 ## Perform the deconvolution of cell-type-specific signal in bulk-tissue RNA-seq top DEGs using single-cell RNA-seq reference
 ### get the gene intersection between both lists
 sc_gene_names <- rownames(seurat_object)
