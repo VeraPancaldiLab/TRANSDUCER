@@ -1,4 +1,5 @@
 library(Seurat)
+library(future)
 library(tidyverse)
 library(biomaRt)
 library(cowplot)
@@ -135,6 +136,8 @@ fig1
 saveRDS(seurat_object, "data/Hwang_Nature_2022/Snapshot_Hwang_Processed.RDS")
 seurat_object <- readRDS("data/Hwang_Nature_2022/Snapshot_Hwang_Processed.RDS")
 
+#### filter object to make a more accessible plot
+seurat_object <- subset(x = seurat_object, downsample = 500)
 ## Load ISRAct signature to explore in the snRNAseq
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ISRact_contributions <- sort(pca_pdx$rotation[,"PC1"])
@@ -177,7 +180,7 @@ ISRact_low <- ISRact_low[ISRact_low %in% sc_gene_names]
 ISRact_high <- ISRact_high[ISRact_high %in% sc_gene_names]
 
 ### equal to gene sets of the same size
-min_size = min(length(ISRact_low), length(ISRact_high), 20)
+min_size = min(length(ISRact_low), length(ISRact_high))
 
 ISRact_low <- head(ISRact_low, min_size)
 ISRact_high <- rev(tail(ISRact_high, min_size))
@@ -196,6 +199,15 @@ seurat_object <- RunPCA(seurat_object, features = topDEGs_list)
 topDEGs_list <- rownames(seurat_object@reductions[["pca"]]@feature.loadings)
 
 ### Generate dimensionality reduction Plot only with these genes
+cols <- c("limegreen", #CRT
+          "steelblue", #CRTl
+          "mediumorchid4", #CRTln
+          "yellow3", #CRTn
+          "firebrick2", #CRTx
+          "magenta", #GART
+          "tan2", #RT
+          "gray52") #Untreated
+
 pca_plot <- DimPlot(seurat_object, reduction = "pca", pt.size = 0.1, label = F, cols = cols)
 legend <- get_legend(pca_plot)
 
@@ -236,4 +248,25 @@ correlations_DEGs_log <- cor(method = "pearson",
                              
                              log2(t(as.matrix(FetchData(object = seurat_object, vars = c(topDEGs_list), layer = "data")))+1))
 
-heatmapPearson(correlations_DEGs_log)
+correlations_DEGs_log[is.na(correlations_DEGs_log)] = 0 
+
+# pdf(file = "results/scRNAseq_proj/Hwang2022_MarquezGalera_ISRacthigh.pdf", width = 25, height = 25)
+# heatmapPearson(correlations_DEGs_log)
+# dev.off()
+
+# New Correlation map using pheatmap
+annot_ref <- FetchData(object = seurat_object, vars = c("response", "treatment_status"), layer = "data")
+stopifnot(all(rownames(annot_ref)==rownames(correlations_DEGs_log)))
+annot_colors <- list(response = c(`Poor response` = "brown", `Untreated` = "grey", `Minimal response` = "lightgreen", `Moderate response` = "#006837")) 
+
+pheatmap(correlations_DEGs_log,
+         scale = "none",
+         filename = "results/scRNAseq_proj/Hwang2022_MarquezGalera_ISRacthigh.pdf",
+         show_colnames = FALSE,
+         annotation_row = annot_ref,
+         annotation_col = annot_ref,
+         annotation_colors = annot_colors,
+         show_rownames = FALSE) 
+
+
+
