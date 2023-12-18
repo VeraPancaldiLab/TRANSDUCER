@@ -142,8 +142,6 @@ seurat_object <- subset(x = seurat_object, downsample = 5000)
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ISRact_contributions <- sort(pca_pdx$rotation[,"PC1"])
 ### translate to Gene ID
-# Translate EnsemblID to gene names
-## Version 75 for PDX data
 ensembl75 <- useEnsembl(biomart = "genes",
                         dataset = "hsapiens_gene_ensembl",
                         version = 75)#listAttributes(ensembl75, page="feature_page")
