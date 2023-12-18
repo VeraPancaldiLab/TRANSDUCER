@@ -85,7 +85,7 @@ Idents(seurat_object) <- factor(Idents(seurat_object),levels = sort(levels(seura
 ### Normalize, find variable genes, scale and center
 seurat_object <- NormalizeData(seurat_object, normalization.method = "LogNormalize", scale.factor = 10000)
 seurat_object <- FindVariableFeatures(seurat_object, selection.method = "vst", nfeatures = 2000) 
-seurat_object <- ScaleData(seurat_object) 
+seurat_object <- ScaleData(seurat_object)
 
 ### PCA + UMAP & tSNE
 seurat_object <- RunPCA(seurat_object)
@@ -137,7 +137,7 @@ saveRDS(seurat_object, "data/Hwang_Nature_2022/Snapshot_Hwang_Processed.RDS")
 seurat_object <- readRDS("data/Hwang_Nature_2022/Snapshot_Hwang_Processed.RDS")
 
 #### filter object to make a more accessible plot
-seurat_object <- subset(x = seurat_object, downsample = 500)
+seurat_object <- subset(x = seurat_object, downsample = 5000)
 ## Load ISRAct signature to explore in the snRNAseq
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ISRact_contributions <- sort(pca_pdx$rotation[,"PC1"])
@@ -215,6 +215,18 @@ pca_plot <- pca_plot & NoLegend()
 pca_plot
 plot(legend)
 
+#### Now using response
+cols <- c(`Poor response` = "brown", 
+          `Untreated` = "grey", 
+          `Minimal response` = "lightgreen",
+          `Moderate response` = "#006837")
+
+pca_plot <- DimPlot(seurat_object, group.by = "response" , reduction = "pca", pt.size = 0.1, label = F, cols = cols)
+legend <- get_legend(pca_plot)
+
+pca_plot <- pca_plot & NoLegend()
+pca_plot
+plot(legend)
 ### Pairwise correlations and hierarchical clustering
 #### random matrix creation
 random.matrix <- matrix(runif(500, min = -1, max = 1), nrow = 50)
@@ -261,7 +273,7 @@ annot_colors <- list(response = c(`Poor response` = "brown", `Untreated` = "grey
 
 pheatmap(correlations_DEGs_log,
          scale = "none",
-         filename = "results/scRNAseq_proj/Hwang2022_MarquezGalera_ISRacthigh.pdf",
+         filename = "results/scRNAseq_proj/Hwang2022_MarquezGalera_ISRacthigh.png",
          show_colnames = FALSE,
          annotation_row = annot_ref,
          annotation_col = annot_ref,
