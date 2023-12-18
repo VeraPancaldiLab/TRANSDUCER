@@ -138,6 +138,7 @@ seurat_object <- readRDS("data/Hwang_Nature_2022/Snapshot_Hwang_Processed.RDS")
 
 #### filter object to make a more accessible plot
 seurat_object <- subset(x = seurat_object, downsample = 5000)
+
 ## Load ISRAct signature to explore in the snRNAseq
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ISRact_contributions <- sort(pca_pdx$rotation[,"PC1"])
