@@ -5,6 +5,7 @@ library(biomaRt)
 library(cowplot)
 library(patchwork)
 library(ggplot2)
+library(pheatmap)
 
 ################################################################################
 # Load data and build Seurat Object
@@ -207,7 +208,7 @@ cols <- c("limegreen", #CRT
           "tan2", #RT
           "gray52") #Untreated
 
-pca_plot <- DimPlot(seurat_object, reduction = "pca", pt.size = 0.1, label = F, cols = cols)
+pca_plot <- DimPlot(seurat_object,  group.by = "treatment_status", reduction = "pca", pt.size = 0.1, label = F, cols = cols)
 legend <- get_legend(pca_plot)
 
 pca_plot <- pca_plot & NoLegend()
@@ -226,6 +227,9 @@ legend <- get_legend(pca_plot)
 pca_plot <- pca_plot & NoLegend()
 pca_plot
 plot(legend)
+
+#### Now using Continuous variable
+FeaturePlot(seurat_object, features = "leiden", reduction = "pca", cols = c("#0571b0","#f7f7f7","#ca0020"))
 ### Pairwise correlations and hierarchical clustering
 #### random matrix creation
 random.matrix <- matrix(runif(500, min = -1, max = 1), nrow = 50)
@@ -261,10 +265,6 @@ correlations_DEGs_log <- cor(method = "pearson",
 
 correlations_DEGs_log[is.na(correlations_DEGs_log)] = 0 
 
-# pdf(file = "results/scRNAseq_proj/Hwang2022_MarquezGalera_ISRacthigh.pdf", width = 25, height = 25)
-# heatmapPearson(correlations_DEGs_log)
-# dev.off()
-
 # New Correlation map using pheatmap
 annot_ref <- FetchData(object = seurat_object, vars = c("response", "treatment_status"), layer = "data")
 stopifnot(all(rownames(annot_ref)==rownames(correlations_DEGs_log)))
@@ -279,5 +279,23 @@ pheatmap(correlations_DEGs_log,
          annotation_colors = annot_colors,
          show_rownames = FALSE) 
 
+# Visualize correlation with UMAP
+library(umap)
+library(plotly) 
+umap_correlations <- umap(correlations_DEGs_log)
 
+factor = "n_genes_by_counts" # treatment_status | response | cnv_score | n_genes_by_counts
+all(rownames(seurat_object[[factor]]) == rownames(umap_correlations$layout)) 
+layout <- umap_correlations[["layout"]] 
+layout <- data.frame(layout) 
+final <- cbind(layout, seurat_object[[factor]])  %>% rename(fct = 3)
+fig2 <- plot_ly(final, x = ~X1, y = ~X2, color = ~fct)
+fig2 <- fig2 %>% add_markers() 
 
+fig2 <- fig2 %>% layout(scene = list(xaxis = list(title = '0'),
+                                     yaxis = list(title = '1')))
+
+fig2 <- fig2 %>% layout(scene = list(xaxis = list(title = '0'), 
+                                     yaxis = list(title = '1'))) 
+
+fig2
