@@ -14,6 +14,7 @@ suppressPackageStartupMessages({
   library(tidyverse)
   library(biomaRt)
   library(readxl)
+  library(UpSetR)
 })
 ################################################################################
 
@@ -99,9 +100,14 @@ ISRactGeneSets <- c(
   GeneSet(ISRact_high, setName=paste0("ISRact_high(", length(ISRact_high),")")),
   GeneSet(ISRact_low, setName=paste0("ISRact_low(", length(ISRact_low),")")))
 
-# AUCell
 geneSets <- GeneSetCollection(c(ISRactGeneSets, HwangGeneSets))
 
+### Quick comparison of gene composition
+upset(fromList(geneIds(geneSets)[grep("ISRact|malignant_state",names(geneSets))]), nsets = 16)
+upset(fromList(geneIds(geneSets)[grep("ISRact|malignant_lineage",names(geneSets))]), nsets = 16)
+upset(fromList(geneIds(geneSets)[grep("ISRact|CAF",names(geneSets))]), nsets = 16)
+
+# AUCell
 ## Calculate ranking
 cells_rankings <- AUCell_buildRankings(expression_matrix, plotStats=TRUE)
 
