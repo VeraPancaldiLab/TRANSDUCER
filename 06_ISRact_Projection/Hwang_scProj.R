@@ -69,12 +69,32 @@ seurat_object[['UMAP']] <- CreateDimReducObject(embeddings = UMAP_coordinates_ma
 # 
 # seurat_object <- RunUMAP(seurat_object, dims = 1:10)
 
+
+## Quality check
+seurat_object[["percent.mt"]] <- Seurat::PercentageFeatureSet(seurat_object, pattern = "^MT-")
+
+
+seurat_object <- PercentageFeatureSet(seurat_object, "^RP[SL]", col.name = "percent_ribo")
+
+# Percentage hemoglobin genes - includes all genes starting with HB except HBP.
+seurat_object <- PercentageFeatureSet(seurat_object, "^HB[^(P)]", col.name = "percent_hb")
+
+p1=cowplot::plot_grid(ncol = 1,
+                      FeatureScatter(seurat_object, "nCount_RNA"  , "nFeature_RNA", group.by = "pid", pt.size = .5,split.by = "batch"),
+                      FeatureScatter(seurat_object, "percent.mt", "nFeature_RNA", group.by = "pid", pt.size = .5,split.by = "batch"),
+                      FeatureScatter(seurat_object, "percent_ribo", "nFeature_RNA", group.by = "pid", pt.size = .5),split.by = "batch",
+                      FeatureScatter(seurat_object, "percent_ribo", "percent.mt", group.by = "pid", pt.size = .5,split.by = "batch")
+)
+
+p1
+
 ## celltypes plot
 DimPlot(seurat_object, reduction = "UMAP", group.by ="new_celltypes")
 DimPlot(seurat_object, reduction = "UMAP", group.by ="pid")
 DimPlot(seurat_object, reduction = "UMAP", group.by ="Level 1 Annotation")
 DimPlot(seurat_object, reduction = "UMAP", group.by ="Level 2 Annotation")
 DimPlot(seurat_object, reduction = "UMAP", group.by ="Level 3 Annotation")
+
 
 ## AUCell projection
 AUC_names = names(AUC_results)
