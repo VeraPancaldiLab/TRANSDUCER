@@ -1,0 +1,183 @@
+---
+title: "Hwang_AUCell_onlytumor"
+output: pdf_document
+date: "2024-01-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+```
+
+First point is to load the data, get it into seurat and filter for tumor cells
+
+```{r}
+# Load sparse expression matrix
+expression_matrix <- ReadMtx(
+  mtx = "data/Hwang_Nature_2022/GEO/matrix.mtx",
+  features = "data/Hwang_Nature_2022/GEO/features.tsv",
+  cells = "data/Hwang_Nature_2022/GEO/barcodes.tsv",
+  skip.cell = 0
+)
+metadata <- read_tsv("data/Hwang_Nature_2022/GEO/metadata.tsv")  %>% column_to_rownames("...1") 
+seurat_object <- CreateSeuratObject(counts = expression_matrix)
+seurat_object <- AddMetaData(seurat_object, metadata = metadata)
+
+## Load original UMAP
+## UMAP
+UMAP_Coord <- read_tsv("data/Hwang_Nature_2022/GEO/obsm/X_umap.tsv", col_types = c("cnn")) %>%
+  rename(UMAP_1 = "0",UMAP_2 = "1") %>% 
+  column_to_rownames("...1") 
+
+
+UMAP_coordinates_mat <- as(UMAP_Coord, "matrix")
+
+seurat_object[['UMAP']] <- CreateDimReducObject(embeddings = UMAP_coordinates_mat, key = "UMAP_", global = T, assay = "RNA")
+
+
+# Filter 
+## keep tumor cells
+seurat_object <- subset(x = seurat_object, 
+                  subset = new_celltypes == "Epithelial-Malignant")
+
+
+
+# Remove unused objects
+rm(expression_matrix)
+rm(metadata)
+```
+
+Then load and create the ISRact signature, dividing it in high and low
+
+```{r, echo=FALSE}
+
+# Build gene sets
+## ISRact
+pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
+ISRact_contributions <- sort(pca_pdx$rotation[,"PC1"])
+### translate to Gene ID
+ensembl75 <- useEnsembl(biomart = "genes",
+                        dataset = "hsapiens_gene_ensembl",
+                        version = 75)#listAttributes(ensembl75, page="feature_page")
+
+annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_id'), mart = ensembl75)
+
+translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
+
+ISRact_info <- tibble(EnsemblID = names(ISRact_contributions),
+                      gene_name = translate[names(ISRact_contributions)],
+                      PC1_score = ISRact_contributions,
+                      class = if_else(ISRact_contributions > 0, "ISRac_high", "ISRac_low"))
+
+ggplot(ISRact_info, aes(x = PC1_score)) +
+  geom_density() +
+  geom_rug(aes(color = class)) +
+  theme_bw()
+
+### extract genes
+ISRact_high <- dplyr::filter(ISRact_info, class == "ISRac_high") %>%
+  dplyr::select("gene_name") %>% 
+  deframe()
+
+ISRact_low <- dplyr::filter(ISRact_info, class == "ISRac_low") %>%
+  dplyr::select("gene_name") %>% 
+  deframe()
+
+### Build Gene set objects
+ISRactGeneSets <- c(
+  GeneSet(ISRact_high, setName=paste0("ISRact_high(", length(ISRact_high),")")),
+  GeneSet(ISRact_low, setName=paste0("ISRact_low(", length(ISRact_low),")")))
+
+geneSets <- GeneSetCollection(c(ISRactGeneSets))
+```
+Now, Lets filter the seurat object so it only consider ISRact_high genes and standardize it
+
+```{r, echo=FALSE}
+seurat_object <- NormalizeData(seurat_object, normalization.method = "LogNormalize", scale.factor = 10000)
+seurat_f <- ScaleData(seurat_object, features = c(ISRact_low, ISRact_high))
+
+input_AUCell <- seurat_f@assays$RNA$scale.data
+```
+
+Then I run AUCell and adhere the results to Seurat object
+```{r}
+
+## Calculate ranking
+cells_rankings <- AUCell_buildRankings(input_AUCell, plotStats=TRUE)
+
+## calculate AUC score
+cells_AUC <- AUCell_calcAUC(geneSets = geneSets, cells_rankings)
+```
+Now some exploratory plots of the AUC_scores
+
+```{r}
+AUC_results <- slot(slot(cells_AUC, "assays"), "data")$AUC %>%
+  t() %>%
+  as_tibble(rownames="CellID") %>%
+  column_to_rownames("CellID")
+
+  barplot(height = deframe(AUC_results))
+```
+
+```{r}
+seurat_object <- AddMetaData(seurat_object, metadata = AUC_results)
+
+# UMAP plot
+AUC_names = names(AUC_results)
+FeaturePlot(seurat_object, reduction = "UMAP", features = AUC_names)
+```
+
+Now Its time to check this on a specific UMAP, precomputed only on the Tumor cells
+
+```{r}
+library(harmony)
+seurat_object <- FindVariableFeatures(seurat_object, selection.method = "vst", nfeatures = 2000) 
+seurat_object <- ScaleData(seurat_object)
+
+seurat_object <- RunPCA(seurat_object)
+seurat_object <- RunHarmony(seurat_object,"pid")
+seurat_object <- RunUMAP(seurat_object, reduction = "harmony",dims=c(1:30))
+
+```
+
+And the visual representation
+
+```{r}
+FeaturePlot(seurat_object, reduction = "umap", features = AUC_names)
+```
+
+Now I create a ISRAct High minus low to get the differenece between both 
+
+```{r}
+ISRact_diffAUC <- dplyr::mutate(AUC_results, ISR_ratio = get(AUC_names[1]) - get(AUC_names[2])) %>% dplyr::select(ISR_ratio)
+seurat_object <- AddMetaData(seurat_object, metadata = ISRact_diffAUC)
+
+```
+
+Now here I create the plots I will share, starting with some parameters as the features to plot
+```{r}
+features = AUC_names[2] # "ISR_ratio" | AUC_names[1/2]
+plot1 <- FeaturePlot(seurat_object, reduction = "umap",  features = features, ncol = 2) & 
+  scale_colour_gradient2(low = 'blue', mid = 'white', high = 'red') # change reductuion to "UMAP" | "umap" 
+
+```
+
+And now I compute the neighbours and cluster this umap to compare with ISRact
+
+```{r}
+# calculate clusters
+seurat_object <- FindNeighbors(seurat_object,reduction = "umap", dims=1:2)
+seurat_object <- FindClusters(seurat_object, resolution = 0.1)
+
+plot2 <- DimPlot(seurat_object, group.by =  "seurat_clusters", reduction = "umap", ncol = 2)
+```
+And at this moment I compare all these clusters with some violin plots
+
+```{r}
+library(patchwork)
+plot3 <- VlnPlot(seurat_object, features = c(features), group.by = "seurat_clusters", pt.size = 0) + geom_hline(yintercept=0, linetype = "dashed")
+
+(plot1 & NoLegend() | plot2 & NoLegend()) / plot3  + plot_layout(heights = c(2,1), guides = 'collect')
+```
