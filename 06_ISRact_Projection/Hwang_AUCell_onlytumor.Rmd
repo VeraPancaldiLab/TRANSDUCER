@@ -53,6 +53,9 @@ Then load and create the ISRact signature, dividing it in high and low
 ```{r, echo=FALSE}
 
 # Build gene sets
+## adjust n of genes
+max_rank = 100
+
 ## ISRact
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ISRact_contributions <- sort(pca_pdx$rotation[,"PC1"])
@@ -78,10 +81,14 @@ ggplot(ISRact_info, aes(x = PC1_score)) +
 
 ### extract genes
 ISRact_high <- dplyr::filter(ISRact_info, class == "ISRac_high") %>%
+  dplyr::arrange(desc(PC1_score)) %>%
+  dplyr::slice(1:max_rank) %>%
   dplyr::select("gene_name") %>% 
   deframe()
 
-ISRact_low <- dplyr::filter(ISRact_info, class == "ISRac_low") %>%
+ISRact_low <- dplyr::filter(ISRact_info, class == "ISRac_low")%>%
+  dplyr::arrange(PC1_score) %>%
+  dplyr::slice(1:max_rank) %>%
   dplyr::select("gene_name") %>% 
   deframe()
 
@@ -173,11 +180,25 @@ seurat_object <- FindClusters(seurat_object, resolution = 0.1)
 
 plot2 <- DimPlot(seurat_object, group.by =  "seurat_clusters", reduction = "umap", ncol = 2)
 ```
-And at this moment I compare all these clusters with some violin plots
+And at this moment I compare all these clusters with some violin plots, as well as assert the n of cells of each cluster
 
 ```{r}
 library(patchwork)
 plot3 <- VlnPlot(seurat_object, features = c(features), group.by = "seurat_clusters", pt.size = 0) + geom_hline(yintercept=0, linetype = "dashed")
-
-(plot1 & NoLegend() | plot2 & NoLegend()) / plot3  + plot_layout(heights = c(2,1), guides = 'collect')
+plot4 <- seurat_object$seurat_clusters %>% tibble(rownames = names(.), cluster = .) %>% ggplot(aes(x = cluster)) + geom_bar(stat ="count") + scale_y_log10() + ylab("log10(ncells)") + theme_classic()
+(plot1 & NoLegend() | plot2 & NoLegend()) / plot3 / plot4  + plot_layout(heights = c(2,1, 1), guides = 'collect')
 ```
+Now the cluster 11 seems to be specific of ISRacthigh. What are their marker genes?
+
+```{r}
+
+markers <- FindMarkers(seurat_object, ident.1 = "11", group.by = 'seurat_clusters')
+```
+
+```{r}
+# Top 10 plot and GSEA
+sign_markers <- dplyr::filter(markers, p_val_adj < 0.01)
+
+VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:10]), group.by = "seurat_clusters", pt.size = 0) + geom_hline(yintercept=0, linetype = "dashed")
+```
+
