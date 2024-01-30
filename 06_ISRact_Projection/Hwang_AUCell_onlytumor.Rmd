@@ -6,8 +6,18 @@ date: "2024-01-24"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
-
+library(Seurat)
+library(future)
+library(tidyverse)
+library(biomaRt)
+library(cowplot)
+library(patchwork)
+library(ggplot2)
+library(GSEABase)
+library(AUCell)
+library(ReactomePA)
+library(org.Hs.eg.db)
+source("src/plot_bar_enrich.R")
 ```
 
 First point is to load the data, get it into seurat and filter for tumor cells
@@ -27,7 +37,7 @@ seurat_object <- AddMetaData(seurat_object, metadata = metadata)
 ## Load original UMAP
 ## UMAP
 UMAP_Coord <- read_tsv("data/Hwang_Nature_2022/GEO/obsm/X_umap.tsv", col_types = c("cnn")) %>%
-  rename(UMAP_1 = "0",UMAP_2 = "1") %>% 
+  dplyr::rename(UMAP_1 = "0",UMAP_2 = "1") %>% 
   column_to_rownames("...1") 
 
 
@@ -140,10 +150,19 @@ Now Its time to check this on a specific UMAP, precomputed only on the Tumor cel
 
 ```{r}
 library(harmony)
-seurat_object <- FindVariableFeatures(seurat_object, selection.method = "vst", nfeatures = 2000) 
-seurat_object <- ScaleData(seurat_object)
+# Filter or not to have specific ISRact clusters
+unsupervised = F
+if (unsupervised == F){
+  features = ISRact_info$gene_name
+  seurat_object <- ScaleData(seurat_object, features = features)
 
-seurat_object <- RunPCA(seurat_object)
+} else {
+  seurat_object <- FindVariableFeatures(seurat_object, selection.method = "vst", nfeatures = 2000)
+  seurat_object <- ScaleData(seurat_object)
+  features = NULL
+}
+
+seurat_object <- RunPCA(seurat_object, features=features)
 seurat_object <- RunHarmony(seurat_object,"pid")
 seurat_object <- RunUMAP(seurat_object, reduction = "harmony",dims=c(1:30))
 
@@ -165,7 +184,7 @@ seurat_object <- AddMetaData(seurat_object, metadata = ISRact_diffAUC)
 
 Now here I create the plots I will share, starting with some parameters as the features to plot
 ```{r}
-features = AUC_names[2] # "ISR_ratio" | AUC_names[1/2]
+features = "ISR_ratio" # "ISR_ratio" | AUC_names[1/2]
 plot1 <- FeaturePlot(seurat_object, reduction = "umap",  features = features, ncol = 2) & 
   scale_colour_gradient2(low = 'blue', mid = 'white', high = 'red') # change reductuion to "UMAP" | "umap" 
 
@@ -191,14 +210,97 @@ plot4 <- seurat_object$seurat_clusters %>% tibble(rownames = names(.), cluster =
 Now the cluster 11 seems to be specific of ISRacthigh. What are their marker genes?
 
 ```{r}
-
-markers <- FindMarkers(seurat_object, ident.1 = "11", group.by = 'seurat_clusters')
+cluster_to_explore <- "10"
+markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
 ```
 
 ```{r}
-# Top 10 plot and GSEA
-sign_markers <- dplyr::filter(markers, p_val_adj < 0.01)
+# Top 10 plot
+sign_markers <- dplyr::filter(markers, p_val_adj < 0.01) %>% dplyr::arrange(desc(avg_log2FC))
 
-VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:10]), group.by = "seurat_clusters", pt.size = 0) + geom_hline(yintercept=0, linetype = "dashed")
+VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:12]), group.by = "seurat_clusters", pt.size = 0.1) + geom_hline(yintercept=0, linetype = "dashed")
+```
+
+```{r}
+library(UpSetR)
+# overlap analysis
+ 
+geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  GeneSet(rownames(sign_markers), setName=paste0("Marker_genes(", nrow(sign_markers),")"))))
+upset(fromList(geneIds(geneSets_vs_markers)))
+```
+
+Now For the enrichment analysis, first I check the distribution of L2FC and decide on hypergeometric or GSEA
+
+```{r}
+# Visualize the scores
+sign_markers %>% ggplot(aes(x = avg_log2FC)) + geom_density() + geom_rug() + theme_classic()
+
+# Get dictionaries of up to date ensembl (not like above with 75 version)
+# load annotation with Biomart
+ensembl <- useEnsembl(biomart = "genes",
+                        dataset = "hsapiens_gene_ensembl")
+
+#listAttributes(ensembl75, page="feature_page")
+annot_ensembl <- getBM(attributes = c('ensembl_gene_id',
+                                        'external_gene_name',
+                                        'entrezgene_id'), mart = ensembl)
+
+gene_to_ensembl = deframe(annot_ensembl[c( "external_gene_name", "ensembl_gene_id")])
+ensembl_to_gene = setNames(names(gene_to_ensembl), gene_to_ensembl)
+gene_to_entrez = deframe(annot_ensembl[c( "external_gene_name", "entrezgene_id")])
+
+# Define lists of genes
+pos_markers <- dplyr::filter(sign_markers, avg_log2FC > 0) %>% rownames()
+neg_markers <- dplyr::filter(sign_markers, avg_log2FC < 0) %>% rownames()
+background <- rownames(markers)
+
+#rank_markers <- 
+
+
+
+## Enrichment
+###! CHECK How much EntrezID limit each category
+dplyr::filter(annot_ensembl, external_gene_name %in% background) %>% summary()
+### Reactome
+pos_Reactome <- enrichPathway(gene = as.character(na.exclude(gene_to_entrez[pos_markers])),
+                                        universe = as.character(na.exclude(gene_to_entrez[background])),
+                                        pvalueCutoff = 0.05, readable=TRUE, organism = "human")
+
+neg_Reactome <- enrichPathway(gene = as.character(na.exclude(gene_to_entrez[neg_markers])),
+                                        universe = as.character(na.exclude(gene_to_entrez[background])),
+                                        pvalueCutoff = 0.05, readable=TRUE, organism = "human")
+
+#### plots
+pos_Reactome@result %>%  
+  plot_bar_enrich(0.05,paste0("Reactome Upregulated in cluster", cluster_to_explore))
+
+neg_Reactome@result %>%  
+  plot_bar_enrich(0.05,paste0("Reactome Downregulated in cluster", cluster_to_explore))
+
+### GO
+for (ont in c("MF", "BP", "CC")){
+  pos_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[pos_markers])),
+           universe = as.character(na.exclude(gene_to_entrez[background])),
+           ont      = ont,
+           pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Hs.eg.db)
+  
+  neg_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[neg_markers])),
+                                     universe = as.character(na.exclude(gene_to_entrez[background])),
+                                     ont      = ont,
+                                     pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Hs.eg.db)
+  
+  #### plots
+  pos_enrich_GO@result %>%  
+    plot_bar_enrich(0.05,paste0("GO-", ont," Upregulated in cluster", cluster_to_explore)) %>% print()
+  
+  neg_enrich_GO@result %>%  
+    plot_bar_enrich(0.05,paste0("GO-", ont," Downregulated in cluster", cluster_to_explore)) %>% print()
+}
+```
+
+Whats going on with that Sigature of Stress? 
+
+```{r}
+
 ```
 
