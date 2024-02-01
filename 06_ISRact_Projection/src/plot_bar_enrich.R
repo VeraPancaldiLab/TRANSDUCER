@@ -11,7 +11,7 @@ plot_bar_enrich <- function(x, p.adjust_th, Title) {
     mutate(Description = as_factor(Description)) %>% 
     dplyr::filter(p.adjust < p.adjust_th) %>%
     slice_tail(n=20) %>%
-    ggplot(aes(x = GeneRatioNum, y = Description, fill = Count)) +
+    ggplot(aes(x = GeneRatioNum, y = Description, fill = p.adjust)) +
     geom_bar(stat="identity") +
     scale_fill_gradient(low = "red", high = "blue", guide=guide_colourbar(reverse = TRUE))+
     theme_bw() +
