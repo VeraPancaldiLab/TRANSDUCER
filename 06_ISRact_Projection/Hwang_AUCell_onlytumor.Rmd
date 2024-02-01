@@ -16,7 +16,9 @@ library(ggplot2)
 library(GSEABase)
 library(AUCell)
 library(ReactomePA)
+library(clusterProfiler)
 library(org.Hs.eg.db)
+library(pheatmap)
 source("src/plot_bar_enrich.R")
 ```
 
@@ -207,7 +209,7 @@ plot3 <- VlnPlot(seurat_object, features = c(features), group.by = "seurat_clust
 plot4 <- seurat_object$seurat_clusters %>% tibble(rownames = names(.), cluster = .) %>% ggplot(aes(x = cluster)) + geom_bar(stat ="count") + scale_y_log10() + ylab("log10(ncells)") + theme_classic()
 (plot1 & NoLegend() | plot2 & NoLegend()) / plot3 / plot4  + plot_layout(heights = c(2,1, 1), guides = 'collect')
 ```
-Now the cluster 11 seems to be specific of ISRacthigh. What are their marker genes?
+Now the cluster 10 seems to be specific of ISRactlow. What are their marker genes?
 
 ```{r}
 cluster_to_explore <- "10"
@@ -301,6 +303,212 @@ for (ont in c("MF", "BP", "CC")){
 Whats going on with that Sigature of Stress? 
 
 ```{r}
+# Extract genes of a signature
+Reactome_id <- "R-HSA-2262752"
+interest_genes <- neg_Reactome@result[Reactome_id,"geneID"] %>% str_split("/") %>% unlist(recursive = T)
+name_sign <- paste0(neg_Reactome@result[Reactome_id,"Description"], " (adj.pval = ", format(neg_Reactome@result[Reactome_id,"p.adjust"], scientific = TRUE, digits = 3), ")")
+
+# Get Pseudobulk for clusters
+pseudo <- AggregateExpression(seurat_object, group.by = "seurat_clusters", return.seurat = T)
+pseudo_bulk_exp <- pseudo@assays$RNA$scale.data[interest_genes,]
+pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("seurat_clusters", AUC_names, "cnv_score")) %>%
+  as_tibble() %>%
+  dplyr::group_by(seurat_clusters) %>%
+  dplyr::summarize(mean_ISRacthigh = mean(`ISRact_high(100)`),
+                   sd_ISRacthigh = sd(`ISRact_high(100)`),
+                   mean_ISRactlow = mean(`ISRact_low(100)`),
+                   sd_ISRactlow = sd(`ISRact_low(100)`),
+                   mean_cnv_score = mean(cnv_score)) %>% 
+  dplyr::mutate(seurat_clusters = paste0("g", seurat_clusters)) %>%
+  column_to_rownames("seurat_clusters")
+
+# Plot Heatmap
+#DoHeatmap(pseudo, features = interest_genes, slot = "scale.data", label = T, draw.lines = F)
+pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = F, main = name_sign)
+
+# Do Violin plot of the interesting genes
+VlnPlot(seurat_object, features = c("JUN", "DNAJC3", "FNIP2", "SLC7A11"), group.by = "seurat_clusters", pt.size = 0.1) + geom_hline(yintercept=0, linetype = "dashed")
 
 ```
 
+Now the cluster 5 seems to be specific of ISRacthigh. What are their marker genes?
+
+```{r}
+cluster_to_explore <- "5"
+markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
+```
+
+```{r}
+# Top 10 plot
+sign_markers <- dplyr::filter(markers, p_val_adj < 0.01) %>% dplyr::arrange(p_val_adj)
+
+VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:12]), group.by = "seurat_clusters", pt.size = 0.1) + geom_hline(yintercept=0, linetype = "dashed")
+```
+
+
+```{r}
+# overlap analysis
+geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  GeneSet(rownames(sign_markers), setName=paste0("Marker_genes(", nrow(sign_markers),")"))))
+upset(fromList(geneIds(geneSets_vs_markers)))
+```
+
+```{r}
+# Define lists of genes
+pos_markers <- dplyr::filter(sign_markers, avg_log2FC > 0) %>% rownames()
+neg_markers <- dplyr::filter(sign_markers, avg_log2FC < 0) %>% rownames()
+background <- rownames(markers)
+
+#rank_markers <- 
+
+## Enrichment
+###! CHECK How much EntrezID limit each category
+dplyr::filter(annot_ensembl, external_gene_name %in% background) %>% summary()
+### Reactome
+pos_Reactome <- enrichPathway(gene = as.character(na.exclude(gene_to_entrez[pos_markers])),
+                                        universe = as.character(na.exclude(gene_to_entrez[background])),
+                                        pvalueCutoff = 0.05, readable=TRUE, organism = "human")
+
+neg_Reactome <- enrichPathway(gene = as.character(na.exclude(gene_to_entrez[neg_markers])),
+                                        universe = as.character(na.exclude(gene_to_entrez[background])),
+                                        pvalueCutoff = 0.05, readable=TRUE, organism = "human")
+
+#### plots
+pos_Reactome@result %>%  
+  plot_bar_enrich(0.05,paste0("Reactome Upregulated in cluster", cluster_to_explore))
+
+neg_Reactome@result %>%  
+  plot_bar_enrich(0.05,paste0("Reactome Downregulated in cluster", cluster_to_explore))
+
+### GO
+for (ont in c("MF", "BP", "CC")){
+  pos_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[pos_markers])),
+           universe = as.character(na.exclude(gene_to_entrez[background])),
+           ont      = ont,
+           pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Hs.eg.db)
+  
+  neg_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[neg_markers])),
+                                     universe = as.character(na.exclude(gene_to_entrez[background])),
+                                     ont      = ont,
+                                     pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Hs.eg.db)
+  #### Save results to file
+  write_rds(pos_enrich_GO, paste0("results/scRNAseq_proj/Hwang_AUCell_onlytumor/cluster_",cluster_to_explore, ont, "_pos.RDS"))
+  write_rds(neg_enrich_GO, paste0("results/scRNAseq_proj/Hwang_AUCell_onlytumor/cluster_",cluster_to_explore, ont, "_neg.RDS"))
+  
+  #### plots
+  pos_enrich_GO@result %>%  
+    plot_bar_enrich(0.05,paste0("GO-", ont," Upregulated in cluster", cluster_to_explore)) %>% print()
+  
+  neg_enrich_GO@result %>%  
+    plot_bar_enrich(0.05,paste0("GO-", ont," Downregulated in cluster", cluster_to_explore)) %>% print()
+}
+```
+
+Now, what is that signature of Downregulation of cytoplasmic translation? rRNA processing? Traslation elongation? Metabolism of Aminoacids? Metabolism of Selenoaminoacids?
+
+```{r}
+# Downregulation of cytoplasmic translation
+neg_enrich_GOBP <- read_rds("results/scRNAseq_proj/Hwang_AUCell_onlytumor/cluster_5BP_neg.RDS")
+GO_id <- "GO:0002181"
+interest_genes <- neg_enrich_GOBP@result[GO_id,"geneID"] %>% str_split("/") %>% unlist(recursive = T)
+name_sign <- paste0(neg_enrich_GOBP@result[GO_id,"Description"], " (adj.pval = ", format(neg_enrich_GOBP@result[GO_id,"p.adjust"], scientific = TRUE, digits = 3), ")")
+
+
+# Get Pseudobulk for clusters
+pseudo <- AggregateExpression(seurat_object, group.by = "seurat_clusters", return.seurat = T)
+pseudo_bulk_exp <- pseudo@assays$RNA$scale.data[interest_genes,]
+pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("seurat_clusters", AUC_names, "cnv_score")) %>%
+  as_tibble() %>%
+  dplyr::group_by(seurat_clusters) %>%
+  dplyr::summarize(mean_ISRacthigh = mean(`ISRact_high(100)`),
+                   sd_ISRacthigh = sd(`ISRact_high(100)`),
+                   mean_ISRactlow = mean(`ISRact_low(100)`),
+                   sd_ISRactlow = sd(`ISRact_low(100)`),
+                   mean_cnv_score = mean(cnv_score)) %>% 
+  dplyr::mutate(seurat_clusters = paste0("g", seurat_clusters)) %>%
+  column_to_rownames("seurat_clusters")
+
+# Plot Heatmap
+#DoHeatmap(pseudo, features = interest_genes, slot = "scale.data", label = T, draw.lines = F)
+pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = F, main = name_sign)
+```
+
+```{r}
+# Nervous system development 
+Reactome_id <- "R-HSA-9675108"
+interest_genes <- neg_Reactome@result[Reactome_id,"geneID"] %>% str_split("/") %>% unlist(recursive = T)
+name_sign <- paste0(neg_Reactome@result[Reactome_id,"Description"], " (adj.pval = ", format(neg_Reactome@result[Reactome_id,"p.adjust"], scientific = TRUE, digits = 3), ")")
+
+
+
+# Get Pseudobulk for clusters
+pseudo <- AggregateExpression(seurat_object, group.by = "seurat_clusters", return.seurat = T)
+pseudo_bulk_exp <- pseudo@assays$RNA$scale.data[interest_genes,]
+pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("seurat_clusters", AUC_names, "cnv_score")) %>%
+  as_tibble() %>%
+  dplyr::group_by(seurat_clusters) %>%
+  dplyr::summarize(mean_ISRacthigh = mean(`ISRact_high(100)`),
+                   sd_ISRacthigh = sd(`ISRact_high(100)`),
+                   mean_ISRactlow = mean(`ISRact_low(100)`),
+                   sd_ISRactlow = sd(`ISRact_low(100)`),
+                   mean_cnv_score = mean(cnv_score)) %>% 
+  dplyr::mutate(seurat_clusters = paste0("g", seurat_clusters)) %>%
+  column_to_rownames("seurat_clusters")
+
+# Plot Heatmap
+#DoHeatmap(pseudo, features = interest_genes, slot = "scale.data", label = T, draw.lines = F)
+pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = T, main = name_sign)
+```
+
+```{r}
+# Selenoamino acid metabolism 
+Reactome_id <- "R-HSA-2408522"
+interest_genes <- neg_Reactome@result[Reactome_id,"geneID"] %>% str_split("/") %>% unlist(recursive = T)
+name_sign <- paste0(neg_Reactome@result[Reactome_id,"Description"], " (adj.pval = ", format(neg_Reactome@result[Reactome_id,"p.adjust"], scientific = TRUE, digits = 3), ")")
+
+
+
+# Get Pseudobulk for clusters
+pseudo <- AggregateExpression(seurat_object, group.by = "seurat_clusters", return.seurat = T)
+pseudo_bulk_exp <- pseudo@assays$RNA$scale.data[interest_genes,]
+pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("seurat_clusters", AUC_names, "cnv_score")) %>%
+  as_tibble() %>%
+  dplyr::group_by(seurat_clusters) %>%
+  dplyr::summarize(mean_ISRacthigh = mean(`ISRact_high(100)`),
+                   sd_ISRacthigh = sd(`ISRact_high(100)`),
+                   mean_ISRactlow = mean(`ISRact_low(100)`),
+                   sd_ISRactlow = sd(`ISRact_low(100)`),
+                   mean_cnv_score = mean(cnv_score)) %>% 
+  dplyr::mutate(seurat_clusters = paste0("g", seurat_clusters)) %>%
+  column_to_rownames("seurat_clusters")
+
+# Plot Heatmap
+#DoHeatmap(pseudo, features = interest_genes, slot = "scale.data", label = T, draw.lines = F)
+pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = T, main = name_sign)
+```
+
+```{r}
+# Upregulation of Microtubule based process (check!!)
+pos_enrich_GOBP <- read_rds("results/scRNAseq_proj/Hwang_AUCell_onlytumor/cluster_5BP_pos.RDS")
+GO_id <- "GO:0007017"
+interest_genes <- neg_enrich_GOBP@result[GO_id,"geneID"] %>% str_split("/") %>% unlist(recursive = T)
+name_sign <- paste0(neg_enrich_GOBP@result[GO_id,"Description"], " (adj.pval = ", format(neg_enrich_GOBP@result[GO_id,"p.adjust"], scientific = TRUE, digits = 3), ")")
+
+
+# Get Pseudobulk for clusters
+pseudo <- AggregateExpression(seurat_object, group.by = "seurat_clusters", return.seurat = T)
+pseudo_bulk_exp <- pseudo@assays$RNA$scale.data[interest_genes,]
+pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("seurat_clusters", AUC_names, "cnv_score")) %>%
+  as_tibble() %>%
+  dplyr::group_by(seurat_clusters) %>%
+  dplyr::summarize(mean_ISRacthigh = mean(`ISRact_high(100)`),
+                   sd_ISRacthigh = sd(`ISRact_high(100)`),
+                   mean_ISRactlow = mean(`ISRact_low(100)`),
+                   sd_ISRactlow = sd(`ISRact_low(100)`),
+                   mean_cnv_score = mean(cnv_score)) %>% 
+  dplyr::mutate(seurat_clusters = paste0("g", seurat_clusters)) %>%
+  column_to_rownames("seurat_clusters")
+
+# Plot Heatmap
+#DoHeatmap(pseudo, features = interest_genes, slot = "scale.data", label = T, draw.lines = F)
+pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = F, main = name_sign)
+```
