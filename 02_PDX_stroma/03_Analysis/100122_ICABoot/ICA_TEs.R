@@ -408,8 +408,8 @@ edges_clean <- dplyr::group_by(edges, source, target, .add = TRUE) %>%
   
 ### Calculate general network measures
 #### general and component specific out degree
-general_node_stats <- group_by(edges_clean, source, best_for, .add=T) %>%
-  summarise(out_degree=n(),
+general_node_stats <- dplyr::group_by(edges_clean, source, best_for, .add=T) %>%
+  dplyr::summarise(out_degree=n(),
             total_peaks=sum(n_peaks)) %>% 
   pivot_wider(id_cols = source,
               names_from = best_for,
@@ -417,14 +417,42 @@ general_node_stats <- group_by(edges_clean, source, best_for, .add=T) %>%
               names_sep = "_") %>%
   ungroup() %>%
   dplyr::mutate_all(~ifelse(is.na(.), 0, .)) %>%
-  dplyr::mutate(out_degree_total = reduce(dplyr::select(., starts_with("out_degree")), `+`),
-                total_peaks_absolute = reduce(dplyr::select(., starts_with("total_peaks")), `+`)) %>%
-  rename(id=source) %>%
+  dplyr::mutate(out_degree_total = purrr::reduce(dplyr::select(., starts_with("out_degree")), `+`),
+                total_peaks_absolute = purrr::reduce(dplyr::select(., starts_with("total_peaks")), `+`)) %>%
+  dplyr::rename(id=source) %>%
   right_join(nodes)
 
 ### Build network
 network <- createNetworkFromDataFrames(general_node_stats, edges_clean, title = "POSTARS3")
 setNodeLabelMapping("id")
+
+### Fisher exact test for RBP n of experimentally detected targets
+#### test 1 RBP 1 component (check)
+contingency.table <- dplyr::filter(general_node_stats, id == "Apc") %>% 
+  dplyr::select(id, out_degree_total, out_degree_best_IC.6)
+
+A = contingency.table$out_degree_best_IC.6 #targets of AGO1 that are IC6
+B = contingency.table$out_degree_total - A #targets of AGO1 that are not IC.6
+C = sum(general_node_stats$best_IC.6 == T) - A # non targets of AGO1 that are IC6
+D = nrow(general_node_stats) - (A+B) - C #Non targets of AGO1 that are not IC.6
+
+test_contingency = matrix(data = c(A,B,C,D), nrow = 2, ncol = 2)
+fisher_test(test_contingency)
+
+#### full implementation
+contingency.table <- dplyr::filter(general_node_stats, id %in% RBPs_to_net$id) %>% 
+  dplyr::select(id, out_degree_total, matches("out_degree_best")) %>%
+  column_to_rownames("id")
+
+for (IC in paste("IC", 1:6, sep = ".")){
+  IC = "IC.6"
+  subset_ct <- dplyr::select(contingency.table, out_degree_total, matches(IC)) %>%
+    dplyr::mutate(out_degree_total = out_degree_total - .[[2]]) %>%
+    as.matrix()
+  fisher_test(subset_ct, simulate.p.value = T)
+  row_wise_fisher_test(subset_ct, simulate.p.value = T)
+}
+
 
 #-------------------------------------------------------------------------------
 
