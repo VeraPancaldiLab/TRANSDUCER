@@ -19,7 +19,13 @@ library(ReactomePA)
 library(clusterProfiler)
 library(org.Hs.eg.db)
 library(pheatmap)
+library(msigdbr)
+library(Hmisc)
+library(ggrepel)
+
 source("src/plot_bar_enrich.R")
+source("src/Get_mostvar.R")
+source("src/scatterplot_with_stats.R")
 ```
 
 First point is to load the data, get it into seurat and filter for tumor cells
@@ -148,7 +154,8 @@ AUC_names = names(AUC_results)
 FeaturePlot(seurat_object, reduction = "UMAP", features = AUC_names)
 ```
 
-Now Its time to check this on a specific UMAP, precomputed only on the Tumor cells
+
+Finally now I compute a specific UMAP, precomputed only on the Tumor cells
 
 ```{r}
 library(harmony)
@@ -170,10 +177,11 @@ seurat_object <- RunUMAP(seurat_object, reduction = "harmony",dims=c(1:30))
 
 ```
 
-And the visual representation
+And the visual representation, whith an extra one for Basal/CLassical
 
 ```{r}
 FeaturePlot(seurat_object, reduction = "umap", features = AUC_names)
+FeaturePlot(seurat_object, reduction = "umap", features = c("Moffitt_basal", "Moffitt_classical", "Bailey_squamous", "Bailey_progenitor","Collison_QM", "Collison_classical", "MALIGNANT CELLS" )) 
 ```
 
 Now I create a ISRAct High minus low to get the differenece between both 
@@ -298,6 +306,23 @@ for (ont in c("MF", "BP", "CC")){
   neg_enrich_GO@result %>%  
     plot_bar_enrich(0.05,paste0("GO-", ont," Downregulated in cluster", cluster_to_explore)) %>% print()
 }
+
+### Halmarks
+h <- msigdbr(species = "Homo sapiens", category = "H") %>% 
+  dplyr::select(gs_name, entrez_gene)
+
+pos_enrich_H <- enricher(gene = as.character(na.exclude(gene_to_entrez[pos_markers])),
+                                     universe = as.character(na.exclude(gene_to_entrez[background])), TERM2GENE=h)
+neg_enrich_H <- enricher(gene = as.character(na.exclude(gene_to_entrez[neg_markers])),
+                                     universe = as.character(na.exclude(gene_to_entrez[background])), TERM2GENE=h)
+
+#### plots
+  pos_enrich_H@result %>%  
+    plot_bar_enrich(0.05,paste0("Hallmark-", ont," Upregulated in cluster", cluster_to_explore)) %>% print()
+  
+  neg_enrich_H@result %>%  
+    plot_bar_enrich(0.05,paste0("Hallmark-", ont," Downregulated in cluster", cluster_to_explore)) %>% print()
+
 ```
 
 Whats going on with that Sigature of Stress? 
@@ -401,6 +426,22 @@ for (ont in c("MF", "BP", "CC")){
   neg_enrich_GO@result %>%  
     plot_bar_enrich(0.05,paste0("GO-", ont," Downregulated in cluster", cluster_to_explore)) %>% print()
 }
+### Halmarks
+h <- msigdbr(species = "Homo sapiens", category = "H") %>% 
+  dplyr::select(gs_name, entrez_gene)
+
+pos_enrich_H <- enricher(gene = as.character(na.exclude(gene_to_entrez[pos_markers])),
+                                     universe = as.character(na.exclude(gene_to_entrez[background])), TERM2GENE=h)
+neg_enrich_H <- enricher(gene = as.character(na.exclude(gene_to_entrez[neg_markers])),
+                                     universe = as.character(na.exclude(gene_to_entrez[background])), TERM2GENE=h)
+
+#### plots
+  pos_enrich_H@result %>%  
+    plot_bar_enrich(0.05,paste0("Hallmark Upregulated in cluster", cluster_to_explore)) %>% print()
+  
+  neg_enrich_H@result %>%  
+    plot_bar_enrich(0.05,paste0("Hallmark Downregulated in cluster", cluster_to_explore)) %>% print()
+
 ```
 
 Now, what is that signature of Downregulation of cytoplasmic translation? rRNA processing? Traslation elongation? Metabolism of Aminoacids? Metabolism of Selenoaminoacids?
@@ -433,8 +474,8 @@ pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = F, 
 ```
 
 ```{r}
-# Nervous system development 
-Reactome_id <- "R-HSA-9675108"
+# Signaling by Rho GTPases, Miro GTPases and RHOBTB3
+Reactome_id <- "R-HSA-9716542"
 interest_genes <- neg_Reactome@result[Reactome_id,"geneID"] %>% str_split("/") %>% unlist(recursive = T)
 name_sign <- paste0(neg_Reactome@result[Reactome_id,"Description"], " (adj.pval = ", format(neg_Reactome@result[Reactome_id,"p.adjust"], scientific = TRUE, digits = 3), ")")
 
@@ -459,56 +500,71 @@ pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("seurat_cluster
 pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = T, main = name_sign)
 ```
 
-```{r}
-# Selenoamino acid metabolism 
-Reactome_id <- "R-HSA-2408522"
-interest_genes <- neg_Reactome@result[Reactome_id,"geneID"] %>% str_split("/") %>% unlist(recursive = T)
-name_sign <- paste0(neg_Reactome@result[Reactome_id,"Description"], " (adj.pval = ", format(neg_Reactome@result[Reactome_id,"p.adjust"], scientific = TRUE, digits = 3), ")")
-
-
-
-# Get Pseudobulk for clusters
-pseudo <- AggregateExpression(seurat_object, group.by = "seurat_clusters", return.seurat = T)
-pseudo_bulk_exp <- pseudo@assays$RNA$scale.data[interest_genes,]
-pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("seurat_clusters", AUC_names, "cnv_score")) %>%
-  as_tibble() %>%
-  dplyr::group_by(seurat_clusters) %>%
-  dplyr::summarize(mean_ISRacthigh = mean(`ISRact_high(100)`),
-                   sd_ISRacthigh = sd(`ISRact_high(100)`),
-                   mean_ISRactlow = mean(`ISRact_low(100)`),
-                   sd_ISRactlow = sd(`ISRact_low(100)`),
-                   mean_cnv_score = mean(cnv_score)) %>% 
-  dplyr::mutate(seurat_clusters = paste0("g", seurat_clusters)) %>%
-  column_to_rownames("seurat_clusters")
-
-# Plot Heatmap
-#DoHeatmap(pseudo, features = interest_genes, slot = "scale.data", label = T, draw.lines = F)
-pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = T, main = name_sign)
-```
+Now, specially encouraged by Hallmark results lets explore the TF activity of the metacells for these clusters
 
 ```{r}
-# Upregulation of Microtubule based process (check!!)
-pos_enrich_GOBP <- read_rds("results/scRNAseq_proj/Hwang_AUCell_onlytumor/cluster_5BP_pos.RDS")
-GO_id <- "GO:0007017"
-interest_genes <- neg_enrich_GOBP@result[GO_id,"geneID"] %>% str_split("/") %>% unlist(recursive = T)
-name_sign <- paste0(neg_enrich_GOBP@result[GO_id,"Description"], " (adj.pval = ", format(neg_enrich_GOBP@result[GO_id,"p.adjust"], scientific = TRUE, digits = 3), ")")
+library(decoupleR)
+library(OmnipathR)
+net <- get_collectri(organism='human', split_complexes=FALSE)
 
+# Extract the normalized log-transformed pseudocounts
+mat <- as.matrix(pseudo@assays$RNA$data)
+# acts <- run_ulm(mat=mat, net=net, .source='source', .target='target',
+#                 .mor='mor', minsize = 5)
 
-# Get Pseudobulk for clusters
-pseudo <- AggregateExpression(seurat_object, group.by = "seurat_clusters", return.seurat = T)
-pseudo_bulk_exp <- pseudo@assays$RNA$scale.data[interest_genes,]
-pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("seurat_clusters", AUC_names, "cnv_score")) %>%
-  as_tibble() %>%
-  dplyr::group_by(seurat_clusters) %>%
-  dplyr::summarize(mean_ISRacthigh = mean(`ISRact_high(100)`),
-                   sd_ISRacthigh = sd(`ISRact_high(100)`),
-                   mean_ISRactlow = mean(`ISRact_low(100)`),
-                   sd_ISRactlow = sd(`ISRact_low(100)`),
-                   mean_cnv_score = mean(cnv_score)) %>% 
-  dplyr::mutate(seurat_clusters = paste0("g", seurat_clusters)) %>%
-  column_to_rownames("seurat_clusters")
+acts <- run_viper(mat=mat, net=net, .source='source', .target='target',
+                .mor='mor', minsize = 5, method = 'scale')
 
-# Plot Heatmap
-#DoHeatmap(pseudo, features = interest_genes, slot = "scale.data", label = T, draw.lines = F)
-pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = F, main = name_sign)
+pseudo_bulk_TFact <- pivot_wider(acts,id_cols = source, values_from = score, names_from = condition) %>%
+  column_to_rownames("source")
+
+filter_TFs = "MostCorr" # "MostCorr" |
+
+if (filter_TFs == "MostVar"){
+  top_50MostVarTF <- Get_mostvar(pseudo_bulk_TFact, 50)
+  pseudo_bulk_TFact <- top_50MostVarTF
+  phtitle <- "Top 50 MostVar TFs"
+  
+} else if (filter_TFs == "MostCorr"){
+  var_tocorr <- "mean_ISRactlow"
+  top_50TF <- rcorr(t(pseudo_bulk_TFact), pseudo_bulk_annot[,var_tocorr,drop=T])$r[,"y"] %>%
+      abs() %>% 
+    sort(decreasing = T) %>%
+      .[2:(11)] %>% 
+    names()
+  
+  top_50MostCorrTF = pseudo_bulk_TFact[top_50TF,]
+  pseudo_bulk_TFact <- top_50MostCorrTF
+  phtitle <- paste0("top 50 Most Correlated TF to ", var_tocorr)
+  
+} else{
+  pseudo_bulk_TFact <- pseudo_bulk_TFact
+  phtitle <- "All TFs"
+  
+}
+pheatmap(pseudo_bulk_TFact, annotation_col = pseudo_bulk_annot, cluster_cols = T, show_rownames = T, main = phtitle)
+
 ```
+Now, explore individual correlations, like the one with Myc
+```{r}
+explore_scatter <- pseudo_bulk_TFact %>%
+  t() %>%
+  cbind(pseudo_bulk_annot) %>%
+  rownames_to_column("cluster")
+
+# low vs high
+scatterplot_with_stats(explore_scatter, "mean_ISRacthigh", "mean_ISRactlow", "cluster", "spearman", "mean_ISRacthigh vs mean_ISRactlow")
+# MYC
+scatterplot_with_stats(explore_scatter, "MYC", "mean_ISRactlow", "cluster", "spearman", "MYC vs mean_ISRactlow")
+scatterplot_with_stats(explore_scatter, "MYC", "mean_ISRacthigh", "cluster", "spearman", "MYC vs mean_ISRacthigh")
+scatterplot_with_stats(explore_scatter, "MYC", "mean_cnv_score", "cluster", "spearman", "MYC vs mean_cnv_score")
+
+# JUN 
+
+scatterplot_with_stats(explore_scatter, "JUN", "mean_ISRacthigh", "cluster", "spearman", "JUN vs mean_ISRacthigh")
+scatterplot_with_stats(explore_scatter, "JUN", "mean_cnv_score", "cluster", "spearman", "JUN vs mean_cnv_score")
+
+# ASCL1
+scatterplot_with_stats(explore_scatter, "ASCL1", "mean_ISRactlow", "cluster", "spearman", "ASCL1 vs mean_ISRactlow")
+```
+
