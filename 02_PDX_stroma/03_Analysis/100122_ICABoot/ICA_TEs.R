@@ -439,18 +439,25 @@ D = nrow(general_node_stats) - (A+B) - C #Non targets of AGO1 that are not IC.6
 test_contingency = matrix(data = c(A,B,C,D), nrow = 2, ncol = 2)
 fisher_test(test_contingency)
 
-#### full implementation
+#### full implementation in function #TBD use apply to make faster
 contingency.table <- dplyr::filter(general_node_stats, id %in% RBPs_to_net$id) %>% 
   dplyr::select(id, out_degree_total, matches("out_degree_best")) %>%
   column_to_rownames("id")
 
+fisher_results = tibble(IC=character(), RBP = character(), n=numeric(), p=numeric(), p.signif=character())
 for (IC in paste("IC", 1:6, sep = ".")){
-  IC = "IC.6"
+  total_IC_genes = sum(general_node_stats[[paste0("best_", IC)]] == T)
   subset_ct <- dplyr::select(contingency.table, out_degree_total, matches(IC)) %>%
-    dplyr::mutate(out_degree_total = out_degree_total - .[[2]]) %>%
     as.matrix()
-  fisher_test(subset_ct, simulate.p.value = T)
-  row_wise_fisher_test(subset_ct, simulate.p.value = T)
+  for (RBP in rownames(subset_ct)){
+    A = subset_ct[RBP,2] #targets of AGO1 that are IC6
+    B = subset_ct[RBP,1] - A #targets of AGO1 that are not IC.6
+    C = total_IC_genes - A # non targets of AGO1 that are IC6
+    D = nrow(general_node_stats) - (A+B) - C #Non targets of AGO1 that are not IC.6
+  
+  test_contingency = matrix(data = c(A,B,C,D), nrow = 2, ncol = 2)
+  fisher_results = add_row(fisher_results, IC = IC, RBP = RBP, fisher_test(test_contingency))
+  }
 }
 
 
