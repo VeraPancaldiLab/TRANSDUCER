@@ -431,8 +431,7 @@ PlotBestCorr <- function(complete_annotation, tf_activity, nTFs, analysis_name =
                              p.value = correlations$P[best_tfs,"y"],
                              p.adj = as.numeric(comp_p.adj[best_tfs] < 0.05)) %>% 
       column_to_rownames("TFs")
-    print(comp)
-    print(any(comp_p.adj < 0.05))
+
     pdf(paste("02_Output/", analysis_name, comp, ".pdf", sep=""))
     tf_activity %>% .[best_tfs,] %>%
       pheatmap(main=paste("Best",analysis_name, comp),
