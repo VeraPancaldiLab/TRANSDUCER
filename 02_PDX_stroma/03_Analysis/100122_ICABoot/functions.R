@@ -421,13 +421,30 @@ Plot_general_TFs <- function(tf_activity, analysis_name, n_mostvar, complete_ann
 PlotBestCorr <- function(complete_annotation, tf_activity, nTFs, analysis_name = "analysis"){
   for (comp in colnames(complete_annotation)){
     
-    rcorr(t(tf_activity), complete_annotation[,comp,drop=T])$r[,"y"] %>%
+    correlations <- rcorr(t(tf_activity), complete_annotation[,comp,drop=T])
+    comp_p.adj <- p.adjust(correlations$P[,"y"], "BH")
+    best_tfs <-  correlations$r[,"y"] %>%
       abs() %>% sort(decreasing = T) %>%
-      .[2:(nTFs+1)] %>% names() -> best_tfs
+      .[2:(nTFs+1)] %>% names()
     
+    annotation_TFs <- tibble(TFs = best_tfs, R = correlations$r[best_tfs,"y"], 
+                             p.value = correlations$P[best_tfs,"y"],
+                             p.adj = as.numeric(comp_p.adj[best_tfs] < 0.05)) %>% 
+      column_to_rownames("TFs")
+    print(comp)
+    print(any(comp_p.adj < 0.05))
     pdf(paste("02_Output/", analysis_name, comp, ".pdf", sep=""))
     tf_activity %>% .[best_tfs,] %>%
-      pheatmap(main=paste("Best",analysis_name, comp), scale = "row", annotation_col = complete_annotation)
+      pheatmap(main=paste("Best",analysis_name, comp),
+               scale = "row",
+               annotation_col = complete_annotation,
+               annotation_row = annotation_TFs, 
+               annotation_colors = list(R = c("red", "white", "blue"),
+                                        p.value = c("black", "white"),
+                                        p.adj = c("white", "black"),
+                                       PAMG = c("#FF7F00", "white", "#377DB8"),
+                                       ISRact = c("#FFFFCC", "#006837"),
+                                       IC.6 = c("#FFFFCC", "#5b0066")))
     
     dev.off()
   }
