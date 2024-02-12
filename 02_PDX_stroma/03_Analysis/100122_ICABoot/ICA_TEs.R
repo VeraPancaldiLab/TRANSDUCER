@@ -444,7 +444,7 @@ contingency.table <- dplyr::filter(general_node_stats, id %in% RBPs_to_net$id) %
   dplyr::select(id, out_degree_total, matches("out_degree_best")) %>%
   column_to_rownames("id")
 
-fisher_results = tibble(IC=character(), RBP = character(), n=numeric(), p=numeric(), p.signif=character())
+fisher_results = tibble(IC=character(), RBP = character(), n=numeric(), p=numeric(), OR=numeric())
 for (IC in paste("IC", 1:6, sep = ".")){
   total_IC_genes = sum(general_node_stats[[paste0("best_", IC)]] == T)
   subset_ct <- dplyr::select(contingency.table, out_degree_total, matches(IC)) %>%
@@ -456,11 +456,20 @@ for (IC in paste("IC", 1:6, sep = ".")){
     D = nrow(general_node_stats) - (A+B) - C #Non targets of AGO1 that are not IC.6
   
   test_contingency = matrix(data = c(A,B,C,D), nrow = 2, ncol = 2)
-  fisher_results = add_row(fisher_results, IC = IC, RBP = RBP, fisher_test(test_contingency))
+  fisher <- fisher.test(test_contingency, conf.int = T, conf.level = 0.95, alternative = "greater")
+  fisher_results = add_row(fisher_results,
+                           IC = IC,
+                           RBP = RBP,
+                           p = fisher$p.value,
+                           OR = fisher$estimate)
   }
 }
 
-
+##### plot of Fisher results
+ggplot(fisher_results, aes(y = RBP, x = OR, color = IC, size = log10(p))) +
+  geom_point() +
+  scale_size(trans = 'reverse') +
+  theme_bw()
 #-------------------------------------------------------------------------------
 
 # FIGURE SPECIFIC PLOTS: Clinical and technical data
