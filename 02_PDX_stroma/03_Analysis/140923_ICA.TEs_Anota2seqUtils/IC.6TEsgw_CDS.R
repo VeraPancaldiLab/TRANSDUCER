@@ -20,7 +20,9 @@ setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/140923_ICA
 component_reorientation = TRUE
 reorient_TEs <- c(1, 1, -1, 1, 1, -1)
 pdf_name <- "results/CDS/IC.6gw_"
+# motif analysis
 de_novo = FALSE
+min_len = 5 #filter for min len
 #-------------------------------------------------------------------------------
 
 # load annotation with Biomart
@@ -113,6 +115,12 @@ motif_list <- motifAnalysis( geneList = S_TEs_ext_l,
                          subregionSel=NULL)
 } else {
   motif_list <- c("DRACH")
+  attract <- read_tsv("Input/ATtRACT_db.tsv") %>%
+    filter(Organism == "Mus_musculus",
+           Len >= min_len) %>% 
+    dplyr::select(Gene_name, Motif) %>%
+    deframe()
+  motifs_in = attract
 }
 
 
@@ -122,7 +130,7 @@ motifs_quant <- contentMotifs(geneList = S_TEs_ext_l, #instead of anota2seq obje
                             geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
                             regulation = c("translationUp", "translationDown"),
                             contrast = c(1,1),
-                            motifsIn = motif_list, 
+                            motifsIn = motifs_in, 
                             region = c("CDS"),
                             dist = 1,
                             selection = "longest",
