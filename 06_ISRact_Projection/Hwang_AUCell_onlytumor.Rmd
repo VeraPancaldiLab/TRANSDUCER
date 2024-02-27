@@ -568,3 +568,10 @@ scatterplot_with_stats(explore_scatter, "JUN", "mean_cnv_score", "cluster", "spe
 scatterplot_with_stats(explore_scatter, "ASCL1", "mean_ISRactlow", "cluster", "spearman", "ASCL1 vs mean_ISRactlow")
 ```
 
+
+```{r}
+explore_scAUCscores <- FetchData(object = seurat_object, vars = c("seurat_clusters", AUC_names, "cnv_score")) %>%
+  dplyr::rename(ISRact_high = 2, ISRact_low = 3)
+
+scatterplot_with_stats(explore_scAUCscores, "ISRact_high", "ISRact_low", type = "spearman", label = FALSE, title = "ISRacthigh vs ISRactlow AUC scores")
+```
