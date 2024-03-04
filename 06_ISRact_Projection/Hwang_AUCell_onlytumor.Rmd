@@ -173,7 +173,7 @@ if (unsupervised == F){
 
 seurat_object <- RunPCA(seurat_object, features=features)
 seurat_object <- RunHarmony(seurat_object,"pid")
-seurat_object <- RunUMAP(seurat_object, reduction = "harmony",dims=c(1:30))
+seurat_object <- RunUMAP(seurat_object, reduction = "harmony",dims=c(2:5))
 
 ```
 
@@ -181,7 +181,7 @@ And the visual representation, whith an extra one for Basal/CLassical
 
 ```{r}
 FeaturePlot(seurat_object, reduction = "umap", features = AUC_names)
-FeaturePlot(seurat_object, reduction = "umap", features = c("Moffitt_basal", "Moffitt_classical", "Bailey_squamous", "Bailey_progenitor","Collison_QM", "Collison_classical", "MALIGNANT CELLS" )) 
+FeaturePlot(seurat_object, reduction = "pca", features = c("Moffitt_basal", "Moffitt_classical", "Bailey_squamous", "Bailey_progenitor","Collison_QM", "Collison_classical", "MALIGNANT CELLS", "GATA6", "cnv_score", "ISR_ratio")) 
 ```
 
 Now I create a ISRAct High minus low to get the differenece between both 
@@ -205,7 +205,7 @@ And now I compute the neighbours and cluster this umap to compare with ISRact
 ```{r}
 # calculate clusters
 seurat_object <- FindNeighbors(seurat_object,reduction = "umap", dims=1:2)
-seurat_object <- FindClusters(seurat_object, resolution = 0.1)
+seurat_object <- FindClusters(seurat_object, resolution = 0.01)
 
 plot2 <- DimPlot(seurat_object, group.by =  "seurat_clusters", reduction = "umap", ncol = 2)
 ```
@@ -220,7 +220,7 @@ plot4 <- seurat_object$seurat_clusters %>% tibble(rownames = names(.), cluster =
 Now the cluster 10 seems to be specific of ISRactlow. What are their marker genes?
 
 ```{r}
-cluster_to_explore <- "10"
+cluster_to_explore <- "1"
 markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
 ```
 
@@ -234,8 +234,10 @@ VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:12]), group.by = "s
 ```{r}
 library(UpSetR)
 # overlap analysis
- 
-geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  GeneSet(rownames(sign_markers), setName=paste0("Marker_genes(", nrow(sign_markers),")"))))
+clusterISRactlow_pos <- rownames(dplyr::filter(sign_markers, avg_log2FC > 0)) %>% GeneSet(., setName=paste0("clusterISRactlow_pos(", length(.),")"))
+clusterISRactlow_neg <- rownames(dplyr::filter(sign_markers, avg_log2FC < 0)) %>% GeneSet(., setName=paste0("clusterISRactlow_neg(", length(.),")"))
+
+geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  clusterISRactlow_pos, clusterISRactlow_neg))
 upset(fromList(geneIds(geneSets_vs_markers)))
 ```
 
@@ -259,7 +261,7 @@ gene_to_ensembl = deframe(annot_ensembl[c( "external_gene_name", "ensembl_gene_i
 ensembl_to_gene = setNames(names(gene_to_ensembl), gene_to_ensembl)
 gene_to_entrez = deframe(annot_ensembl[c( "external_gene_name", "entrezgene_id")])
 
-# Define lists of genes
+# Define lists of genes #! This is extra, as the filtering ive done it above already!
 pos_markers <- dplyr::filter(sign_markers, avg_log2FC > 0) %>% rownames()
 neg_markers <- dplyr::filter(sign_markers, avg_log2FC < 0) %>% rownames()
 background <- rownames(markers)
@@ -359,7 +361,7 @@ VlnPlot(seurat_object, features = c("JUN", "DNAJC3", "FNIP2", "SLC7A11"), group.
 Now the cluster 5 seems to be specific of ISRacthigh. What are their marker genes?
 
 ```{r}
-cluster_to_explore <- "5"
+cluster_to_explore <- "0"
 markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
 ```
 
@@ -373,7 +375,10 @@ VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:12]), group.by = "s
 
 ```{r}
 # overlap analysis
-geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  GeneSet(rownames(sign_markers), setName=paste0("Marker_genes(", nrow(sign_markers),")"))))
+clusterISRactlow_pos <- rownames(dplyr::filter(sign_markers, avg_log2FC > 0)) %>% GeneSet(., setName=paste0("clusterISRactlow_pos(", length(.),")"))
+clusterISRactlow_neg <- rownames(dplyr::filter(sign_markers, avg_log2FC < 0)) %>% GeneSet(., setName=paste0("clusterISRactlow_neg(", length(.),")"))
+
+geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  clusterISRactlow_pos, clusterISRactlow_neg))
 upset(fromList(geneIds(geneSets_vs_markers)))
 ```
 
@@ -574,4 +579,16 @@ explore_scAUCscores <- FetchData(object = seurat_object, vars = c("seurat_cluste
   dplyr::rename(ISRact_high = 2, ISRact_low = 3)
 
 scatterplot_with_stats(explore_scAUCscores, "ISRact_high", "ISRact_low", type = "spearman", label = FALSE, title = "ISRacthigh vs ISRactlow AUC scores")
+```
+
+Another way of looking at this proposed by Matthieu
+
+```{r}
+
+df=seurat_object[[AUC_names]] %>% dplyr::rename(ISRacthigh = 1, ISRactlow = 2) %>% t() %>% CreateAssayObject()
+
+all(colnames(seurat_object)==rownames(df))
+seurat_object[["ISR"]] = df
+
+FeatureScatter(seurat_object, feature1 ="ISRacthigh", feature2 =  "ISRactlow")
 ```
