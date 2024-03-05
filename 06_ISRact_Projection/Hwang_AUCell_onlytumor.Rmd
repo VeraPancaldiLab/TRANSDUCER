@@ -375,11 +375,11 @@ VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:12]), group.by = "s
 
 ```{r}
 # overlap analysis
-clusterISRactlow_pos <- rownames(dplyr::filter(sign_markers, avg_log2FC > 0)) %>% GeneSet(., setName=paste0("clusterISRactlow_pos(", length(.),")"))
-clusterISRactlow_neg <- rownames(dplyr::filter(sign_markers, avg_log2FC < 0)) %>% GeneSet(., setName=paste0("clusterISRactlow_neg(", length(.),")"))
+clusterISRacthigh_pos <- rownames(dplyr::filter(sign_markers, avg_log2FC > 0)) %>% GeneSet(., setName=paste0("clusterISRacthigh_pos(", length(.),")"))
+clusterISRacthigh_neg <- rownames(dplyr::filter(sign_markers, avg_log2FC < 0)) %>% GeneSet(., setName=paste0("clusterISRacthigh_neg(", length(.),")"))
 
-geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  clusterISRactlow_pos, clusterISRactlow_neg))
-upset(fromList(geneIds(geneSets_vs_markers)))
+geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  clusterISRacthigh_pos, clusterISRacthigh_neg,  clusterISRactlow_pos, clusterISRactlow_neg))
+upset(fromList(geneIds(geneSets_vs_markers)), nsets = 6)
 ```
 
 ```{r}
@@ -523,14 +523,14 @@ acts <- run_viper(mat=mat, net=net, .source='source', .target='target',
 pseudo_bulk_TFact <- pivot_wider(acts,id_cols = source, values_from = score, names_from = condition) %>%
   column_to_rownames("source")
 
-filter_TFs = "MostCorr" # "MostCorr" |
+filter_TFs = "MostVar" # "MostCorr" |
 
 if (filter_TFs == "MostVar"){
   top_50MostVarTF <- Get_mostvar(pseudo_bulk_TFact, 50)
   pseudo_bulk_TFact <- top_50MostVarTF
   phtitle <- "Top 50 MostVar TFs"
   
-} else if (filter_TFs == "MostCorr"){
+} else if (filter_TFs == "MostCorr"){ #!Need to change for cases with less than 4 clusters
   var_tocorr <- "mean_ISRactlow"
   top_50TF <- rcorr(t(pseudo_bulk_TFact), pseudo_bulk_annot[,var_tocorr,drop=T])$r[,"y"] %>%
       abs() %>% 
