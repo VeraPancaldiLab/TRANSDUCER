@@ -239,3 +239,98 @@ for (comp in colnames(S_mat)){
 # #system(paste(c("cd 02_Output/ \n pdfunite", concat_pdf, "ICA_TEs.pdf"), collapse = " "))
 # system(paste(c("cd 02_Output/ \n convert", concat_pdf, "ICA_TEs.pdf"), collapse = " "))
 
+# RBP expression correlation analysis #! To be done!!
+RBPs <- read_tsv("01_Input/RBPs_hs.csv") %>% # rbp.db homo sapiens database March 2024
+  dplyr::rename(gene_symbol = `Gene Symbol`, ensembl_gene = `Annotation ID`)
+
+list_of_RBPs <- dplyr::select(RBPs, gene_symbol, ensembl_gene) %>% 
+  dplyr::filter(ensembl_gene %in% expression_m$EnsemblID)
+
+## analysis of correlation
+# RBPs_corrs <-  dplyr::filter(expression_m, EnsemblID %in% list_of_RBPs$ensembl_gene) %>%
+#   mutate(gene_symbol = ensembl_to_gene[EnsemblID]) %>%
+#   dplyr::select(gene_symbol, A_TEs$sample) %>% 
+#   relocate(gene_symbol, all_of(order_by)) %>%
+#   pivot_longer(-gene_symbol, names_to = "sample") %>%
+#   pivot_wider(values_from = value, names_from = gene_symbol) %>%
+#   inner_join(A_TEs, by = "sample") %>%
+#   column_to_rownames("sample") %>%
+#   formatted_cors(cor.stat = "spearman") %>%
+#   filter(measure1 %in% list_of_RBPs$gene_symbol,
+#          measure2 %in% names(A_TEs)) %>%
+#   mutate(FDR = p.adjust(p = p, method = "BH"),
+#          sig_FDR = FDR < 0.05)
+# 
+# write_tsv(RBPs_corrs, paste0("02_Output/RBPs.",omic,"_vs_IC.TEs.tsv")) 
+# 
+# 
+# ## Plots
+# ### n of significant deregulated RBPs per IC
+# for (i in 1:500){
+#   random_genes <- sample_n(expression_m, nrow(list_of_RBPs))
+#   
+#   random_corr <- random_genes %>%
+#     dplyr::select(EnsemblID, A_TEs$sample) %>%
+#     relocate(EnsemblID, all_of(order_by)) %>%
+#     pivot_longer(-EnsemblID, names_to = "sample") %>%
+#     pivot_wider(values_from = value, names_from = EnsemblID) %>%
+#     inner_join(A_TEs, by = "sample") %>%
+#     column_to_rownames("sample") %>%
+#     formatted_cors(cor.stat = "spearman") %>%
+#     filter(measure1 %in% random_genes$EnsemblID,
+#            measure2 %in% names(A_TEs)) %>%
+#     mutate(FDR = p.adjust(p = p, method = "BH"),
+#            sig_FDR = FDR < 0.05)
+#   
+#   if (i == 1)
+#   {
+#     print(max(random_corr$r))
+#     random_correlations <- dplyr::mutate(random_corr, iteration = i)
+#   } else
+#   {
+#     print(i)
+#     random_correlations <- dplyr::mutate(random_corr, iteration = i) %>%
+#       rbind(random_correlations)
+#   }
+# }
+# 
+# random_significant <- dplyr::filter(random_correlations, sig_FDR) %>% 
+#   group_by(iteration) %>%
+#   group_by(measure2, .add = TRUE) %>%
+#   dplyr::summarise(count = n()) %>%
+#   group_by(measure2) %>%
+#   dplyr::summarise(mean = mean(count), sd = sd(count))
+# 
+# 
+# dplyr::filter(RBPs_corrs, sig_FDR) %>% 
+#   ggplot(aes(measure2)) +
+#   geom_bar(stat = "count") +
+#   geom_point(inherit.aes = FALSE, random_significant, mapping = aes(x = measure2, y = mean), color = "red") +
+#   geom_point(inherit.aes = FALSE, random_significant, mapping = aes(x = measure2, y = mean + sd), shape = 2) +
+#   geom_point(inherit.aes = FALSE, random_significant, mapping = aes(x = measure2, y = mean - sd), shape = 6) +
+#   ggtitle(label = paste0("RBPs ", omic, " is significantly correlated to an IC."),
+#           subtitle = " vs. 500 random lists of genes mean & sd") +
+#   
+#   theme_bw() +
+#   labs(x = "component", y = "count") +
+#   scale_y_continuous(breaks=seq(0,12,2)) +
+#   rotate_x_text(angle = 90)
+# 
+# ### component specific significantly correlated components
+# plot_IC6_RBPstotal <- dplyr::filter(RBPs_corrs, sig_FDR,
+#                                     measure2 == interest_IC) %>%
+#   arrange(r) %>%
+#   mutate(measure1 = as_factor(measure1)) %>%
+#   arrange(abs(r)) %>%
+#   slice_tail(n=50) %>%
+#   ggplot(aes(x = r, y = measure1, fill = FDR)) +
+#   geom_bar(stat="identity") +
+#   scale_fill_gradient(low = "red", high = "blue", guide=guide_colourbar(reverse = TRUE))+
+#   theme_bw() +
+#   xlim(-1,1) +
+#   labs(title = paste0(interest_IC," top 50 most correlated RBPs ", omic)) +
+#   xlab("Spearman correlation") +
+#   ylab("")
+# 
+# ggsave(file="02_Output/Figures/plot_IC6TE_RBPstotal.svg", plot=plot_IC6_RBPstotal, width=5, height=5)
+# #-------------------------------------------------------------------------------
