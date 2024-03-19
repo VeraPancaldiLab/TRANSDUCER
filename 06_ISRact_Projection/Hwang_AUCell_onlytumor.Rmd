@@ -78,12 +78,20 @@ max_rank = 100
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ISRact_contributions <- sort(pca_pdx$rotation[,"PC1"])
 ### translate to Gene ID
+# ensembl75 <- useEnsembl(biomart = "genes",
+#                         dataset = "hsapiens_gene_ensembl",
+#                         version = 75
+#                         )#listAttributes(ensembl75, page="feature_page")
+# 
+# annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+#                                         'external_gene_id'), mart = ensembl75)
 ensembl75 <- useEnsembl(biomart = "genes",
-                        dataset = "hsapiens_gene_ensembl",
-                        version = 75)#listAttributes(ensembl75, page="feature_page")
+                        dataset = "hsapiens_gene_ensembl"
+                        )#listAttributes(ensembl75, page="feature_page")
 
 annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
-                                        'external_gene_id'), mart = ensembl75)
+                                        'external_gene_name'), mart = ensembl75) %>% dplyr::rename(external_gene_id = "external_gene_name")
+
 
 translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
 
