@@ -78,19 +78,19 @@ max_rank = 100
 pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ISRact_contributions <- sort(pca_pdx$rotation[,"PC1"])
 ### translate to Gene ID
-# ensembl75 <- useEnsembl(biomart = "genes",
-#                         dataset = "hsapiens_gene_ensembl",
-#                         version = 75
-#                         )#listAttributes(ensembl75, page="feature_page")
-# 
-# annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
-#                                         'external_gene_id'), mart = ensembl75)
 ensembl75 <- useEnsembl(biomart = "genes",
-                        dataset = "hsapiens_gene_ensembl"
+                        dataset = "hsapiens_gene_ensembl",
+                        version = 75
                         )#listAttributes(ensembl75, page="feature_page")
 
 annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
-                                        'external_gene_name'), mart = ensembl75) %>% dplyr::rename(external_gene_id = "external_gene_name")
+                                        'external_gene_id'), mart = ensembl75)
+# ensembl75 <- useEnsembl(biomart = "genes",
+#                         dataset = "hsapiens_gene_ensembl"
+#                         )#listAttributes(ensembl75, page="feature_page")
+# 
+# annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
+#                                         'external_gene_name'), mart = ensembl75) %>% dplyr::rename(external_gene_id = "external_gene_name")
 
 
 translate = deframe(annot_ensembl75[c("ensembl_gene_id", "external_gene_id")])
@@ -120,8 +120,8 @@ ISRact_low <- dplyr::filter(ISRact_info, class == "ISRac_low")%>%
 
 ### Build Gene set objects
 ISRactGeneSets <- c(
-  GeneSet(ISRact_high, setName=paste0("ISRact_high(", length(ISRact_high),")")),
-  GeneSet(ISRact_low, setName=paste0("ISRact_low(", length(ISRact_low),")")))
+  GeneSet(na.omit(ISRact_high), setName=paste0("ISRact_high(", length(ISRact_high),")")),
+  GeneSet(na.omit(ISRact_low), setName=paste0("ISRact_low(", length(ISRact_low),")")))
 
 geneSets <- GeneSetCollection(c(ISRactGeneSets))
 ```
@@ -189,7 +189,7 @@ And the visual representation, whith an extra one for Basal/CLassical
 
 ```{r}
 FeaturePlot(seurat_object, reduction = "umap", features = AUC_names)
-FeaturePlot(seurat_object, reduction = "umap", features = c("Moffitt_basal", "Moffitt_classical", "Bailey_squamous", "Bailey_progenitor","Collison_QM", "Collison_classical", "MALIGNANT CELLS", "GATA6", "cnv_score", "ISR_ratio")) 
+FeaturePlot(seurat_object, reduction = "umap", features = c("Moffitt_basal", "Moffitt_classical", "Bailey_squamous", "Bailey_progenitor", "MALIGNANT CELLS", "GATA6", "cnv_score", "ISR_ratio", "n_genes_by_counts"))
 ```
 
 Now I create a ISRAct High minus low to get the differenece between both 
@@ -236,8 +236,34 @@ markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = '
 ```
 
 ```{r}
+# Explore marker pct filtering
+ dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=pct.1, y=pct.2, colour=avg_log2FC))+
+  geom_point() + 
+  scale_colour_gradient2() +
+  theme_classic()
+  
+ dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x= avg_log2FC, y = -p_val_adj, colour=(pct.1 + pct.2)/2))+
+  geom_point() + 
+  scale_colour_gradient(low = "lightgrey", high = "black")+
+  theme_classic()
+
+  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x= avg_log2FC, y = (pct.1 + pct.2)/2))+
+  geom_point() + 
+  theme_classic()
+ 
+  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=(pct.1 + pct.2)/2)) +
+  geom_bar(stat = "count") + 
+  theme_classic()
+
+  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=abs(pct.1 - pct.2))) +
+  geom_bar(stat = "count") + 
+  theme_classic()
+
 # Top 10 plot
-sign_markers <- dplyr::filter(markers, p_val_adj < 0.01) %>% dplyr::arrange(desc(avg_log2FC))
+sign_markers <- dplyr::filter(markers, p_val_adj<0.01, pct.1>0.1) %>% dplyr::arrange(desc(avg_log2FC)) 
+
+## Save for later
+clusterISRactlow_pos <- rownames(dplyr::filter(sign_markers, avg_log2FC > 0)) %>% GeneSet(., setName=paste0("clusterISRactlow_pos(", length(.),")"))
 
 VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:6]), group.by = "seurat_clusters", pt.size = 0.1) + geom_hline(yintercept=0, linetype = "dashed")
 ```
@@ -265,7 +291,7 @@ gene_to_entrez = deframe(annot_ensembl[c( "external_gene_name", "entrezgene_id")
 
 # Define lists of genes #! This is extra, as the filtering ive done it above already!
 pos_markers <- dplyr::filter(sign_markers, avg_log2FC > 0) %>% rownames()
-neg_markers <- dplyr::filter(sign_markers, avg_log2FC < 0) %>% rownames()non
+neg_markers <- dplyr::filter(sign_markers, avg_log2FC < 0) %>% rownames()
 background <- rownames(markers)
 
 #rank_markers <- 
@@ -368,8 +394,32 @@ markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = '
 ```
 
 ```{r}
+# Explore marker pct filtering
+ dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=pct.1, y=pct.2, colour=avg_log2FC))+
+  geom_point() + 
+  scale_colour_gradient2() +
+  theme_classic()
+  
+ dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x= avg_log2FC, y = -p_val_adj, colour=(pct.1 + pct.2)/2))+
+  geom_point() + 
+  scale_colour_gradient(low = "lightgrey", high = "black")+
+  theme_classic()
+
+  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x= avg_log2FC, y = (pct.1 + pct.2)/2))+
+  geom_point() + 
+  theme_classic()
+ 
+  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=(pct.1 + pct.2)/2)) +
+  geom_bar(stat = "count") + 
+  theme_classic()
+
+  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=abs(pct.1 - pct.2))) +
+  geom_bar(stat = "count") + 
+  theme_classic()
+
 # Top 10 plot
-sign_markers <- dplyr::filter(markers, p_val_adj < 0.01) %>% dplyr::arrange(desc(avg_log2FC))
+
+sign_markers <- dplyr::filter(markers, p_val_adj<0.01, pct.1>0.1) %>% dplyr::arrange(desc(avg_log2FC)) 
 
 VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:5]), group.by = "seurat_clusters", pt.size = 0.1) + geom_hline(yintercept=0, linetype = "dashed")
 ```
