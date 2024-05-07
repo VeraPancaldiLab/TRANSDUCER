@@ -592,7 +592,7 @@ random_significant <- dplyr::filter(random_correlations, sig_FDR) %>%
 
 dplyr::filter(RBPs_corrs, sig_FDR) %>% 
   ggplot(aes(measure2)) +
-  geom_bar(stat = "count") +
+  geom_bar(stat = "count", fill = "grey69") +
   geom_point(inherit.aes = FALSE, random_significant, mapping = aes(x = measure2, y = mean), color = "red") +
   geom_point(inherit.aes = FALSE, random_significant, mapping = aes(x = measure2, y = mean + sd), shape = 2) +
   geom_point(inherit.aes = FALSE, random_significant, mapping = aes(x = measure2, y = mean - sd), shape = 6) +
