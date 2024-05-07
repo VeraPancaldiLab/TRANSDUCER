@@ -90,7 +90,7 @@ S_TEs_ext_l <- list(translationUp = S_TEs_extup$geneID,
 ## Compare difference in nucleotide composition
 content <- contentAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                                customBg = S_TEs$geneID, # like so we need to give some background
-                               geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                               geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)],
                                regulation = c("translationUp", "translationDown"),
                                contrast = c(1,1), 
                                region = c('CDS'),
@@ -114,20 +114,20 @@ motif_list <- motifAnalysis( geneList = S_TEs_ext_l,
                          subregion = NULL,
                          subregionSel=NULL)
 } else {
-  motif_list <- c("DRACH")
+  motif_list <- c("DRACH", "HCARD")
   attract <- read_tsv("Input/ATtRACT_db.tsv") %>%
     filter(Organism == "Mus_musculus",
            Len >= min_len) %>% 
     dplyr::select(Gene_name, Motif) %>%
     deframe()
-  motifs_in = attract
+  motifs_in = motif_list # attract | motif_list
 }
 
 
 ### Quantification
 motifs_quant <- contentMotifs(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                             customBg = S_TEs$geneID, # like so we need to give some background
-                            geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                            geneListcolours =  brewer.pal(n = 3, name = "RdBu")[c(1,3)],
                             regulation = c("translationUp", "translationDown"),
                             contrast = c(1,1),
                             motifsIn = motifs_in, 
@@ -137,39 +137,40 @@ motifs_quant <- contentMotifs(geneList = S_TEs_ext_l, #instead of anota2seq obje
                             annot = annot,
                             comparisons = list(c(1,2)),
                             unitOut = "number",
-                            pdfName = pdf_name
-)
+                            pdfName = pdf_name)
 
-# ## Codon Analysis # To be fixed
-# ### caclulate usage per transcript
-# codonOut <- codonUsage(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
-#                             customBg = S_TEs$geneID, # like so we need to give some background
-#                             analysis = "codon",
-#                             annot = annot,
-#                             regulation = c("translationUp", "translationDown"),
-#                             contrast = c(1,1),
-#                             type = "sequence",
-#                             comparisons = list(c(1,2)),
-#                             annotType = 'ccds',
-#                             sourceCod = "load",
-#                             selection = "longest",
-#                             pAdj=0.01,
-#                             plotHeatmap = TRUE,
-#                             pdfName = pdf_name,
-#                             species = "mouse")
-# 
-# ### Statistical analysis
-# selCodonOut <- codonCalc(codonIn = codonOut[['codonAll']],
-#                           analysis = "codon",
-#                          featsel = codonOut[[1]],
-#                          unit = "freq",
-#                          regulation = c("translationUp", "translationDown"),
-#                          contrast = c(1,1),
-#                          geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
-#                          customBg = TEs_subset$geneID, # like so we need to give some background
-#                          pdfName = pdf_name,
-#                          plotOut = T,
-#                          plotType = 'ecdf')
+## Codon Analysis # To be fixed
+### caclulate usage per transcript
+codonOut <- codonUsage(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
+                            customBg = S_TEs$geneID, # like so we need to give some background
+                            geneListcolours =  brewer.pal(n = 3, name = "RdBu")[c(1,3)],
+                            analysis = "codon",
+                            annot = annot,
+                            regulation = c("translationUp", "translationDown"),
+                            contrast = c(1,1),
+                            type = "sequence",
+                            comparisons = list(c(1,2)),
+                            annotType = 'ccds',
+                            sourceCod = "load",
+                            selection = "longest",
+                            pAdj=0.01,
+                            plotHeatmap = TRUE,
+                            pdfName = pdf_name,
+                            species = "mouse",)
+
+### Statistical analysis
+selCodonOut <- codonCalc(codonIn = codonOut[['codonAll']],
+                          analysis = "codon",
+                         featsel = codonOut[[1]],
+                         geneListcolours =  brewer.pal(n = 3, name = "RdBu")[c(1,3)],
+                         unit = "freq",
+                         regulation = c("translationUp", "translationDown"),
+                         contrast = c(1,1),
+                         geneList = TEs_5perc_l, #instead of anota2seq object  you input geneList and effect_measures
+                         customBg = TEs_subset$geneID, # like so we need to give some background
+                         pdfName = pdf_name,
+                         plotOut = T,
+                         plotType = 'ecdf')
 
 # Feature integration
 features <- c(content,
@@ -186,5 +187,6 @@ featureIntegration(geneList = S_TEs_ext_l, #instead of anota2seq object  you inp
                    regOnly = T,
                    allFeat = F,
                    regulationGen = "translation",
-                   analysis_type = "lm")
+                   analysis_type = "lm",
+                   geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)])
 

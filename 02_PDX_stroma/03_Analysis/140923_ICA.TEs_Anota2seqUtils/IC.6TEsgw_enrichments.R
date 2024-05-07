@@ -103,4 +103,5 @@ featureIntegration(geneList = S_TEs_ext_l, #instead of anota2seq object  you inp
                    regOnly = T,
                    allFeat = F,
                    regulationGen = "translation",
-                   analysis_type = "lm")
+                   analysis_type = "lm",
+                   geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)])
