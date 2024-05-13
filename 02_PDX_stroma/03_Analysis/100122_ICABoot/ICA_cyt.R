@@ -306,7 +306,6 @@ clinical_technical_corrplot <- complete_annotation %>%
 ggsave(file="02_Output/Figures/clinical_technical_corrplot.svg", plot=clinical_technical_corrplot, width=4, height=6)
 sed -i "s/ textLength='[^']*'//" file.svg
 #-------------------------------------------------------------------------------
-
 # FIGURE SPECIFIC PLOTS: MCPCounter deconvolution
 #-------------------------------------------------------------------------------
 deconvolution_corr <- A_mat %>%
@@ -337,7 +336,6 @@ deconvolution_corrplot <- ggplot(deconvolution_corr, aes(measure1, measure2, fil
 
 ggsave(file="02_Output/Figures/deconvolution_corrplot.svg", plot=deconvolution_corrplot, width=8, height=6)
 #-------------------------------------------------------------------------------
-
 # FIGURE SPECIFIC PLOTS: Most correlated stromal TF activities
 #-------------------------------------------------------------------------------
 stroma_mostvar_TF <- Get_mostvar(stroma_tf, 20) %>% rownames_to_column() %>% pivot_longer(-rowname) %>% 
@@ -460,3 +458,156 @@ gsva_IC4 <- ggplot(gsvaTop, aes(x = ES, y = gene_set)) +
   rremove("ylab")
 
 ggsave(file="02_Output/Figures/gsva_IC4.svg", plot=gsva_IC4, width=10, height=6)
+
+#-------------------------------------------------------------------------------
+# THESIS PLOTS: Clinical and technical data + other components
+#-------------------------------------------------------------------------------
+levels = c(paste0("ICA",1:6), "PAMG",
+           "RNAconc_cyt", "Dups_R1", "GC_R1", # general adn rRNA abundance
+           "Number_of_reads_mapped_to_too_many_loci", "Per_of_reads_mapped_to_multiple_loci", # rRNA abundance
+           "Deletion_rate_per_base", "input2maped_length_diff", "Uniquely_mapped_reads_per") 
+
+clinical_technical_full_corrplot <- sample_info %>%
+  as_tibble(rownames = "CITID") %>%
+  inner_join(rownames_to_column(A_mat, "CITID")) %>% 
+  inner_join(multiqc) %>%
+  inner_join(seq_info) %>%
+  dplyr::select(CITID, matches("IC."), PAMG,
+                RNAconc_cyt, Dups_R1, GC_R1,
+                Number_of_reads_mapped_to_too_many_loci, Per_of_reads_mapped_to_multiple_loci, 
+                Deletion_rate_per_base, input2maped_length_diff, Uniquely_mapped_reads_per) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% levels,
+         measure2 %in% names(A_mat)) %>% #not square corr
+  dplyr::mutate(measure1 = factor(measure1,
+                                  levels = levels)) %>% 
+  ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICAcyt ~ multiqc",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0)) +
+  scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
+  ggpubr::rotate_x_text(angle = 90)
+
+ggsave(file="02_Output/Figures/clinical_technical_full_corrplot.svg", plot=clinical_technical_full_corrplot, width=8, height=6)
+sed -i "s/ textLength='[^']*'//" file.svg
+#-------------------------------------------------------------------------------
+# THESIS PLOTS: Deconvolution plots
+#-------------------------------------------------------------------------------
+for (method in c("mMCPcounter", "ImmuCC")){
+
+  if (method == "mMCPcounter"){
+    deconv = mMCPcounter_res
+  } else  if (method == "ImmuCC"){
+    deconv = ImmuCC_res
+  }
+  
+    deconvolution_corr <- A_mat %>%
+      as_tibble(rownames = "CITID") %>%
+      inner_join(as_tibble(deconv, rownames = "CITID")) %>%
+      dplyr::select(CITID, names(A_mat), names(deconv)) %>%
+      column_to_rownames("CITID") %>%
+      formatted_cors("spearman") %>%
+      filter(measure1 %in% names(deconv),
+             measure2 %in% names(A_mat))
+    
+    clust <- dplyr::select(deconvolution_corr, measure1, measure2, r) %>% 
+      pivot_wider(names_from=measure2, values_from = r) %>%
+      column_to_rownames("measure1") %>%
+      dist() %>%
+      hclust()
+    
+    deconvolution_corrplot <- ggplot(deconvolution_corr, aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+      geom_tile() +
+      labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title=paste0("Correlations ICAcyt ~ ", method),
+           subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+      scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+      geom_text() +
+      theme_classic() +
+      scale_x_discrete(expand=c(0,0),limits = clust$labels[clust$order]) +
+      scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
+      ggpubr::rotate_x_text(angle = 90)
+    
+    if (method == "mMCPcounter"){
+      ggsave(file=paste0("02_Output/Figures/", method, "_deconv.svg"), plot=deconvolution_corrplot, width=10, height=6)
+      
+    } else  if (method == "ImmuCC"){
+      ggsave(file=paste0("02_Output/Figures/", method, "_deconv.svg"), plot=deconvolution_corrplot, width=7, height=6)
+    }
+    
+}
+
+
+stroma_mostvar_TF <- Get_mostvar(stroma_tf, 15) %>% rownames_to_column() %>% pivot_longer(-rowname) %>% 
+  pivot_wider(names_from=rowname, values_from=value)
+
+stroma_tf_corr <- A_mat %>%
+  as_tibble(rownames = "CITID") %>%
+  inner_join(as_tibble(t(stroma_tf), rownames = "CITID")) %>%
+  dplyr::select(CITID, names(A_mat), names(stroma_mostvar_TF)[-1]) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% names(stroma_mostvar_TF)[-1],
+         measure2 %in% names(A_mat))
+
+clust <- dplyr::select(stroma_tf_corr, measure1, measure2, r) %>% 
+  pivot_wider(names_from=measure2, values_from = r) %>%
+  column_to_rownames("measure1") %>%
+  dist() %>%
+  hclust()
+
+stroma_tf_small_corrplot <- ggplot(stroma_tf_corr, aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICAcyt ~ Stroma most variable TF activities",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0),limits = clust$labels[clust$order]) +
+  scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
+  ggpubr::rotate_x_text(angle = 90)
+
+ggsave(file="02_Output/Figures/stroma_tf_small_corrplot.svg", plot=stroma_tf_small_corrplot, width=10, height=6)
+
+
+tumour_mostvar_TF <- Get_mostvar(tumour_tf, 15) %>% rownames_to_column() %>% pivot_longer(-rowname) %>% 
+  pivot_wider(names_from=rowname, values_from=value)
+
+tumour_tf_corr <- A_mat %>%
+  as_tibble(rownames = "CITID") %>%
+  inner_join(as_tibble(t(tumour_tf), rownames = "CITID")) %>%
+  dplyr::select(CITID, names(A_mat), names(tumour_mostvar_TF)[-1]) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% names(tumour_mostvar_TF)[-1],
+         measure2 %in% names(A_mat))
+
+clust <- dplyr::select(tumour_tf_corr, measure1, measure2, r) %>% 
+  pivot_wider(names_from=measure2, values_from = r) %>%
+  column_to_rownames("measure1") %>%
+  dist() %>%
+  hclust()
+
+tumour_tf_small_corrplot <- ggplot(tumour_tf_corr, aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICAcyt ~ Tumour most variable TF Activities",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0),limits = clust$labels[clust$order]) +
+  scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
+  ggpubr::rotate_x_text(angle = 90)
+
+ggsave(file="02_Output/Figures/tumour_tf_small_corrplot.svg", plot=tumour_tf_small_corrplot, width=10, height=6)
+
+
+#-------------------------------------------------------------------------------
+
+sed -i "s/ textLength='[^']*'//" file.svg
+#-------------------------------------------------------------------------------
+
