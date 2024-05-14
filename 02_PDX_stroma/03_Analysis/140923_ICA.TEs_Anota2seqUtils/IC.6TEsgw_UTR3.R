@@ -90,7 +90,7 @@ S_TEs_ext_l <- list(translationUp = S_TEs_extup$geneID,
 ## Compare difference in nucleotide composition
 content <- contentAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                                customBg = S_TEs$geneID, # like so we need to give some background
-                               geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                           geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)],
                                regulation = c("translationUp", "translationDown"),
                                contrast = c(1,1), 
                                region = c('UTR3'),
@@ -127,7 +127,7 @@ motif_list <- motifAnalysis( geneList = S_TEs_ext_l,
 ### Quantification
 motifs_quant <- contentMotifs(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                             customBg = S_TEs$geneID, # like so we need to give some background
-                            geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                            geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)],
                             regulation = c("translationUp", "translationDown"),
                             contrast = c(1,1),
                             motifsIn = motifs_in, 
@@ -154,5 +154,6 @@ featureIntegration(geneList = S_TEs_ext_l, #instead of anota2seq object  you inp
                    regOnly = T,
                    allFeat = F,
                    regulationGen = "translation",
-                   analysis_type = "lm")
+                   analysis_type = "lm",
+                   geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)])
 

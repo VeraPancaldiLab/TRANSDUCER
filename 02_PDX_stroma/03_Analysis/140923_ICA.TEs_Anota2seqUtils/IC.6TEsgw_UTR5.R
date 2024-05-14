@@ -89,7 +89,7 @@ S_TEs_ext_l <- list(translationUp = S_TEs_extup$geneID,
 ## length analysis (Only 5UTR!)
 len5UTR <- lengthAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                           customBg = S_TEs$geneID, # like so we need to give some background
-                          geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                          geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)],
                           regulation = c("translationUp", "translationDown"),
                           contrast = c(1,1), 
                           region = c('UTR5'),
@@ -101,7 +101,7 @@ len5UTR <- lengthAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object  
 ## Compare difference in nucleotide composition
 content <- contentAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                                customBg = S_TEs$geneID, # like so we need to give some background
-                               geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                           geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)],
                                regulation = c("translationUp", "translationDown"),
                                contrast = c(1,1), 
                                region = c('UTR5'),
@@ -115,7 +115,7 @@ content <- contentAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object 
 ## Compare presence of uORFs
 uorf_strong <- uorf_analysis(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                                  customBg = S_TEs$geneID, # like so we need to give some background
-                                 geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                             geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)],
                                  regulation = c("translationUp", "translationDown"),
                                  contrast = c(1,1),
                                  onlyUTR5 = T,
@@ -152,7 +152,7 @@ motif_list <- motifAnalysis( geneList = S_TEs_ext_l,
 ### Quantification
 motifs_quant <- contentMotifs(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                             customBg = S_TEs$geneID, # like so we need to give some background
-                            geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                            geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)],
                             regulation = c("translationUp", "translationDown"),
                             contrast = c(1,1),
                             motifsIn = motifs_in, 
@@ -169,7 +169,7 @@ motifs_quant <- contentMotifs(geneList = S_TEs_ext_l, #instead of anota2seq obje
 feOut <- foldingEnergyAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                                    customBg = S_TEs$geneID, # like so we need to give some background
                                    species = 'mouse',
-                                   geneListcolours = c(brewer.pal(8, "Reds")[c(4,8)]),
+                               geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)],
                                    regulation = c("translationUp", "translationDown"),
                                    contrast = c(1,1), 
                                    region = c('UTR5'),
@@ -181,7 +181,7 @@ feOut <- foldingEnergyAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq obj
                                    plotOut = TRUE)
 
 # Feature integration
-features <- c(len5UTR,
+features <- c(#len5UTR,
                   content,
                   uorf_strong,
                   motifs_quant,
@@ -197,4 +197,5 @@ featureIntegration(geneList = S_TEs_ext_l, #instead of anota2seq object  you inp
                    regOnly = T,
                    allFeat = F,
                    regulationGen = "translation",
-                   analysis_type = "lm")
+                   analysis_type = "lm",
+                   geneListcolours = brewer.pal(n = 3, name = "RdBu")[c(1,3)])

@@ -120,7 +120,7 @@ motif_list <- motifAnalysis( geneList = S_TEs_ext_l,
            Len >= min_len) %>% 
     dplyr::select(Gene_name, Motif) %>%
     deframe()
-  motifs_in = motif_list # attract | motif_list
+  motifs_in = attract # attract | motif_list
 }
 
 
