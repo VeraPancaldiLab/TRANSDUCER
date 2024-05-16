@@ -144,8 +144,8 @@ motif_list <- motifAnalysis( geneList = S_TEs_ext_l,
            Len >= min_len) %>% 
     dplyr::select(Gene_name, Motif) %>%
     deframe()
-  motif_list <- c("DRACH")
-  motifs_in = attract
+  motif_list <- c("DRACH", "HCARD")
+  motifs_in = motif_list
 }
 
 
@@ -181,7 +181,7 @@ feOut <- foldingEnergyAnalysis(geneList = S_TEs_ext_l, #instead of anota2seq obj
                                    plotOut = TRUE)
 
 # Feature integration
-features <- c(#len5UTR,
+features <- c(len5UTR,
                   content,
                   uorf_strong,
                   motifs_quant,

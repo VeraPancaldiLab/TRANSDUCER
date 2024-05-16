@@ -120,7 +120,7 @@ motif_list <- motifAnalysis( geneList = S_TEs_ext_l,
            Len >= min_len) %>% 
     dplyr::select(Gene_name, Motif) %>%
     deframe()
-  motifs_in = attract # attract | motif_list
+  motifs_in = motif_list # attract | motif_list
 }
 
 
@@ -144,7 +144,7 @@ motifs_quant <- contentMotifs(geneList = S_TEs_ext_l, #instead of anota2seq obje
 codonOut <- codonUsage(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures
                             customBg = S_TEs$geneID, # like so we need to give some background
                             geneListcolours =  brewer.pal(n = 3, name = "RdBu")[c(1,3)],
-                            analysis = "codon",
+                            analysis = "aa",
                             annot = annot,
                             regulation = c("translationUp", "translationDown"),
                             contrast = c(1,1),
@@ -156,7 +156,7 @@ codonOut <- codonUsage(geneList = S_TEs_ext_l, #instead of anota2seq object  you
                             pAdj=0.01,
                             plotHeatmap = TRUE,
                             pdfName = pdf_name,
-                            species = "mouse",)
+                            species = "mouse")
 
 ### Statistical analysis
 selCodonOut <- codonCalc(codonIn = codonOut[['codonAll']],
@@ -175,7 +175,7 @@ selCodonOut <- codonCalc(codonIn = codonOut[['codonAll']],
 # Feature integration
 features <- c(content,
               motifs_quant
-              # selCodonOut, # To be fixed
+              #selCodonOut, # To be fixed
 )
 
 featureIntegration(geneList = S_TEs_ext_l, #instead of anota2seq object  you input geneList and effect_measures

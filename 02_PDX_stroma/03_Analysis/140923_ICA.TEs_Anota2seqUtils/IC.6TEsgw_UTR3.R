@@ -40,6 +40,7 @@ annot_ensembl75 <- getBM(attributes = c('ensembl_gene_id',
 gene_to_ensembl = deframe(annot_ensembl75[c( "external_gene_id", "ensembl_gene_id")])
 ensembl_to_gene = setNames(names(gene_to_ensembl), gene_to_ensembl)
 gene_to_entrez = deframe(annot_ensembl75[c( "external_gene_id", "entrezgene")])
+
 # Data loading
 ## ICs
 ICA_TEs <- read_rds("../100122_ICABoot/02_Output/ICA_TEs.RDS")
@@ -119,8 +120,8 @@ motif_list <- motifAnalysis( geneList = S_TEs_ext_l,
            Len >= min_len) %>% 
     dplyr::select(Gene_name, Motif) %>%
     deframe()
-  motif_list <- c("DRACH")
-  motifs_in = attract
+  motif_list <- c("DRACH", "HCARD")
+  motifs_in = motif_list
 }
 
 
