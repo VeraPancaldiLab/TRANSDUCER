@@ -376,20 +376,33 @@ ggplot(S_cyt) +
   coord_cartesian(clip = 'off') +
   theme_classic()
 
+### Improved plot
+Elyada_violinplot <- bind_rows(dplyr::mutate(S_cyt_iCAFs, signature = "iCAFs"),
+          dplyr::mutate(S_cyt_apCAFs, signature = "apCAFs"),
+          dplyr::mutate(S_cyt_myCAFs, signature = "myCAFs"),
+          dplyr::mutate(S_cyt, signature = "background")) %>%
+  dplyr::mutate(signature = fct(signature, levels = c("myCAFs", "iCAFs", "apCAFs", "background"))) %>%
+  ggplot(aes(y = IC.4.cyt, x = signature, fill= signature)) + 
+  geom_violin() +
+  scale_fill_manual(values=c("#329F2A","#FF7F00", "#6A3D9A", "grey")) +
+  geom_boxplot(width=0.05, fill = "white") +
+  geom_hline(yintercept = median(S_cyt$IC.4.cyt),color = "red", linetype = "dashed") +
+  theme_bw()
+
+ggsave("02_Output/Figures/Elyada_IC4cyt_violinplot.svg", plot=Elyada_violinplot, width=7, height=3)
+
 ### heatmap of gene expression
 annot_row <- pivot_longer(Elayada,  cols = tidyselect::everything(), names_to = "signature", values_to = "genes") %>%
   dplyr::filter(!is.na(genes)) %>%
-  dplyr::arrange(genes) %>%
-  mutate(value = 1) %>% 
-  pivot_wider(names_from = "signature", id_cols = "genes") %>%
-  replace(is.na(.), 0) %>% column_to_rownames("genes")
+  column_to_rownames("genes") 
 
 annot_col <- inner_join(A_cyt, annotations, "sample") %>% 
   dplyr::select(sample, PAMG, ISRact, IC.4.cyt) %>% column_to_rownames("sample")
 
 annot_colors <- list(PAMG = c("#FF7F00", "white", "#377DB8"),
                      ISRact = c("#FFFFCC", "#006837"),
-                     IC.4.cyt = c("#FFFFCC", "#5b0066")) 
+                     IC.4.cyt = c("#FFFFCC", "#5b0066"),
+                     signature = c(myCAFs = "#329F2A",iCAFs ="#FF7F00", apCAFs ="#6A3D9A")) 
 
 stopifnot(names(cyt_m)[-1] == annot_col$sample)
 mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
@@ -400,8 +413,9 @@ mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
            annotation_row = annot_row,
            annotation_col = annot_col,
            annotation_colors = annot_colors,
-           cluster_rows = T, show_rownames = TRUE,
-           show_colnames= FALSE, main = "Stromal transcription of Elayada et al. 2019 murine CAF markers")
+           cluster_rows = T, show_rownames = F,
+           show_colnames= FALSE, main = "Stromal transcription of Elayada et al. 2019 murine CAF markers", 
+           filename = "02_Output/Figures/Elyada_heatmap.pdf", width =7, height=5)
 
 ## Verginadis et al 2022
 ### gene weight check
@@ -425,20 +439,37 @@ ggplot(S_cyt) +
   coord_cartesian(clip = 'off') +
   theme_classic()
 
+### Improved plot
+Verginadis_violinplot <- bind_rows(dplyr::mutate(S_cyt_vCAFs, signature = "vCAFs"),
+                               dplyr::mutate(S_cyt_mCAFs, signature = "mCAFs"),
+                               dplyr::mutate(S_cyt_cCAFs, signature = "cCAFs"),
+                               dplyr::mutate(S_cyt_melCAFs, signature = "melCAFs"),
+                               dplyr::mutate(S_cyt_CAFs, signature = "CAFs"),
+                               dplyr::mutate(S_cyt, signature = "background")) %>%
+  dplyr::mutate(signature = fct(signature, levels = c("vCAFs", "mCAFs", "cCAFs","melCAFs", "CAFs", "background"))) %>%
+  ggplot(aes(y = IC.4.cyt, x = signature, fill= signature)) + 
+  geom_violin() +
+  scale_fill_manual(values=c("#E52A87","#D95F01", "#1A9E76", "#766FB4", "lightblue", "grey")) +
+  geom_boxplot(width=0.05, fill = "white") +
+  geom_hline(yintercept = median(S_cyt$IC.4.cyt),color = "red", linetype = "dashed") +
+  theme_bw()
+
+ggsave("02_Output/Figures/Verginadis_violinplot.svg", plot=Verginadis_violinplot, width=9, height=3)
+
 ### heatmap of gene expression
 annot_row <- pivot_longer(Verginadis,  cols = tidyselect::everything(), names_to = "signature", values_to = "genes") %>%
   dplyr::filter(!is.na(genes)) %>%
-  dplyr::arrange(genes) %>%
-  mutate(value = 1) %>% 
-  pivot_wider(names_from = "signature", id_cols = "genes") %>%
-  replace(is.na(.), 0) %>% column_to_rownames("genes")
+  dplyr::mutate(signature = if_else(base::duplicated(genes),"many",signature)) %>% 
+  dplyr::filter(!base::duplicated(genes,fromLast = T)) %>% # to remove the unchanged one
+  column_to_rownames("genes")
 
 annot_col <- inner_join(A_cyt, annotations, "sample") %>% 
   dplyr::select(sample, PAMG, ISRact, IC.4.cyt) %>% column_to_rownames("sample")
 
 annot_colors <- list(PAMG = c("#FF7F00", "white", "#377DB8"),
                      ISRact = c("#FFFFCC", "#006837"),
-                     IC.4.cyt = c("#FFFFCC", "#5b0066")) 
+                     IC.4.cyt = c("#FFFFCC", "#5b0066"),
+                     signature=c(vCAFs="#E52A87", mCAFs="#D95F01", cCAFs="#1A9E76", melCAFs="#766FB4", CAFs="lightblue", many="grey"))
 
 stopifnot(names(cyt_m)[-1] == annot_col$sample)
 mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
@@ -449,8 +480,9 @@ mutate(cyt_m, Genenames = ensembl_to_gene[cyt_m$EnsemblID]) %>%
            annotation_row = annot_row,
            annotation_col = annot_col,
            annotation_colors = annot_colors,
-           cluster_rows = T, show_rownames = TRUE,
-           show_colnames= FALSE, main = "Stromal transcription of Verginadis et al. 2022 murine CAF markers")
+           cluster_rows = T, show_rownames = F,
+           show_colnames= FALSE, main = "Stromal transcription of Verginadis et al. 2022 murine CAF markers", 
+           filename = "02_Output/Figures/Verginadis_heatmap.pdf", width =7, height=5)
 
 # Samain et al 2021 and Csf1 expression
 ## Csf1 correlation with ISRact/IC.4.cyt
