@@ -494,7 +494,19 @@ clinical_technical_full_corrplot <- sample_info %>%
   ggpubr::rotate_x_text(angle = 90)
 
 ggsave(file="02_Output/Figures/clinical_technical_full_corrplot.svg", plot=clinical_technical_full_corrplot, width=8, height=6)
-sed -i "s/ textLength='[^']*'//" file.svg
+
+detailed_ISRactIC4cyt_corr <- as_tibble(complete_annotation, rownames = "sample") %>%
+  dplyr::mutate(IC.4_cyt = IC.4) %>% 
+  scatterplot_with_stats(varx = "ISRact",
+                         vary = "IC.4_cyt",
+                         label = "sample",
+                         type = "spearman",
+                         title = "comparison ISRact vs IC.4_cyt")
+
+ggsave(detailed_ISRactIC4cyt_corr,
+  filename = "02_Output/Figures/ISRactvsIC4cytcorr.svg",
+  width = 4,
+  height = 4)
 #-------------------------------------------------------------------------------
 # THESIS PLOTS: Deconvolution plots
 #-------------------------------------------------------------------------------
