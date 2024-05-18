@@ -704,6 +704,20 @@ clinical_technical_full_corrplot <- sample_info %>%
   ggpubr::rotate_x_text(angle = 90)
 
 ggsave(file="02_Output/Figures/clinical_technical_full_corrplot_TEs.svg", plot=clinical_technical_full_corrplot, width=12, height=6)
+
+detailed_ISRactIC6TEs_corr <- as_tibble(complete_annotation, rownames = "sample") %>%
+  dplyr::mutate(IC.6_TEs = IC.6) %>% 
+  scatterplot_with_stats(varx = "ISRact",
+                         vary = "IC.6_TEs",
+                         label = "sample",
+                         type = "spearman",
+                         title = "comparison ISRact vs IC.6_TEs")
+
+ggsave(detailed_ISRactIC6TEs_corr,
+       filename = "02_Output/Figures/detailed_ISRactIC6TEscorr.svg",
+       width = 4,
+       height = 4)
+
 sed -i "s/ textLength='[^']*'//" file.svg
 #-------------------------------------------------------------------------------
 # THESIS PLOTS: Deconvolution plots
