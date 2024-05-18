@@ -2,7 +2,7 @@ library(tidyverse)
 library(anota2seq)
 library(biomaRt)
 ################################PARAMETERS######################################
-filter_samples = "17AC_(NT|FAKi)" # (A|B|C)_17AC_(NT|NEAA) | 17AC_(NT|IL1) | (A|B|D)_17AC_(NT|TGF) | 17AC_(NT|FAKi)
+filter_samples = "17AC_(NT|TGF)" # (A|B|C)_17AC_(NT|NEAA) | 17AC_(NT|IL1) | (A|B|D)_17AC_(NT|TGF) | 17AC_(NT|FAKi)
 filter_genes = "allzeros" # custom | allzeros | NULL
 exclude_samples = NULL # NULL c("Batch_A_17AC_FAKi", "Batch_A_17AC_TGF")
 correct_batch = TRUE
@@ -32,13 +32,14 @@ if (!is.null(filter_samples)){
 }
 
 if (!is.null(exclude_samples)){
-  counts <- dplyr::select(counts, Geneid, names(counts)[!names(counts) %in% exclude_samples])
+  counts <- dplyr::select(counts, Geneid, !matches(exclude_samples))
 }
 
 ## Metadata
 manip_info <- read_tsv("../00_Data/Data_RNA_sample_Jacobo.tsv") %>% 
   dplyr::filter(sample_name %in% names(counts)) %>%
-  dplyr::mutate(sample_name = fct(sample_name, levels=names(counts)[-1])) %>%
+  dplyr::mutate(sample_name = fct(sample_name, levels=names(counts)[-1]),
+                Condition = fct(Condition, levels= c("NT", unique(Condition)[ !unique(Condition) == 'NT']))) %>% # to reinforce NT as the first term always
   dplyr::arrange(sample_name)
 
 all(names(counts)[-1] == manip_info$sample_name) %>% stopifnot()
@@ -70,15 +71,21 @@ ads <- anota2seqDataSetFromMatrix(
   varCutOff = NULL)
 
 ## QC
-ads <- anota2seqPerformQC(ads,
-                          generateSingleGenePlots = TRUE, 
-                          fileStem = "02_Output/")
-
-ads <- anota2seqResidOutlierTest(ads)
+# ads <- anota2seqPerformQC(ads,
+#                           generateSingleGenePlots = TRUE, 
+#                           fileStem = "02_Output/")
+# 
+# ads <- anota2seqResidOutlierTest(ads)
 
 ## Analysis
+### set contrast to reinforce correct order to NEAA vs NT
+phenoLev <- unique(phenoVec)
+myContrast <- matrix(nrow =length(phenoLev),ncol=length(phenoLev)-1)
+rownames(myContrast) <- phenoLev
+myContrast[,1] = c(-1, 1)
+
 ads <- anota2seqAnalyze(ads,
-                        correctionMethod = "BH", useProgBar = TRUE, fileStem = "02_Output/",
+                        correctionMethod = "BH", useProgBar = TRUE, fileStem = "02_Output/", contrasts = myContrast,
                         analysis = c("translation", "buffering", "translated mRNA", "total mRNA"))
 
 ads <- anota2seqSelSigGenes(Anota2seqDataSet = ads,
@@ -120,13 +127,20 @@ write_tsv(ads_results, filename)
 stimuli_markers <- read_tsv(file = "../00_Data/stimuli_markers.tsv")
 highlight_list <- dplyr::filter(stimuli_markers, stimuli %in% phenoVec) %>% deframe()
 
-tibble(ads_results) %>%
+marker_transplot <- tibble(ads_results) %>%
   mutate(highlight = if_else(identifier %in% highlight_list, identifier, "Other") %>% fct(levels = c("Other", highlight_list))) %>% 
   dplyr::arrange(highlight) %>%
   ggplot() +
   aes(x = totalmRNA.apvEff, y = translatedmRNA.apvEff, color = highlight) +
+  scale_color_manual(values = c(Other = "grey", setNames(brewer.pal(n = length(highlight_list), name = "Set1"), c(highlight_list)))) + 
   geom_point() +
-  geom_abline(intercept = 0, slope = 1)+
+  geom_abline(intercept = 0, slope = 1, linetype = "dotted", colour = "red")+
+  geom_hline(yintercept = 0,linetype = "dotted", colour = "red")+
+  geom_vline(xintercept = 0, linetype = "dotted", colour = "red")+
   theme_classic() + 
   labs(title = filename)
+
+ggsave(paste0("../FIGURES/marker_transplot_",paste(unique(phenoVec), collapse = "vs"), "_CorrectBatch", correct_batch, ".svg"),
+       marker_transplot, width = 5,height = 4)
+
 

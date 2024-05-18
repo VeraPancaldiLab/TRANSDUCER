@@ -6,11 +6,12 @@ library(sva)
 library(pheatmap)
 library(biomaRt)
 library(msigdbr)
+library(GSVA)
 ################################################################################
 ################################PARAMETERS######################################
 filter_samples = "17AC_(NEAA|NT)" # NULL | 17AC | 02136 | more complex like "17AC_(FAKi|NT)" for FAKi vs NT
 exclude_samples = NULL # NULL | c("Batch_A_17AC_FAKi_Input", "Batch_A_17AC_TGF_F8")
-correct_batch = T # Should correct for batch effect?
+correct_batch = F # Should correct for batch effect?
 sample_sample_corrplot_annot = "manip_info" # manip_info | picard_metrics | tech_info | STAR_info
 ################################################################################
 #################################FUNCTIONS######################################
@@ -212,7 +213,7 @@ msigdbr_list = split(x = use_genesets$ensembl_gene, f = use_genesets$gs_name)
 signature_dict <- dplyr::select(all_genesets, c(gs_name, gs_id)) %>%
   distinct(gs_id, .keep_all = T) %>%  deframe()
 
-gsvaRes <- gsva(data.matrix(leverages), msigdbr_list, min.sz = 15)
+gsvaRes <- gsva(gsvaParam(data.matrix(leverages), msigdbr_list, minSize = 15))
 
 #### plot of whatever PC Reactome enrichment
 comp = "Dim.6"
@@ -238,8 +239,15 @@ ggplot(gsvaTop, aes(x = ES, y = gene_set)) +
 ## Exploratory plots
 ### corrplots sample vs sample
 if (sample_sample_corrplot_annot == "manip_info") {
-  annot <- dplyr::select(sample_info, sample_name, Batch, CAF, Condition, Experimentalist, Fraction) %>%
+  annot <- dplyr::select(sample_info, sample_name, Batch, #CAF, 
+                         Condition, Fraction) %>%
     column_to_rownames("sample_name")
+  colors = brewer.pal(n = 10, name = "Set1")
+  annot_colors <- list(Batch = setNames(colors[5:8], c("A", "B", "C", "D")),
+                       #CAF = setNames(colors[5:6], c("17AC", "02136")),
+                       Condition = c(NT="grey", setNames(colors[1:4], c("FAKi","IL1","NEAA","TGFB"))),
+                       Fraction = c(Input = "darkgreen", F8 ="darkred"))
+  
   } else if (sample_sample_corrplot_annot == "tech_info") {
   annot <- dplyr::select(sample_info, sample_name, ng_ul, R260_280, R260_230, RQN, RQN_Integragen, ng_ul_Integragen) %>%
     column_to_rownames("sample_name")
@@ -255,7 +263,16 @@ formatted_cors(norm_tmp, "pearson") %>%
   dplyr::select(measure1, measure2, r) %>%
   pivot_wider(id_cols = measure1, names_from = measure2, values_from = r) %>%
   column_to_rownames("measure1") %>%
-  pheatmap(annotation_col = annot)
+  pheatmap(annotation_col = annot,
+           annotation_row = annot,
+           annotation_colors = annot_colors,
+           show_rownames = F,
+           show_colnames = F,
+           height = 5,
+           width = 6,
+          filename = paste0("../FIGURES/heatmapCAF_filt", filter_samples, 
+                            "_batchC", correct_batch, "_annot.",
+                            sample_sample_corrplot_annot, ".pdf"))
 
 ### corrplots PCA vs contmetadata
 column_to_rownames(pca_toplot, "Row.names") %>%
