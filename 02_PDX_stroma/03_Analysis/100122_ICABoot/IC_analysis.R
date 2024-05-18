@@ -83,7 +83,7 @@ dplyr::select(Acomparison, ends_with(c("cyt", "pol", "ISRact", "PAMG"))) %>%
 
 ### cyt ~ TEs
 dplyr::select(Acomparison, ends_with(c("cyt", "TEs", "ISRact", "PAMG"))) %>%
-    formatted_cors(cor.stat = "pearson") %>%
+    formatted_cors(cor.stat = "spearman") %>%
   dplyr::filter(str_detect(measure1, ".TEs", negate = TRUE), str_detect(measure2, ".cyt", negate = TRUE)) %>%
   ggplot(aes(measure2, measure1, fill=r, label=round(r_if_sig,2))) +
   geom_tile() +
@@ -653,3 +653,36 @@ plot_IC6_RBPstotal <- dplyr::filter(RBPs_corrs, sig_FDR,
   ylab("")
   
 ggsave(file="02_Output/Figures/plot_IC6TE_RBPstotal.svg", plot=plot_IC6_RBPstotal, width=5, height=5)
+
+# THESIS PLOTS: IC.4_cyt vs IC.6_TEs and ISRact
+#-------------------------------------------------------------------------------
+corrplot_ic4vsic6 <- dplyr::select(Acomparison, ends_with(c("cyt", "TEs", "ISRact", "PAMG"))) %>%
+  formatted_cors(cor.stat = "spearman") %>%
+  dplyr::filter(str_detect(measure1, ".TEs", negate = TRUE), str_detect(measure2, ".cyt", negate = TRUE)) %>%
+  ggplot(aes(measure2, measure1, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nCorrelation", title= "Cytosolic vs Translation Efficacies", 
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0)) +
+  scale_y_discrete(expand=c(0,0)) +
+  rotate_x_text(angle = 90)
+
+ggsave(file="02_Output/Figures/corrplot_ic4cytvsic6tes.svg", plot=corrplot_ic4vsic6 , width=6, height=5)
+
+detailed_IC6TEsIC4cyt_corr <- as_tibble(Acomparison, rownames = "sample") %>%
+  dplyr::mutate(IC.4_cyt = IC.4.cyt,
+                IC.6_TEs = IC.6.TEs) %>% 
+  scatterplot_with_stats(varx = "IC.6_TEs",
+                         vary = "IC.4_cyt",
+                         label = "sample",
+                         type = "spearman",
+                         title = "comparison IC.6_TEs vs IC.4_cyt")
+
+ggsave(detailed_IC6TEsIC4cyt_corr,
+       filename = "02_Output/Figures/detailed_IC6TEsIC4cyt_corr.svg",
+       width = 4,
+       height = 4)
+#-------------------------------------------------------------------------------
