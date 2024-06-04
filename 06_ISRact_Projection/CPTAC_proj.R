@@ -22,6 +22,7 @@ setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
 source("src/human_cohort_data_filter.R")
 source("src/correlation_plotter.R")
 source("src/formatted_cors.R")
+source('src/plot_bar_enrich.R')
 
 ## CPTAC (Proteogenomics)
 ### upper quartile normalized and log2 data 
@@ -92,7 +93,7 @@ if (norm_method == "upperquartile_ogdata"){
 #Version 95 for Proteogenimics data
 ensembl95 <- useEnsembl(biomart = "genes",
                         dataset = "hsapiens_gene_ensembl",
-                        version = 95)#listAttributes(ensembl95, page="feature_page")
+                        version = 97)#listAttributes(ensembl95, page="feature_page") # 95, but 05/2024 it doesnt work?
 
 annot_ensembl95 <- getBM(attributes = c('ensembl_gene_id',
                                         'external_gene_name'), mart = ensembl95)
@@ -175,18 +176,53 @@ pca_full_df <- pca_pdx[["x"]] %>%
 #-------------------------------------------------------------------------------
 # Plot projecion PacaOmics and then projection Proteogenomics
 
-show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Sauyeun PDX"),
+show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Shin et al. PDX"),
                              as_tibble(projection_CPTAC) %>% mutate(ISRact = "Unknown",
-                                                                    dataset = "CPTAC"))
+                                                                    dataset = "CPTAC")) %>%
+  dplyr::rename(ISRactPCA ="PC1")
 
-dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
-  dplyr::filter(dataset %in% c("Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"), # "Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"
+projection_scatter_cptac <- dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
+  dplyr::filter(dataset %in% c("Shin et al. PDX","PACAOMICS PDX", "CPTAC", "CCLE"), # "Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"
                 ISRact %in% c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) %>% 
-  ggplot(aes(x=PC1, y=PC2, color = ISRact, shape = dataset)) +
+  ggplot(aes(x=ISRactPCA, y=PC2, color = ISRact, shape = dataset)) +
   geom_point() +
-  scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "CPTAC", "CCLE")) +
-  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) + #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
-  ylim(-250,15)
+  scale_shape_discrete(limits = c("Shin et al. PDX", "PACAOMICS PDX", "CPTAC", "CCLE")) +
+  scale_color_discrete(c(low_ISRact = "seagreen", high_ISRact= "tomato3", 'Unknown')) + #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
+  #ylim(-250,15) +
+  theme_bw()
+
+ggsave(projection_scatter_cptac,
+       filename = "results/Figures/projection_scatter_cptac.svg",
+       width = 7,
+       height = 3)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Check ISR marker genes
+marker_genes = c("PHGDH", "CBS", "IL18")
+
+Gene_ISRactPCA_comparison <- dplyr::select(CPTAC_tumor, -EnsemblID) %>%
+  pivot_longer(-Gene, names_to = "sample") %>% 
+  dplyr::filter(Gene %in% marker_genes) %>% 
+  inner_join(CPTAC_PC1, by = "sample") %>%
+  dplyr::filter(PC1status != "medium_ISRact")
+
+for (mgene in marker_genes) {
+  
+
+  mgene_plot <- dplyr::filter(Gene_ISRactPCA_comparison, Gene == mgene) %>%
+    ggplot(aes(y = value, x = PC1status, fill = PC1status)) + 
+    geom_violin() +
+    scale_fill_manual(values = c(low_ISRact = "seagreen", high_ISRact= "tomato3")) +
+    rotate_x_text(90) +
+    geom_boxplot(width=0.1, fill="white")+
+    labs(title = mgene)
+  
+  ggsave(mgene_plot,
+         filename = paste0("results/Figures/cptac_",mgene,".svg"),
+         width = 3,
+         height = 2)
+}
+
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Check relation with original PDX samples
@@ -293,8 +329,11 @@ DEqMS.results = outputResult(fit4,coef_col = 1)
 
 
 ### Use ggplot2 to plot volcano
+highlight = c("PHGDH","IL18", "IDO1",
+              "APP", "LUM")
+
 DEqMS.results$log.sca.pval = -log10(DEqMS.results$sca.P.Value)
-ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) + 
+dpea_isractpca_volcano <- ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) + 
   geom_point(size=0.5 )+
   theme_bw(base_size = 16) + # change theme
   xlab(expression("log2(ISRactPCA high/low)")) + # x-axis label
@@ -304,26 +343,17 @@ ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) +
   geom_vline(xintercept = 0, colour = "black") + # Add 0 lines
   scale_colour_gradient(low = "black", high = "black", guide = FALSE)+
   geom_text_repel(data=subset(DEqMS.results, abs(logFC)>0.5&log.sca.pval > 3),
-                  aes( logFC, log.sca.pval ,label=gene)) # add gene label
-
-### same volcano but highlighting some genes
-highlight = c("PHGDH","IL18", "IDO1",
-              "APP")
-
-ggplot(DEqMS.results, aes(x = logFC, y =log.sca.pval )) + 
-  geom_point(size=0.5 )+
-  theme_bw(base_size = 16) + # change theme
-  xlab(expression("log2(ISRactPCA high/low)")) + # x-axis label
-  ylab(expression(" -log10(P-value)")) + # y-axis label
-  geom_vline(xintercept = c(-1,1), colour = "red") + # Add fold change cutoffs
-  geom_hline(yintercept = 3, colour = "red") + # Add significance cutoffs
-  geom_vline(xintercept = 0, colour = "black") + # Add 0 lines
-  scale_colour_gradient(low = "black", high = "black", guide = FALSE) +
+                  aes( logFC, log.sca.pval ,label=gene))+# add gene label
   geom_point(data= DEqMS.results[rownames(DEqMS.results) %in% highlight,],
              aes( logFC, log.sca.pval), color="red") + 
   geom_label_repel(data= DEqMS.results[rownames(DEqMS.results) %in% highlight,],
-                  aes( logFC, log.sca.pval ,label=gene)) # add gene label
+                   aes( logFC, log.sca.pval ,label=gene)) # add gene label
 
+print(dpea_isractpca_volcano)
+ggsave(dpea_isractpca_volcano,
+       filename = "results/Figures/dpea_isractpca_volcano.svg",
+       width = 5,
+       height = 5)
 
 ### GSEA of fold changes
 all_genesets <- msigdbr("Homo sapiens")
@@ -343,6 +373,25 @@ topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
 plotGseaTable(reactome_list[topPathways], deframe(rownames_to_column(DEqMS.results["logFC"])), fgseaReactome, 
               gseaParam=0.5)
 
+barplot_DEP_reactome <- dplyr::filter(fgseaReactome, pathway %in% topPathways) %>%
+  arrange(NES) %>% 
+  mutate(pathway = str_remove(pathway,"REACTOME_"),
+         pathway = as_factor(pathway)) %>% 
+  #dplyr::filter(p.adjust < p.adjust_th) %>%
+  #slice_tail(n=20) %>%
+  ggplot(aes(x = NES, y = pathway, fill = padj)) +
+  geom_bar(stat="identity") +
+  scale_fill_gradientn(colours = c("red", "white"), guide=guide_colourbar(reverse = TRUE))+
+  theme_bw() +
+  labs(title = "REACTOME") +
+  ylab("")
+
+print(barplot_DEP_reactome)
+ggsave(barplot_DEP_reactome,
+       filename = "results/Figures/barplot_DEP_reactome.svg",
+       width = 8,
+       height = 5)
+
 #### Kegg
 kegg <- all_genesets %>% filter(gs_subcat %in% c("CP:KEGG"))
 kegg_list = split(x = kegg$gene_symbol, f = kegg$gs_name)
@@ -358,6 +407,25 @@ topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
 plotGseaTable(kegg_list[topPathways], deframe(rownames_to_column(DEqMS.results["logFC"])), fgseaKegg, 
               gseaParam=0.5)
 
+barplot_DEP_kegg <- dplyr::filter(fgseaKegg, pathway %in% topPathways) %>%
+  arrange(NES) %>% 
+  mutate(pathway = str_remove(pathway,"KEGG_"),
+         pathway = as_factor(pathway)) %>% 
+  #dplyr::filter(p.adjust < p.adjust_th) %>%
+  #slice_tail(n=20) %>%
+  ggplot(aes(x = NES, y = pathway, fill = padj)) +
+  geom_bar(stat="identity") +
+  scale_fill_gradientn(colours = c("red", "white", "grey"), guide=guide_colourbar(reverse = TRUE),
+                       rescaler = ~ scales::rescale_mid(., mid = 0.05))+
+  theme_bw() +
+  labs(title = "KEGG") +
+  ylab("")
+
+print(barplot_DEP_kegg)
+ggsave(barplot_DEP_kegg,
+       filename = "results/Figures/barplot_DEP_kegg.svg",
+       width = 8,
+       height = 5)
 #-------------------------------------------------------------------------------
 # Survival curves regarding ISR status
 surv_data <- dplyr::rename(CPTAC_PC1, case_id = sample) %>%
@@ -369,7 +437,7 @@ fit <-  survfit(Surv(follow_up_days, status) ~ PC1status,
 print(fit)
 
 ### Change color, linetype by strata, risk.table color by strata
-ggsurvplot(fit,
+kmos_cptac_ISRact <- ggsurvplot(fit,
            pval = TRUE, conf.int = TRUE,
            risk.table = TRUE, # Add risk table
            risk.table.col = "strata", # Change risk table color by groups
@@ -377,6 +445,10 @@ ggsurvplot(fit,
            surv.median.line = "hv", # Specify median survival
            ggtheme = theme_bw(), # Change ggplot2 theme
            palette = c("tomato3", "seagreen"))
+
+print(kmos_cptac_ISRact)
+ggsave(paste0("results/survplots/FIGURES/kmos_cptac_ISRact.svg"),
+       kmos_cptac_ISRact$plot, height = 4 , width = 4)
 
 ## Cox Proportional hazzards model
 cox.mod <- coxph(Surv(follow_up_days, status) ~ PC1, 
@@ -407,14 +479,14 @@ surv_data <- as_tibble(human_data, rownames = "case_id") %>%
   dplyr::select(case_id, reverse_translate[c("CBS", "PHGDH")]) %>%
   inner_join(clinical_data, by = "case_id")
 
-measure = "overlap" # overlap | mean
+measure = "mean" # overlap | mean
 ## Calculate the measure to split samples
 if(measure == "mean"){
 ### min mean
 surv_data <- dplyr::mutate(surv_data, 
                            meanPHGDHCBS = rowMeans(surv_data[c("PHGDH", "CBS")]),
                            stratPHGDHCBS = if_else(meanPHGDHCBS < quantile(meanPHGDHCBS, probs = 0.3333), "low_PHGDHCBS",
-                                                   if_else(meanPHGDHCBS < quantile(meanPHGDHCBS, probs = 0.6666), "medium_PHGDHCBS", "high_PHGDHCBS")))
+                                                   if_else(meanPHGDHCBS < quantile(meanPHGDHCBS, probs = 0.6666), "indetermined", "high_PHGDHCBS")))
 } else if(measure == "overlap"){
 ### overlap min and overlap max
 surv_data <- dplyr::mutate(surv_data,
@@ -424,16 +496,19 @@ surv_data <- dplyr::mutate(surv_data,
 )
 }
 ## Visualize stratification
-ggplot(surv_data, aes(PHGDH, CBS, color = stratPHGDHCBS)) +
-  geom_point()
+strat_visu <- ggplot(surv_data, aes(PHGDH, CBS, color = stratPHGDHCBS)) +
+  scale_color_manual(values = c(high_PHGDHCBS = "tomato3", low_PHGDHCBS = "seagreen", indetermined = "darkgrey")) +
+  geom_point() + theme_classic()
 
+ggsave(paste0("results/survplots/FIGURES/cptac_split", measure ,"_phgdhcbs.svg"),
+       strat_visu, height = 3 , width = 4)
 ## Kaplan Meyer of the selected measure
 fit <-  survfit(Surv(follow_up_days, status) ~ stratPHGDHCBS, 
                 data = dplyr::filter(surv_data, !stratPHGDHCBS %in% c("medium_PHGDHCBS", "indetermined")))
 print(fit)
 
 ### Change color, linetype by strata, risk.table color by strata
-ggsurvplot(fit,
+kmos_cptac <- ggsurvplot(fit,
            pval = TRUE, conf.int = TRUE,
            risk.table = TRUE, # Add risk table
            risk.table.col = "strata", # Change risk table color by groups
@@ -442,4 +517,76 @@ ggsurvplot(fit,
            ggtheme = theme_bw(), # Change ggplot2 theme
            palette = c("tomato3", "seagreen")) +
   labs(title = paste0(measure, " split of PHGDH | CBS expression"))
+
+print(kmos_cptac)
+ggsave(paste0("results/survplots/FIGURES/kmos_cptac_", measure ,"_phgdhcbs.svg"),
+       kmos_cptac$plot, height = 4 , width = 4)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Deconvolution proportions
+df_tocorr <- inner_join(Molecular_phenotype_data, CPTAC_PC1, "sample") %>%
+  dplyr::rename(ISRactPCA = "PC1") %>% 
+  rename_all( ~ str_replace_all(., " ", ".")) %>% 
+  rename_all( ~ str_replace_all(., "-", "."))
+
+corrplot_CPTACmeta <- df_tocorr %>% 
+  dplyr::select(ISRactPCA, matches("MCPCounter"), matches("pathway"), matches("deconv")) %>% # , matches("deconv") misses samples!
+  formatted_cors("spearman") %>%
+  filter(measure1 == "ISRactPCA",
+         measure2 != "ISRactPCA") %>% #not square corr
+  dplyr::mutate(measure2 = fct(measure2, levels = unique(measure2))) %>% 
+  ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nCorrelation", title="Correlations ISRactPCA vs CPTAC variables",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+  geom_text() +
+  theme_classic() +
+  ggpubr::rotate_x_text(angle = 0)
+
+ggsave(file="results/Figures/corrplot_CPTACmeta.svg", plot=corrplot_CPTACmeta, width=4, height=6)
+
+
+
+tcell_ISRactPCA <-correlation_plotter(df_tocorr, "ISRactPCA", "T.cells_MCPCounter", "")
+ggsave(tcell_ISRactPCA,
+       filename = "results/Figures/tcell_ISRactPCA.svg",
+       width = 4,
+       height = 4)
+
+cd8tcell_ISRactPCA <-correlation_plotter(df_tocorr, "ISRactPCA", "CD8.T.cells_MCPCounter", "")
+ggsave(cd8tcell_ISRactPCA,
+       filename = "results/Figures/cd8tcell_ISRactPCA.svg",
+       width = 4,
+       height = 4)
+
+cytotcell_ISRactPCA <-correlation_plotter(df_tocorr, "ISRactPCA", "Cytotoxic.lymphocytes_MCPCounter", "")
+ggsave(cytotcell_ISRactPCA,
+       filename = "results/Figures/cytotcell_ISRactPCA.svg",
+       width = 4,
+       height = 4)
+
+Bcell_ISRactPCA <-correlation_plotter(df_tocorr, "ISRactPCA", "B.lineage_MCPCounter", "")
+ggsave(Bcell_ISRactPCA,
+       filename = "results/Figures/Bcell_ISRactPCA.svg",
+       width = 4,
+       height = 4)
+
+jakstat_ISRactPCA <-correlation_plotter(df_tocorr, "ISRactPCA", "JAK.STAT_pathway", "")
+ggsave(jakstat_ISRactPCA,
+       filename = "results/Figures/jakstat_ISRactPCA.svg",
+       width = 4,
+       height = 4)
+
+stromal_deconv <-correlation_plotter(df_tocorr, "ISRactPCA", "stromal_deconv", "")
+ggsave(jakstat_ISRactPCA,
+       filename = "results/Figures/stromal_deconv.svg",
+       width = 4,
+       height = 4)
+
+egfr_pathway <-correlation_plotter(df_tocorr, "ISRactPCA", "EGFR_pathway", "")
+ggsave(egfr_pathway,
+       filename = "results/Figures/egfr_pathway.svg",
+       width = 4,
+       height = 4)
 #-------------------------------------------------------------------------------

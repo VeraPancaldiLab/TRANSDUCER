@@ -27,7 +27,7 @@ sample_info <- read_delim("data/Sauyeun_PDX/sample_info.tsv",
 
 top_samples <-arrange(sample_info, ICA3) %>%
   dplyr::slice( unique(c(1:5, n() - 0:4)) ) %>%
-  mutate(ISRact = ifelse(ICA3 < 0, "low_ICA3", "high_ICA3")) %>%
+  mutate(ISRact = ifelse(ICA3 < 0, "low_ISRact", "high_ISRact")) %>%
   arrange(sample)
 
 
@@ -88,15 +88,17 @@ projection_PACAOMICS <- predict(pca_pdx, PACAOMICS_norm) %>%
   as_tibble() %>%
   mutate(sample = PACAOMICS_norm$sample, .before = 1) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
-  mutate(ISRact = replace(ISRact, is.na(ISRact) & sample %in% sample_info$sample, "medium_ICA3"),
-         ISRact = replace_na(ISRact, "Unknown"))
+  mutate(ISRact = replace(ISRact, is.na(ISRact) & sample %in% sample_info$sample, "intermediate_ICA3"),
+         ISRact = replace_na(ISRact, "Unknown"),
+         ISRact = str_replace(ISRact, 'ICA3', 'ISRact'))
 
 PACAOMICS_PC1 <- arrange(projection_PACAOMICS, PC1) %>% #! wrong! remove the last part of medium or the full object
   dplyr::filter(!sample=="!") %>%
-  mutate(PC1status = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3/3))), labels = c("low_PC1", "medium_PC1", "high_PC1"), include.lowest = TRUE)) %>%
+  mutate(PC1status = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3/3))), labels = c("low_ISRact", "intermediate_ISRact", "high_ISRact"), include.lowest = TRUE)) %>%
   dplyr::select(sample, PC1,  PC1status) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
-  mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
+  mutate(ISRact = replace_na(ISRact, "intermediate_ICA3"),
+         ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
   inner_join(sample_info_PACAOMICS[, c("sample","PAMG", "ICA3")], by = "sample")
 
 
@@ -108,20 +110,56 @@ pca_full_df <- pca_pdx[["x"]] %>%
   rownames_to_column("sample") %>%
   inner_join(top_samples[,c("sample","ISRact")])
 
+
 #-------------------------------------------------------------------------------
-# Plot projecion
-
-show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Sauyeun PDX"),
+# Plot projecion PacaOmics and then projection Proteogenomics
+show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Shin et al. PDX"),
                              mutate(projection_PACAOMICS, sample = paste0(sample, "_OG"),
-                                    dataset = "PACAOMICS PDX"))
+                                    dataset = "PaCaOmics PDX")) %>%
+  dplyr::rename(ISRactPCA = "PC1")
 
-dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
-  dplyr::filter(dataset %in% c("Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"), # "Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"
-                ISRact %in% c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) %>% 
-  ggplot(aes(x=PC1, y=PC2, color = ISRact, shape = dataset)) +
+projection_scatter_pacaomics <- dplyr::mutate(show_projection) %>%
+  dplyr::filter(dataset %in% c("Shin et al. PDX","PaCaOmics PDX", "CPTAC", "CCLE"), # "Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"
+                ISRact %in% c('low_ISRact', 'high_ISRact', 'intermediate_ISRact', 'Unknown')) %>% 
+  ggplot(aes(x=ISRactPCA, y=PC2, color = ISRact, shape = dataset)) +
   geom_point() +
-  scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "CPTAC", "CCLE")) +
-  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue)
+  scale_shape_manual(values = c(`Shin et al. PDX` = 16, `PaCaOmics PDX` = 17, CPTAC = 15, CCLE = 18)) +
+  scale_color_manual(values = c(low_ISRact = "seagreen", high_ISRact= "tomato3", intermediate_ISRact = "grey", Unknown = "#619CFF")) + #c('low_ISRact', 'high_ISRact', 'intermediate_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
+  #ylim(-250,15) +
+  theme_bw()
+
+ggsave(projection_scatter_pacaomics,
+       filename = "results/Figures/projection_scatter_pacaomics.svg",
+       width = 7,
+       height = 3)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Check ISR marker genes
+marker_genes = c("PHGDH", "CBS", "IL18")
+
+Gene_ISRactPCA_comparison <- as_tibble(PACAOMICS_norm_, rownames = "Gene") %>%
+  pivot_longer(-Gene, names_to = "sample") %>% 
+  dplyr::filter(Gene %in% marker_genes) %>% 
+  inner_join(PACAOMICS_PC1, by = "sample") %>%
+  dplyr::filter(PC1status != "intermediate_ISRact")
+
+for (mgene in marker_genes) {
+  
+  
+  mgene_plot <- dplyr::filter(Gene_ISRactPCA_comparison, Gene == mgene) %>%
+    ggplot(aes(y = value, x = PC1status, fill = PC1status)) + 
+    geom_violin() +
+    scale_fill_manual(values = c(low_ISRact = "seagreen", high_ISRact= "tomato3")) +
+    rotate_x_text(90) +
+    geom_boxplot(width=0.1, fill="white")+
+    labs(title = mgene)
+  
+  ggsave(mgene_plot,
+         filename = paste0("results/Figures/pacaomics_",mgene,".svg"),
+         width = 3,
+         height = 2)
+}
+
 #-------------------------------------------------------------------------------
 
 # Plot comparisons with Basal/Classical and ISRact

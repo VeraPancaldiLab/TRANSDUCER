@@ -148,7 +148,7 @@ fit <-  survfit(Surv(OS, OS_event) ~ PC1status,
 print(fit)
 
 #### Change color, linetype by strata, risk.table color by strata
-ggsurvplot(fit,
+kmos_tcga_ISRact <- ggsurvplot(fit,
            pval = TRUE, conf.int = TRUE,
            risk.table = TRUE, # Add risk table
            risk.table.col = "strata", # Change risk table color by groups
@@ -157,6 +157,9 @@ ggsurvplot(fit,
            ggtheme = theme_bw(), # Change ggplot2 theme
            palette = c("tomato3", "seagreen"))
 
+print(kmos_tcga_ISRact)
+ggsave(paste0("results/survplots/FIGURES/kmos_tcga_ISRact.svg"),
+       kmos_tcga_ISRact$plot, height = 4 , width = 4)
 ### Cox Proportional hazzards model
 cox.mod <- coxph(Surv(OS, OS_event) ~ PC1, 
                  data = as.data.frame(surv_data))
@@ -188,7 +191,7 @@ fit <-  survfit(Surv(PFS, PFS_event) ~ PC1status,
 print(fit)
 
 #### Change color, linetype by strata, risk.table color by strata
-ggsurvplot(fit,
+kmpfs_tcga_ISRact <- ggsurvplot(fit,
            pval = TRUE, conf.int = TRUE,
            risk.table = TRUE, # Add risk table
            risk.table.col = "strata", # Change risk table color by groups
@@ -196,6 +199,10 @@ ggsurvplot(fit,
            surv.median.line = "hv", # Specify median survival
            ggtheme = theme_bw(), # Change ggplot2 theme
            palette = c("tomato3", "seagreen"))
+
+print(kmpfs_tcga_ISRact)
+ggsave(paste0("results/survplots/FIGURES/kmpfs_tcga_ISRact.svg"),
+       kmpfs_tcga_ISRact$plot, height = 4 , width = 4)
 
 ### Cox Proportional hazzards model
 cox.mod <- coxph(Surv(PFS, PFS_event) ~ PC1, 
@@ -253,7 +260,7 @@ fit <-  survfit(Surv(OS, OS_event) ~ stratPHGDHCBS,
 print(fit)
 
 ### Change color, linetype by strata, risk.table color by strata
-ggsurvplot(fit,
+kmos_tcga <- ggsurvplot(fit,
            pval = TRUE, conf.int = TRUE,
            risk.table = TRUE, # Add risk table
            risk.table.col = "strata", # Change risk table color by groups
@@ -263,13 +270,16 @@ ggsurvplot(fit,
            palette = c("tomato3", "seagreen")) +
   labs(title = paste0(measure, " split of PHGDH | CBS expression vs OS"))
 
+print(kmos_tcga)
+ggsave(paste0("results/survplots/FIGURES/kmos_tcga_", measure ,"_phgdhcbs.svg"),
+       kmos_tcga$plot, height = 4 , width = 4)
 ### PFS
 fit <-  survfit(Surv(PFS, PFS_event) ~ stratPHGDHCBS, 
                 data = dplyr::filter(surv_data, !stratPHGDHCBS %in% c("medium_PHGDHCBS", "indetermined")))
 print(fit)
 
 ### Change color, linetype by strata, risk.table color by strata
-ggsurvplot(fit,
+kmpfs_tcga <- ggsurvplot(fit,
            pval = TRUE, conf.int = TRUE,
            risk.table = TRUE, # Add risk table
            risk.table.col = "strata", # Change risk table color by groups
@@ -278,4 +288,8 @@ ggsurvplot(fit,
            ggtheme = theme_bw(), # Change ggplot2 theme
            palette = c("tomato3", "seagreen")) +
   labs(title = paste0(measure, " split of PHGDH | CBS expression vs PFS"))
+
+print(kmpfs_tcga)
+ggsave(paste0("results/survplots/FIGURES/kmpfs_tcga_", measure ,"_phgdhcbs.svg"),
+       kmpfs_tcga$plot, height = 4 , width = 4)
 #-------------------------------------------------------------------------------

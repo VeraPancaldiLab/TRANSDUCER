@@ -135,7 +135,7 @@ Sauyeun_norm_ <- dplyr::select(Sauyeun_raw, -Genenames) %>%
   cpm(log=TRUE)
 
 ## Export version for comparison
-as_tibble(Sauyeun_norm_, rownames = "EnsemblID") %>% write_tsv("data/Sauyeun_PDX/PDX_PCA_input_data.tsv")
+#as_tibble(Sauyeun_norm_, rownames = "EnsemblID") %>% write_tsv("data/Sauyeun_PDX/PDX_PCA_input_data.tsv")
 
 ## prepare for PCA
 Sauyeun_norm <- Sauyeun_norm_ %>%
@@ -189,7 +189,7 @@ pca_pdx <- Sauyeun_norm_subset %>%
 
 
 ## Visualize 
-fviz_eig(pca_pdx, addlabels = TRUE, ylim = c(0, 50)) #visualize explained variance
+fviz_eig(pca_pdx, addlabels = TRUE, ylim = c(0, 70)) #visualize explained variance
 
 fviz_pca_ind(pca_pdx,
              col.ind = top_samples$ISRact, # color by groups
@@ -200,21 +200,23 @@ fviz_pca_ind(pca_pdx,
 )
 
 ## export PCA for projection
-write_rds(pca_pdx, "data/Classifiers/pca_pdx.RDS")
+#write_rds(pca_pdx, "data/Classifiers/pca_pdx.RDS")
 
 ## create object for further comparisons
 projection_Sauyeun <- predict(pca_pdx, Sauyeun_norm) %>%
   as_tibble() %>%
   mutate(sample = Sauyeun_norm$sample, .before = 1) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
-  mutate(ISRact = replace_na(ISRact, "medium_ICA3")) 
+  mutate(ISRact = replace_na(ISRact, "intermediate_ICA3")) 
+
+write_rds(projection_Sauyeun, "results/pca_pdx_projection_middle.RDS")
 
 Sauyeun_PC1 <- arrange(projection_Sauyeun, PC1) %>% 
   dplyr::filter(!sample=="!") %>%
   mutate(PC1status = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3/3))), labels = c("low_PC1", "medium_PC1", "high_PC1"), include.lowest = TRUE)) %>%
   dplyr::select(sample, PC1,  PC1status) %>%
   left_join(top_samples[,c("sample","ISRact")]) %>%
-  mutate(ISRact = replace_na(ISRact, "medium_ICA3")) %>%
+  mutate(ISRact = replace_na(ISRact, "intermediate_ICA3")) %>%
   inner_join(sample_info[, c("sample","PAMG", "ICA3", "Diabetes")], by = "sample")
 
 # Plot comparisons with Basal/Classical and ISRact
@@ -227,4 +229,82 @@ correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PAMG", data_name 
 ## ISR vs IFNsign
 correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "IFNsign", data_name = "Sauyeun PDX")
 
+#-------------------------------------------------------------------------------
+# Plot ISRact distribution
 
+dist_isract <- dplyr::arrange(sample_info, desc(ICA3)) %>%
+  rowid_to_column() %>%
+  dplyr::mutate(group = if_else(rowid<6, "high_ISRact", if_else(rowid>(27-5), "low_ISRact", "intermediate_ISRact"))) %>%
+  dplyr::rename(ISRact = "ICA3") %>%
+  ggplot(aes(x = ISRact)) +
+  geom_density() +
+    geom_rug(aes(color = group)) +
+    scale_colour_manual(values = c(low_ISRact = "seagreen", high_ISRact= "tomato3", intermediate_ISRact = "grey")) +
+    theme_classic()
+
+ggsave(dist_isract,
+       filename = "results/Figures/dist_isract.svg",
+       width = 5,
+       height = 2)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Plot projecion of full cohort
+pca_full_df <- pca_pdx[["x"]] %>%
+  as.data.frame() %>%
+  rownames_to_column("sample") %>%
+  inner_join(top_samples[,c("sample","ISRact")])
+
+show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Shin et al. PDX"),
+                             mutate(projection_Sauyeun, sample = paste0(sample, "_OG"),
+                                    dataset = "Shin et al. PDX")) %>%
+  dplyr::rename(ISRactPCA = "PC1")
+
+projection_scatter_shin_full <- dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
+  dplyr::filter(dataset %in% c("Shin et al. PDX","PaCaOmics PDX", "CPTAC", "CCLE"), # "Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"
+                ISRact %in% c('low_ISRact', 'high_ISRact', 'intermediate_ISRact', 'Unknown')) %>% 
+  ggplot(aes(x=ISRactPCA, y=PC2, color = ISRact, shape = dataset)) +
+  geom_point() +
+  scale_shape_manual(values = c(`Shin et al. PDX` = 16, `PaCaOmics PDX` = 17, CPTAC = 15, CCLE = 18)) +
+  scale_color_manual(values = c(low_ISRact = "seagreen", high_ISRact= "tomato3", intermediate_ISRact = "grey", Unknown = "#619CFF")) + #c('low_ISRact', 'high_ISRact', 'intermediate_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
+  #ylim(-250,15) +
+  theme_bw()
+
+ggsave(projection_scatter_shin_full,
+       filename = "results/Figures/projection_scatter_shin_full.svg",
+       width = 7,
+       height = 3)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Check ISR marker genes
+marker_genes = c("PHGDH", "CBS", "IL18")
+
+Gene_ISRactPCA_comparison <- as_tibble(Sauyeun_norm_, rownames ="EnsemblID")  %>%
+  dplyr::mutate(Gene =  translate[EnsemblID]) %>%
+  dplyr::select(-EnsemblID) %>% 
+  pivot_longer(-Gene, names_to = "sample") %>% 
+  dplyr::filter(Gene %in% marker_genes) %>% 
+  inner_join(Sauyeun_PC1, by = "sample") %>%
+  dplyr::mutate(ISRact = str_replace(ISRact, 'ICA3', 'ISRact'),
+                ISRact = fct(ISRact, levels = c("low_ISRact", "intermediate_ISRact", "high_ISRact"))) %>%
+  dplyr::filter(ISRact != "intermediate_ISRact") 
+
+
+
+
+for (mgene in marker_genes) {
+  
+  mgene_plot <- dplyr::filter(Gene_ISRactPCA_comparison, Gene == mgene) %>%
+    ggplot(aes(y = value, x = ISRact, fill = ISRact)) + 
+    geom_violin() +
+    scale_fill_manual(values = c(low_ISRact = "seagreen", high_ISRact = "tomato3")) +
+    rotate_x_text(90) +
+    geom_boxplot(width=0.1, fill="white")+
+    labs(title = mgene)
+  
+  ggsave(mgene_plot,
+         filename = paste0("results/Figures/shin_",mgene,".svg"),
+         width = 3,
+         height = 2)
+}
+
+#-------------------------------------------------------------------------------
