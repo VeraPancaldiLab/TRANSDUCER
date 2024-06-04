@@ -102,4 +102,38 @@ tumour_TFs %>% .[best_tfs,] %>%
                                     PAMG = c("#FF7F00", "white", "#377DB8"),
                                     ISRact = c("#FFFFCC", "#006837")))
 
+#-------------------------------------------------------------------------------
+#5vs5 most extreme samples TF activities
+subset_annotation <- dplyr::arrange(complete_annotation, desc(ISRact)) %>%
+  rownames_to_column("sampleid") %>%
+  rowid_to_column() %>%
+  dplyr::mutate(group = if_else(rowid<6, "high_ISRact", if_else(rowid>(27-5), "low_ISRact", "intermediate_ISRact"))) %>%
+  dplyr::filter(group != "intermediate_ISRact") %>%
+  dplyr::select(-rowid) %>%
+  column_to_rownames("sampleid")
 
+subset_TFs <- tumour_TFs[rownames(subset_annotation)]
+nTFs = 25
+correlations <- rcorr(t(subset_TFs), subset_annotation[,"ISRact",drop=T])
+comp_p.adj <- p.adjust(correlations$P[,"y"], "BH")
+best_tfs <-  correlations$r[,"y"] %>%
+  abs() %>% sort(decreasing = T) %>%
+  .[2:(nTFs+1)] %>% names()
+
+subset_TFs %>% .[best_tfs,]  %>%
+  pheatmap(main="Tumour TFs most correlated with ISRact",
+           scale = "row",
+           annotation_col = subset_annotation,
+           annotation_row = annotation_TFs, 
+           filename = "02_Output/Figures/TFact_tumour_5vs5_ISRact.pdf",
+           width = 7,
+           height = 5,
+           annotation_colors = list(R = c("red", "white", "blue"),
+                                    p.value = c("black", "white"),
+                                    p.adj = c("white", "black"),
+                                    Diabetes = c("white", "black"),
+                                    PAMG = c("#FF7F00", "white", "#377DB8"),
+                                    ISRact = c("#FFFFCC", "#006837"),
+                                    group = c(low_ISRact = "seagreen", high_ISRact= "tomato3")))
+
+#-------------------------------------------------------------------------------
