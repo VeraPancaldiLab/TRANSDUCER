@@ -110,30 +110,68 @@ pca_full_df <- pca_pdx[["x"]] %>%
 #-------------------------------------------------------------------------------
 # Plot projecion
 
-show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Sauyeun PDX"),
+show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Shin et al. PDX"),
                              as_tibble(projection_ccle %>% mutate(ISRact = if_else(is.na(ISRact), "Unknown", ISRact),
                                                                   dataset = "CCLE")))
 
-dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
-  dplyr::filter(dataset %in% c("Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"), # "Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"
+projection_scatter_ccle <- dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
+  dplyr::filter(dataset %in% c("Shin et al. PDX","PACAOMICS PDX", "CPTAC", "CCLE"), # "Shin et al. PDX","PACAOMICS PDX", "CPTAC", "CCLE"
                 ISRact %in% c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) %>% 
-  ggplot(aes(x=PC1, y=PC2, color = ISRact, shape = dataset)) +
+  dplyr::rename(ISRactPCA = PC1) %>%
+  ggplot(aes(x=ISRactPCA, y=PC2, color = ISRact, shape = dataset)) +
   geom_point() +
-  scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "CPTAC", "CCLE")) +
-  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue)
+  scale_shape_manual(values = c(`Shin et al. PDX` = 16, `PaCaOmics PDX` = 17, CPTAC = 15, CCLE = 18)) +
+  scale_color_manual(values = c(low_ISRact = "seagreen", high_ISRact= "tomato3", intermediate_ISRact = "grey", Unknown = "#619CFF")) +
+  theme_bw()
+
+ggsave(projection_scatter_ccle,
+       filename = "results/Figures/projection_scatter_ccle.svg",
+       width = 7,
+       height = 3)
 #-------------------------------------------------------------------------------
 
 # Plot comparisons with Basal/Classical and ISRact
 ## PAMG vs PC1
 correlation_plotter(data = projection_ccle, col1 = "PAMG", col2 = "PC1", data_name = "CCLE")
 
-
 #-------------------------------------------------------------------------------
-# CCLE plot with names and colored according to any gene expression
-pivot_longer(ccle_norm_gn,-GeneName, names_to = "ccle_name", values_to = "expression") %>%
+# CCLE plot with names and colored according to CBS and PHGDH gene expression
+ccle_toplot <- pivot_longer(ccle_norm_gn,-GeneName, names_to = "ccle_name", values_to = "expression") %>%
   pivot_wider(id_cols = "ccle_name", names_from = "GeneName", values_from = "expression") %>%
   inner_join(projection_ccle, by="ccle_name") %>% 
-  ggplot(aes(x=PC1, y=GATA6, label = str_remove(ccle_name, "_PANCREAS"))) +
+  dplyr::mutate(ISRact = if_else(is.na(ISRact), "Unknown", ISRact)) %>%
+  dplyr::rename(ISRactPCA = PC1)
+
+corr_spearman <- rcorr(ccle_toplot[["PHGDH"]], ccle_toplot[["CBS"]], type = "spearman")
+stats <- paste0("Spearman: R = ", round(corr_spearman$r["x","y"], 2), ", pval = ", round(corr_spearman$P["x","y"], 4))
+
+scatter_phgdhcbs_ccle <- ggplot(ccle_toplot, aes(x=PHGDH, y=CBS, label = str_remove(ccle_name, "_PANCREAS"))) +
   geom_point(aes(color = ISRact)) + 
-  geom_smooth(method=lm) + theme_bw() + geom_text_repel()
+  scale_color_manual(values = c(low_ISRact = "seagreen", high_ISRact= "tomato3", intermediate_ISRact = "grey", Unknown = "#619CFF")) +
+  geom_smooth(method=lm) + 
+  labs(title = paste0("Comparison between PHGDH and CBS in CCLE"),
+       subtitle = stats) + 
+  theme_bw()
+
+ggsave(scatter_phgdhcbs_ccle,
+       filename = "results/Figures/scatter_phgdhcbs_ccle.svg",
+       width = 5,
+       height = 4)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+corr_spearman <- rcorr(ccle_toplot[["ISRactPCA"]], ccle_toplot[["PAMG"]], type = "spearman")
+stats <- paste0("Spearman: R = ", round(corr_spearman$r["x","y"], 2), ", pval = ", round(corr_spearman$P["x","y"], 4))
+
+scatter_isractpcapamg_ccle <- ggplot(ccle_toplot, aes(x=ISRactPCA, y=PAMG, label = str_remove(ccle_name, "_PANCREAS"))) +
+  geom_point(aes(color = ISRact)) + 
+  scale_color_manual(values = c(low_ISRact = "seagreen", high_ISRact= "tomato3", intermediate_ISRact = "grey", Unknown = "#619CFF")) +
+  geom_smooth(method=lm) + 
+  labs(title = paste0("Comparison between ISRactPCA and PAMG in CCLE"),
+       subtitle = stats) + 
+  theme_bw()
+
+ggsave(scatter_isractpcapamg_ccle,
+       filename = "results/Figures/scatter_isractpcapamg_ccle.svg",
+       width = 5,
+       height = 4)
 #-------------------------------------------------------------------------------

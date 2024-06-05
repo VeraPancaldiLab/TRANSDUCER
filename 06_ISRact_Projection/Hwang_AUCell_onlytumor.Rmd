@@ -234,7 +234,7 @@ Now the cluster 10 seems to be specific of ISRactlow. What are their marker gene
 
 ```{r}
 cluster_to_explore <- "10"
-markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
+markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')saveeeeee
 ```
 
 ```{r}

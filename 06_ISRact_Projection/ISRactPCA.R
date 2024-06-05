@@ -201,7 +201,7 @@ fviz_pca_ind(pca_pdx,
 
 ## export PCA for projection
 #write_rds(pca_pdx, "data/Classifiers/pca_pdx.RDS")
-
+pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
 ## create object for further comparisons
 projection_Sauyeun <- predict(pca_pdx, Sauyeun_norm) %>%
   as_tibble() %>%
