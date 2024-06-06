@@ -163,9 +163,32 @@ for (mgene in marker_genes) {
 #-------------------------------------------------------------------------------
 
 # Plot comparisons with Basal/Classical and ISRact
-## ISR vs PC1
-correlation_plotter(data = PACAOMICS_PC1, col1 = "ICA3", col2 = "PC1", data_name = "PACAOMICs PDX")
-## PAMG vs PC1
-correlation_plotter(data = PACAOMICS_PC1, col1 = "PAMG", col2 = "PC1", data_name = "PACAOMICs PDX")
-## ISR vs PAMG
-correlation_plotter(data = PACAOMICS_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "PACAOMICs PDX")
+## ISR vs ISRactPCA
+scatter_pacaomics_isractvsisractpca <- dplyr::select(PACAOMICS_PC1, -ISRact) %>% 
+  dplyr::rename(ISRactPCA = "PC1", ISRact = "ICA3") %>% 
+  correlation_plotter(data = ., col1 = "ISRact", col2 = "ISRactPCA", data_name = "PaCaOmics PDX")
+
+ggsave(scatter_pacaomics_isractvsisractpca,
+       filename = "results/Figures/scatter_pacaomics_isractvsisractpca.svg",
+       width = 2,
+       height = 2)
+
+## PAMG vs ISRactPCA
+scatter_pacaomics_pamgvsisractpca <- dplyr::select(PACAOMICS_PC1, -ISRact) %>% 
+  dplyr::rename(ISRactPCA = "PC1", ISRact = "ICA3") %>% 
+  correlation_plotter(data = ., col1 = "PAMG", col2 = "ISRactPCA", data_name = "PaCaOmics PDX")
+
+ggsave(scatter_pacaomics_pamgvsisractpca,
+       filename = "results/Figures/scatter_pacaomics_pamgvsisractpca.svg",
+       width = 2,
+       height = 2)
+
+## ISRact vs PAMG
+scatter_pacaomics_isractvspamg <- dplyr::select(PACAOMICS_PC1, -ISRact) %>% 
+  dplyr::rename(ISRactPCA = "PC1", ISRact = "ICA3") %>% 
+  correlation_plotter(data = ., col1 = "ISRact", col2 = "PAMG", data_name = "PaCaOmics PDX")
+
+ggsave(scatter_pacaomics_isractvspamg,
+       filename = "results/Figures/scatter_pacaomics_isractvspamg.svg",
+       width = 2,
+       height = 2)

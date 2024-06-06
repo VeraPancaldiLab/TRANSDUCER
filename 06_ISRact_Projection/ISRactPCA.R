@@ -220,14 +220,35 @@ Sauyeun_PC1 <- arrange(projection_Sauyeun, PC1) %>%
   inner_join(sample_info[, c("sample","PAMG", "ICA3", "Diabetes")], by = "sample")
 
 # Plot comparisons with Basal/Classical and ISRact
-## ISR vs PC1
-correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PC1", data_name = "Sauyeun PDX")
-## PAMG vs PC1
-correlation_plotter(data = Sauyeun_PC1, col1 = "PAMG", col2 = "PC1", data_name = "Sauyeun PDX")
-## ISR vs PAMG
-correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "PAMG", data_name = "Sauyeun PDX")
-## ISR vs IFNsign
-correlation_plotter(data = Sauyeun_PC1, col1 = "ICA3", col2 = "IFNsign", data_name = "Sauyeun PDX")
+## ISR vs ISRactPCA
+scatter_shin_isractvsisractpca <- dplyr::select(Sauyeun_PC1, -ISRact) %>% 
+  dplyr::rename(ISRactPCA = "PC1", ISRact = "ICA3") %>% 
+  correlation_plotter(data = ., col1 = "ISRact", col2 = "ISRactPCA", data_name = "Shin et al. PDX")
+
+ggsave(scatter_shin_isractvsisractpca,
+       filename = "results/Figures/scatter_shin_isractvsisractpca.svg",
+       width = 2,
+       height = 2)
+
+## PAMG vs ISRactPCA
+scatter_shin_pamgvsisractpca <- dplyr::select(Sauyeun_PC1, -ISRact) %>% 
+  dplyr::rename(ISRactPCA = "PC1", ISRact = "ICA3") %>% 
+  correlation_plotter(data = ., col1 = "PAMG", col2 = "ISRactPCA", data_name = "Shin et al. PDX")
+
+ggsave(scatter_shin_pamgvsisractpca,
+       filename = "results/Figures/scatter_shin_pamgvsisractpca.svg",
+       width = 2,
+       height = 2)
+
+## ISRact vs PAMG
+scatter_shin_isractvspamg <- dplyr::select(Sauyeun_PC1, -ISRact) %>% 
+  dplyr::rename(ISRactPCA = "PC1", ISRact = "ICA3") %>% 
+  correlation_plotter(data = ., col1 = "ISRact", col2 = "PAMG", data_name = "Shin et al. PDX")
+
+ggsave(scatter_shin_isractvspamg,
+       filename = "results/Figures/scatter_shin_isractvspamg.svg",
+       width = 2,
+       height = 2)
 
 #-------------------------------------------------------------------------------
 # Plot ISRact distribution
@@ -307,4 +328,126 @@ for (mgene in marker_genes) {
          height = 2)
 }
 
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Gene weight comparison with PAMG
+PAMG_gw <- as_tibble(pdacmolgrad:::.molGradSys$PDX$gw[pdacmolgrad:::.molGradSys$PDX$k], rownames="GeneName") %>%
+  dplyr::rename(PAMG = "ICA1")
+
+ISRactPCA_gw <- as_tibble(pca_pdx$rotation, rownames="EnsemblID") %>%
+  mutate(GeneName = translate[EnsemblID]) %>%
+  dplyr::select(GeneName, PC1) %>%
+  dplyr::rename(ISRactPCA = PC1)
+
+## discrete
+compare = list(PAMG_gw$GeneName, ISRactPCA_gw$GeneName)
+
+compare_names = c("PAMG", "ISRactPCA")
+my_breaks = c(500, 1000, 5000, 10000, 20000)
+isractpcavspamg_venn <- ggVennDiagram(
+  compare,
+  category.names = compare_names,
+  label = "count",
+  label_geom = "text"
+) + scale_fill_gradient(low="grey90",high = "red", trans = "log", breaks = my_breaks)
+
+ggsave(isractpcavspamg_venn,
+       filename = paste0("results/Figures/isractpcavspamg_venn.svg"),
+       width = 4,
+       height = 2)
+## Cuantitative comparison of common genes
+PAMG_ISRact_quantc <- full_join(PAMG_gw, ISRactPCA_gw, by = "GeneName") %>%
+  mutate(na_PAMG = is.na(PAMG),na_ISRactPCA = is.na(ISRactPCA))
+
+PAMG_ISRact_quantc %>%
+  drop_na() %>%
+  correlation_plotter(col1 = "ISRactPCA", col2 = "PAMG", data_name = "gene weights")
+
+## Whats the gene weight of ISRactPCA and PAMG unique genes?
+## ISRact vs PAMG presence
+### positive
+PAMG_ISRact_quantc_ISRactpos <- dplyr::filter(PAMG_ISRact_quantc, ISRactPCA > 0 | is.na(ISRactPCA))
+
+PAMG_absence_test = wilcox.test(x = dplyr::filter(PAMG_ISRact_quantc_ISRactpos, na_PAMG == T) %>% dplyr::select(ISRactPCA) %>% deframe() %>% abs(),
+                                y = dplyr::filter(PAMG_ISRact_quantc_ISRactpos, na_PAMG == F) %>% dplyr::select(ISRactPCA) %>% deframe() %>% abs(),
+                                alternative = "two.sided")
+
+isractpos_commonvsunique <- ggplot(PAMG_ISRact_quantc_ISRactpos, aes(x = na_PAMG, y = ISRactPCA)) + 
+  geom_violin(aes(fill = na_PAMG)) + 
+  scale_fill_grey(start = 0.4, end = 0.9)+
+  geom_boxplot(width=0.1) +
+  scale_x_discrete(labels= c("common", "unique ISRactPCA"))+
+  labs(title = "Are ISRactPCA positive contributions different between common and unique genes",
+       subtitle = paste0("Wilcoxon test two sided p-value = ", 
+                         formatC(PAMG_absence_test$p.value, format = "e", digits = 2))) +
+  theme_bw()
+
+ggsave(isractpos_commonvsunique,
+       filename = paste0("results/Figures/isractpos_commonvsunique.svg"),
+       width = 4,
+       height = 2)
+
+### negative
+PAMG_ISRact_quantc_ISRactneg <- dplyr::filter(PAMG_ISRact_quantc, ISRactPCA < 0 | is.na(ISRactPCA))
+
+PAMG_absence_test = wilcox.test(x = dplyr::filter(PAMG_ISRact_quantc_ISRactneg, na_PAMG == T) %>% dplyr::select(ISRactPCA) %>% deframe() %>% abs(),
+                                y = dplyr::filter(PAMG_ISRact_quantc_ISRactneg, na_PAMG == F) %>% dplyr::select(ISRactPCA) %>% deframe() %>% abs(),
+                                alternative = "two.sided")
+
+isractneg_commonvsunique <- ggplot(PAMG_ISRact_quantc_ISRactneg, aes(x = na_PAMG, y = ISRactPCA)) + 
+  geom_violin(aes(fill = na_PAMG)) + 
+  scale_fill_grey(start = 0.4, end = 0.9)+
+  geom_boxplot(width=0.1) +
+  scale_x_discrete(labels= c("common", "unique for ISRactPCA"))+
+  labs(title = "Are ISRactPCA negative contributions different between common and unique genes",
+       subtitle = paste0("Wilcoxon test two sided p-value = ", 
+                         formatC(PAMG_absence_test$p.value, format = "e", digits = 2))) +
+  theme_bw()
+
+ggsave(isractneg_commonvsunique,
+       filename = paste0("results/Figures/isractneg_commonvsunique.svg"),
+       width = 4,
+       height = 2)
+
+
+## PAMG vs ISRact presence
+### positive
+PAMG_ISRact_quantc_PAMGpos <- dplyr::filter(PAMG_ISRact_quantc, PAMG > 0 | is.na(PAMG))
+ISRactPCA_absence_test = wilcox.test(x = dplyr::filter(PAMG_ISRact_quantc_PAMGpos, na_ISRactPCA == T) %>% dplyr::select(PAMG) %>% deframe() %>% abs(),
+                                     y = dplyr::filter(PAMG_ISRact_quantc_PAMGpos, na_ISRactPCA == F) %>% dplyr::select(PAMG) %>% deframe() %>% abs(),
+                                     alternative = "two.sided")
+pamgpos_commonvsunique <- ggplot(PAMG_ISRact_quantc_PAMGpos, aes(x = na_ISRactPCA, y = PAMG)) + 
+  geom_violin(aes(fill = na_ISRactPCA)) + 
+  scale_fill_grey(start = 0.4, end = 0.9)+
+  geom_boxplot(width=0.1) +
+  scale_x_discrete(labels= c("common", "unique for PAMG"))+
+  labs(title = "Are PAMG positive contributions different between common and unique genes",
+       subtitle = paste0("Wilcoxon test two sided p-value = ", 
+                         formatC(ISRactPCA_absence_test$p.value, format = "e", digits = 2))) +
+  theme_bw()
+
+ggsave(pamgpos_commonvsunique,
+       filename = paste0("results/Figures/pamgpos_commonvsunique.svg"),
+       width = 4,
+       height = 2)
+
+### negative
+PAMG_ISRact_quantc_PAMGneg <- dplyr::filter(PAMG_ISRact_quantc, PAMG < 0 | is.na(PAMG))
+ISRactPCA_absence_test = wilcox.test(x = dplyr::filter(PAMG_ISRact_quantc_PAMGneg, na_ISRactPCA == T) %>% dplyr::select(PAMG) %>% deframe() %>% abs(),
+                                     y = dplyr::filter(PAMG_ISRact_quantc_PAMGneg, na_ISRactPCA == F) %>% dplyr::select(PAMG) %>% deframe() %>% abs(),
+                                     alternative = "two.sided")
+pamgneg_commonvsunique <- ggplot(PAMG_ISRact_quantc_PAMGneg, aes(x = na_ISRactPCA, y = PAMG)) + 
+  geom_violin(aes(fill = na_ISRactPCA)) + 
+  scale_fill_grey(start = 0.4, end = 0.9)+
+  geom_boxplot(width=0.1) +
+  scale_x_discrete(labels= c("common", "unique for PAMG"))+
+  labs(title = "Are PAMG negative contributions different between common and unique genes",
+       subtitle = paste0("Wilcoxon test two sided p-value = ", 
+                         formatC(ISRactPCA_absence_test$p.value, format = "e", digits = 2))) +
+  theme_bw()
+
+ggsave(pamgneg_commonvsunique,
+       filename = paste0("results/Figures/pamgneg_commonvsunique.svg"),
+       width = 4,
+       height = 2)
 #-------------------------------------------------------------------------------

@@ -273,7 +273,13 @@ heatmap <- subset_corr_hm %>% column_to_rownames("measure2") %>%
 #-------------------------------------------------------------------------------
 # Plot comparisons with Basal/Classical and ISRact
 ## PAMG vs PC1
-correlation_plotter(data = CPTAC_PC1, col1 = "PAMG", col2 = "PC1", data_name = "CPTAC")
+scatter_cptac_isractpcavspamg <- dplyr::rename(CPTAC_PC1, ISRactPCA = "PC1") %>% 
+  correlation_plotter(data = ., col1 = "PAMG", col2 = "ISRactPCA", data_name = "CPTAC")
+
+ggsave(scatter_cptac_isractpcavspamg,
+       filename = "results/Figures/scatter_cptac_isractpcavspamg.svg",
+       width = 2,
+       height = 2)
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Proteomics DPEA

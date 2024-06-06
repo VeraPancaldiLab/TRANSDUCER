@@ -2,9 +2,9 @@
 
 correlation_plotter <- function(data, col1, col2, data_name){
   corr_spearman <- rcorr(data[[col1]], data[[col2]], type = "spearman")
-  corr_pearson <- rcorr(data[[col1]], data[[col2]], type = "pearson")
-  stats <- paste0("Spearman: R = ", round(corr_spearman$r["x","y"], 2), ", pval = ", round(corr_spearman$P["x","y"], 4),
-                 "\nPearson: R = ", round(corr_pearson$r["x","y"], 2), ", pval = ", round(corr_pearson$P["x","y"], 4))
+  #corr_pearson <- rcorr(data[[col1]], data[[col2]], type = "pearson")
+  stats <- paste0("Spearman: R = ", round(corr_spearman$r["x","y"], 2), ", pval = ", round(corr_spearman$P["x","y"], 4))#,
+                 #"\nPearson: R = ", round(corr_pearson$r["x","y"], 2), ", pval = ", round(corr_pearson$P["x","y"], 4))
   
   ggplot(data) +
     aes_string(col1, col2) +
