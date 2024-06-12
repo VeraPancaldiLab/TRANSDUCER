@@ -22,6 +22,7 @@ library(pheatmap)
 library(msigdbr)
 library(Hmisc)
 library(ggrepel)
+library(patchwork)
 
 source("src/plot_bar_enrich.R")
 source("src/Get_mostvar.R")
@@ -203,11 +204,29 @@ seurat_object <- AddMetaData(seurat_object, metadata = ISRact_diffAUC)
 Now here I create the plots I will share, starting with some parameters as the features to plot
 ```{r}
 features = "ISR_ratio" # "ISR_ratio" | AUC_names[1/2]
-plot1 <- FeaturePlot(seurat_object, reduction = "umap",  features = features, ncol = 2) & 
+plot1 <- FeaturePlot(seurat_object, reduction = "umap",  features = features) & 
   scale_colour_gradient2(low = 'blue', mid = 'white', high = 'red') # change reductuion to "UMAP" | "umap" 
 
-plotGATA6 <-  FeaturePlot(seurat_object, reduction = "umap",  features = "GATA6", ncol = 2) & 
-  scale_colour_gradient2(low = 'blue', mid = 'white', high = 'red') # change reductuion to "UMAP" | "umap" 
+# basal classical sc markers from Raghavan et al 2021
+scclassical <- c("FOXA3","GATA6","PDX1","MUC5AC","CEACAM6","LYZ","TFF2","EPCAM")
+scbasal <- c("TGFB2", "IFIT3", "S100A2", "MT2A", "CAV1", "CD44", "COL6A1", "TGFB1", "WNT7B", "DKK1", "KRT6A", "TP63")
+mean.exp <- colMeans(x = seurat_object@assays$RNA$data[scbasal, ], na.rm = TRUE) %>%
+  as_tibble(rownames = "CellID") %>%
+  dplyr::rename(Raghavan_scbasal = value) %>%
+  dplyr::mutate(Raghavan_scclassical = colMeans(x = seurat_object@assays$RNA$data[scclassical, ], na.rm = TRUE),
+                Raghavan_schybrid = colMeans(x = seurat_object@assays$RNA$data[c(scclassical, scbasal), ], na.rm = TRUE)) %>%
+  column_to_rownames("CellID") 
+
+seurat_object <- AddMetaData(seurat_object, metadata = mean.exp)
+
+#
+plot_basalclassical <-  FeaturePlot_scCustom(seurat_object, reduction = "umap",  features = c("Raghavan_scbasal", "Raghavan_scclassical"), colors_use = viridis_magma_dark_high) # change reductuion to "UMAP" | "umap" 
+
+plot_hybrid <- FeaturePlot_scCustom(seurat_object, reduction = "umap",  features = c("Raghavan_schybrid"), colors_use = viridis_magma_dark_high) # change 
+
+plot_NRL <- FeaturePlot_scCustom(seurat_object$, reduction = "umap",  features = c("Raghavan_schybrid"), colors_use = viridis_magma_dark_high) # change reductuion to "UMAP" | "umap" 
+
+
 
 ```
 
@@ -217,32 +236,46 @@ And now I compute the neighbours and cluster this umap to compare with ISRact
 # calculate clusters
 seurat_object <- FindNeighbors(seurat_object,reduction = "umap", dims=1:2)
 seurat_object <- FindClusters(seurat_object, resolution = 0.1)
+alphabet_pal <- DiscretePalette_scCustomize(num_colors = 12, palette = "alphabet")
 
-plot2 <- DimPlot(seurat_object, group.by =  "seurat_clusters", reduction = "umap", ncol = 2)
+plot2 <- DimPlot_scCustom(seurat_object, group.by =  "seurat_clusters", reduction = "umap",  colors_use = alphabet_pal)
 ```
 And at this moment I compare all these clusters with some violin plots, as well as assert the n of cells of each cluster
 
 ```{r}
-library(patchwork)
-plot3 <- VlnPlot(seurat_object, features = c(features), group.by = "seurat_clusters", pt.size = 0) + geom_hline(yintercept=0, linetype = "dashed")
+plot3 <- VlnPlot_scCustom(seurat_object, features = c(features), group.by = "seurat_clusters", pt.size = 0,  colors_use = alphabet_pal) + geom_hline(yintercept=0, linetype = "dashed")
 plot4 <- seurat_object$seurat_clusters %>% tibble(rownames = names(.), cluster = .) %>% ggplot(aes(x = cluster)) + geom_bar(stat ="count") + scale_y_log10() + ylab("log10(ncells)") + theme_classic()
-plot5 <- VlnPlot(seurat_object, features = c("GATA6"), group.by = "seurat_clusters", pt.size = 0) + geom_hline(yintercept=0, linetype = "dashed")
+plot5 <- VlnPlot_scCustom(seurat_object, features = c("Raghavan_scbasal"), group.by = "seurat_clusters", pt.size = 0, colors_use = alphabet_pal) + geom_hline(yintercept=0, linetype = "dashed")
+plot6 <- VlnPlot_scCustom(seurat_object, features = c("Raghavan_scclassical"), group.by = "seurat_clusters", pt.size = 0, colors_use = alphabet_pal) + geom_hline(yintercept=0, linetype = "dashed")
+plot7 <- VlnPlot_scCustom(seurat_object, features = c("Raghavan_schybrid"), group.by = "seurat_clusters", pt.size = 0, colors_use = alphabet_pal) + geom_hline(yintercept=0, linetype = "dashed")
 
-(plot1 | plot2 & NoLegend()) / (plot3 | plotGATA6) + plot_layout(heights = c(1,1), guides = 'collect')
+
+
+(plot2 & NoLegend()) / (plot3 | plot1 ) / (plot_basalclassical) / (plot5 | plot6) + plot_layout(heights = c(2,1,1,1), guides = 'collect')
+ggsave("results/Figures/umap_hwang_isractpca.svg",
+       width = 7,
+       height = 10)
 ```
 Now the cluster 10 seems to be specific of ISRactlow. What are their marker genes?
 
 ```{r}
-cluster_to_explore <- "10"
-markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')saveeeeee
+# cluster_to_explore <- "10"
+# markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
+# save.image(file = "Hwang_AUCell_onlytumor_untilCluster10.RDATA")
+load("Hwang_AUCell_onlytumor_untilCluster10.RDATA")
 ```
 
 ```{r}
 # Explore marker pct filtering
- dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=pct.1, y=pct.2, colour=avg_log2FC))+
+pct_l2fc_plot <-  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=pct.1, y=pct.2, colour=avg_log2FC))+
   geom_point() + 
-  scale_colour_gradient2() +
+  scale_colour_gradient2(limits = c(-2.4,4), oob = squish) +
   theme_classic()
+
+print(pct_l2fc_plot)
+ggsave("results/Figures/cluster10_l2fc.svg", pct_l2fc_plot, 
+       width = 4,
+       height = 3)
   
  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x= avg_log2FC, y = -p_val_adj, colour=(pct.1 + pct.2)/2))+
   geom_point() + 
@@ -313,13 +346,14 @@ neg_Reactome <- enrichPathway(gene = as.character(na.exclude(gene_to_entrez[neg_
                                         pvalueCutoff = 0.05, readable=TRUE, organism = "human")
 
 #### plots
-pos_Reactome@result %>%  
+reactome_pos_plot <- pos_Reactome@result %>%  
   plot_bar_enrich(0.05,paste0("Reactome Upregulated in cluster", cluster_to_explore))
 
 neg_Reactome@result %>%  
   plot_bar_enrich(0.05,paste0("Reactome Downregulated in cluster", cluster_to_explore))
 
 ### GO
+go_plots <- list()
 for (ont in c("MF", "BP", "CC")){
   pos_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[pos_markers])),
            universe = as.character(na.exclude(gene_to_entrez[background])),
@@ -332,11 +366,13 @@ for (ont in c("MF", "BP", "CC")){
                                      pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Hs.eg.db)
   
   #### plots
-  pos_enrich_GO@result %>%  
+  pos_GO_plot <- pos_enrich_GO@result %>%  
     plot_bar_enrich(0.05,paste0("GO-", ont," Upregulated in cluster", cluster_to_explore)) %>% print()
   
   neg_enrich_GO@result %>%  
     plot_bar_enrich(0.05,paste0("GO-", ont," Downregulated in cluster", cluster_to_explore)) %>% print()
+  
+  go_plots[[ont]] <- pos_GO_plot
 }
 
 ### Halmarks
@@ -349,14 +385,26 @@ neg_enrich_H <- enricher(gene = as.character(na.exclude(gene_to_entrez[neg_marke
                                      universe = as.character(na.exclude(gene_to_entrez[background])), TERM2GENE=h)
 
 #### plots
-  pos_enrich_H@result %>%  
-    plot_bar_enrich(0.05,paste0("Hallmark-", ont," Upregulated in cluster", cluster_to_explore)) %>% print()
+halmark_pos_plot <- pos_enrich_H@result %>%  
+    plot_bar_enrich(0.05,paste0("Hallmark Upregulated in cluster", cluster_to_explore)) %>% print()
+
   
-  neg_enrich_H@result %>%  
-    plot_bar_enrich(0.05,paste0("Hallmark-", ont," Downregulated in cluster", cluster_to_explore)) %>% print()
+halmark_neg_plot <-  neg_enrich_H@result %>%  
+    plot_bar_enrich(0.05,paste0("Hallmark Downregulated in cluster", cluster_to_explore)) %>% print()
 
 ```
 
+```{r}
+# create cluster 10 joint plot for export
+(go_plots[["MF"]]) /(go_plots[["BP"]]) /(go_plots[["CC"]]) / (halmark_pos_plot) / (reactome_pos_plot) + plot_layout(heights = c(1+9/1,
+                                                                                                                                1+20/1,
+                                                                                                                                1+20/1,
+                                                                                                                                1+0/1,
+                                                                                                                                1+5/1), guides = 'collect')
+ggsave("results/Figures/cluster10_enrichments.svg",
+       width = 7,
+       height = 13)
+```
 Whats going on with that Sigature of Stress? 
 
 ```{r}
@@ -391,16 +439,23 @@ VlnPlot(seurat_object, features = c("JUN", "DNAJC3", "FNIP2", "SLC7A11"), group.
 Now the cluster 5 seems to be specific of ISRacthigh. What are their marker genes?
 
 ```{r}
-cluster_to_explore <- "5"
-markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
+# cluster_to_explore <- "5"
+# markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
+# save.image(file = "Hwang_AUCell_onlytumor_untilCluster5.RDATA")
+load("Hwang_AUCell_onlytumor_untilCluster5.RDATA")
 ```
 
 ```{r}
 # Explore marker pct filtering
- dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=pct.1, y=pct.2, colour=avg_log2FC))+
+pct_l2fc_plot <-  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=pct.1, y=pct.2, colour=avg_log2FC))+
   geom_point() + 
-  scale_colour_gradient2() +
+  scale_colour_gradient2(limits = c(-2.4,4), oob = squish) +
   theme_classic()
+
+print(pct_l2fc_plot)
+ggsave("results/Figures/cluster5_l2fc.svg", pct_l2fc_plot, 
+       width = 4,
+       height = 3)
   
  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x= avg_log2FC, y = -p_val_adj, colour=(pct.1 + pct.2)/2))+
   geom_point() + 
@@ -433,7 +488,13 @@ library(UpSetR)
 clusterISRacthigh_pos <- rownames(dplyr::filter(sign_markers, avg_log2FC > 0)) %>% GeneSet(., setName=paste0("clusterISRacthigh_pos(", length(.),")"))
 
 geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  clusterISRacthigh_pos,  clusterISRactlow_pos))
-upset(fromList(geneIds(geneSets_vs_markers)), nsets = 6)
+upset_marker_vs_isractpca <- upset(fromList(geneIds(geneSets_vs_markers)), nsets = 6)
+
+
+svg("results/Figures/upset_marker_vs_isractpca.svg", height = 4, width = 6)
+print(upset_marker_vs_isractpca)
+dev.off()
+
 ```
 
 ```{r}
@@ -460,13 +521,14 @@ neg_Reactome <- enrichPathway(gene = as.character(na.exclude(gene_to_entrez[neg_
                                         pvalueCutoff = 0.05, readable=TRUE, organism = "human")
 
 #### plots
-pos_Reactome@result %>%  
+reactome_pos_plot <- pos_Reactome@result %>%  
   plot_bar_enrich(0.05,paste0("Reactome Upregulated in cluster", cluster_to_explore))
 
 neg_Reactome@result %>%  
   plot_bar_enrich(0.05,paste0("Reactome Downregulated in cluster", cluster_to_explore))
 
 ### GO
+go_plots <- list()
 for (ont in c("MF", "BP", "CC")){
   pos_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[pos_markers])),
            universe = as.character(na.exclude(gene_to_entrez[background])),
@@ -482,11 +544,12 @@ for (ont in c("MF", "BP", "CC")){
   write_rds(neg_enrich_GO, paste0("results/scRNAseq_proj/Hwang_AUCell_onlytumor/cluster_",cluster_to_explore, ont, "_neg.RDS"))
   
   #### plots
-  pos_enrich_GO@result %>%  
+pos_GO_plot <- pos_enrich_GO@result %>%  
     plot_bar_enrich(0.05,paste0("GO-", ont," Upregulated in cluster", cluster_to_explore)) %>% print()
   
   neg_enrich_GO@result %>%  
     plot_bar_enrich(0.05,paste0("GO-", ont," Downregulated in cluster", cluster_to_explore)) %>% print()
+    go_plots[[ont]] <- pos_GO_plot
 }
 ### Halmarks
 h <- msigdbr(species = "Homo sapiens", category = "H") %>% 
@@ -498,14 +561,25 @@ neg_enrich_H <- enricher(gene = as.character(na.exclude(gene_to_entrez[neg_marke
                                      universe = as.character(na.exclude(gene_to_entrez[background])), TERM2GENE=h)
 
 #### plots
-  pos_enrich_H@result %>%  
+halmark_pos_plot <-  pos_enrich_H@result %>%  
     plot_bar_enrich(0.05,paste0("Hallmark Upregulated in cluster", cluster_to_explore)) %>% print()
   
   neg_enrich_H@result %>%  
     plot_bar_enrich(0.05,paste0("Hallmark Downregulated in cluster", cluster_to_explore)) %>% print()
 
 ```
-
+export plot FigR28
+```{r}
+# create cluster 10 joint plot for export
+(go_plots[["MF"]]) /(go_plots[["BP"]]) /(go_plots[["CC"]]) / (halmark_pos_plot) / (reactome_pos_plot) + plot_layout(heights = c(1+20,
+                                                                                                                                1+20,
+                                                                                                                                1+20,
+                                                                                                                                1+7,
+                                                                                                                                1+20), guides = 'collect')
+ggsave("results/Figures/cluster5_enrichments.svg",
+       width = 8,
+       height = 15)
+```
 Now, what is that signature of Downregulation of cytoplasmic translation? rRNA processing? Traslation elongation? Metabolism of Aminoacids? Metabolism of Selenoaminoacids?
 
 ```{r}
