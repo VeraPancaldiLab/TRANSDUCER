@@ -25,10 +25,9 @@ plot_bar_enrich <- function(x, p.adjust_th, Title) {
     mutate(Description = as_factor(Description)) %>% 
     dplyr::filter(p.adjust < p.adjust_th) %>%
     slice_tail(n=20) %>%
-    ggplot(aes(x = GeneRatioNum, y = Description, fill = ount)) +
+    ggplot(aes(x = GeneRatioNum, y = Description, fill = p.adjust)) +
     geom_bar(stat="identity") +
-    scale_fill_gradient(low = "red", high = "blue", guide=guide_colourbar(reverse = TRUE))+
-    theme_bw() +
+    scale_fill_gradient(low = "red", high = "blue", guide=guide_colourbar(reverse = TRUE), limits = c(10^-11,0.1), trans = "log", breaks = c( 0.05, 0.01, 0.001, 10^-5, 10^-10),oob=squish)+    theme_bw() +
     labs(title = Title) +
     xlab("Gene Ratio") +
     ylab("")
@@ -303,6 +302,11 @@ ggplot(S_TEs, aes(IC.6)) +
   geom_rug(aes(color = threshold)) +
   theme_bw()
 
+ggsave("results/Figures/ic6tes_distrib.svg",
+       width = 6,
+       height = 2)
+
+
 ## data processing
 S_TEs_extup <- dplyr::filter(S_TEs, threshold == "high")
 S_TEs_extdown <- dplyr::filter(S_TEs, threshold == "low")
@@ -462,28 +466,49 @@ TEs_5perc_down_enrich_PA <- enrichPathway(gene= as.character(na.exclude(gene_to_
                                           universe = as.character(na.exclude(gene_to_entrez[S_TEs$geneID])),
                                           pvalueCutoff = 0.05, readable=TRUE, organism = "mouse")
 #### plots
-TEs_5perc_up_enrich_PA@result %>%  
+reactome_pos_plot <- TEs_5perc_up_enrich_PA@result %>%  
   plot_bar_enrich(0.05,"Reactome Upregulated in IC.6 (extreme gene weights)")
 
-TEs_5perc_down_enrich_PA@result %>%  
+reactome_neg_plot <- TEs_5perc_down_enrich_PA@result %>%  
   plot_bar_enrich(0.05,"Reactome Downregulated in IC.6 (extreme gene weights)")
 
 ### GO
-ont = "CC"
-TEs_5perc_up_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[S_TEs_ext_l$translationUp])),
-                                   universe = as.character(na.exclude(gene_to_entrez[S_TEs$geneID])),
-                                   ont      = ont,
-                                   pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Mm.eg.db)
-
-TEs_5perc_down_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[S_TEs_ext_l$translationDown])),
+pos_GO_plots = list()
+neg_GO_plots = list()
+for (ont in c("MF", "BP", "CC")){
+  TEs_5perc_up_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[S_TEs_ext_l$translationUp])),
                                      universe = as.character(na.exclude(gene_to_entrez[S_TEs$geneID])),
                                      ont      = ont,
                                      pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Mm.eg.db)
+  
+  TEs_5perc_down_enrich_GO <- enrichGO(gene = as.character(na.exclude(gene_to_entrez[S_TEs_ext_l$translationDown])),
+                                       universe = as.character(na.exclude(gene_to_entrez[S_TEs$geneID])),
+                                       ont      = ont,
+                                       pvalueCutoff = 0.05, readable=TRUE, OrgDb = org.Mm.eg.db)
+  
+  #### plots
+  pos_GO_plots[[ont]] <- TEs_5perc_up_enrich_GO@result %>%  
+    plot_bar_enrich(0.05,paste0("GO-", ont," Upregulated in IC.6 (extreme gene weights)"))
+  
+  neg_GO_plots[[ont]] <- TEs_5perc_down_enrich_GO@result %>%  
+    plot_bar_enrich(0.05, paste0("GO-", ont," Downregulated in IC.6 (extreme gene weights)"))
+}
 
-#### plots
-TEs_5perc_up_enrich_GO@result %>%  
-  plot_bar_enrich(0.05,paste0("GO-", ont," Upregulated in IC.6 (extreme gene weights)"))
+# create joint positive plot for export
+(reactome_pos_plot) / (pos_GO_plots[["MF"]]) / (pos_GO_plots[["BP"]]) / (pos_GO_plots[["CC"]]) + plot_layout(heights = c(1+5,
+                                                                                                                         1+19,
+                                                                                                                                1,
+                                                                                                                                1), guides = 'collect')
+ggsave("results/Figures/enrichments_pos.svg",
+       width = 8,
+       height = 7)
 
-TEs_5perc_down_enrich_GO@result %>%  
-  plot_bar_enrich(0.05, paste0("GO-", ont," Downregulated in IC.6 (extreme gene weights)"))
+# create joint negative plot for export
+(reactome_neg_plot) / (neg_GO_plots[["MF"]]) /(neg_GO_plots[["BP"]]) /(neg_GO_plots[["CC"]]) + plot_layout(heights = c(1+20,
+                                                                                                                       1+20,
+                                                                                                                       1+20,
+                                                                                                                       1+20), guides = 'collect')
+ggsave("results/Figures/enrichments_neg.svg",
+       width = 8,
+       height = 15)
 

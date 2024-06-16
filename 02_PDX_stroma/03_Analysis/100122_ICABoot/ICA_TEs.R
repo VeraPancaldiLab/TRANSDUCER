@@ -268,7 +268,8 @@ msigdbr_list = split(x = use_genesets$ensembl_gene, f = use_genesets$gs_name)
 signature_dict <- dplyr::select(all_genesets, c(gs_name, gs_id)) %>%
   distinct(gs_id, .keep_all = T) %>%  deframe()
 
-gsvaRes <- gsva(data.matrix(S_mat), msigdbr_list, min.sz = 15)
+gsvapar <- gsvaParam(data.matrix(S_mat), msigdbr_list,minSize = 15)
+gsvaRes <- gsva(gsvapar)
 
 ### Plot
 for (comp in colnames(S_mat)){
@@ -632,7 +633,7 @@ ggsave(file="02_Output/Figures/density_heatmap_IC6_TEs.svg", plot=density_heatma
 
 #-------------------------------------------------------------------------------
 
-# FIGURE SPECIFIC PLOTS: IC.4 GSVA bottom and top genes
+# FIGURE SPECIFIC PLOTS: IC.6 GSVA bottom and top genes
 #-------------------------------------------------------------------------------
 gsvaRes[order(gsvaRes[,"IC.6"]),]
 
@@ -642,7 +643,7 @@ gsvaTop <- as_tibble(gsvaRes, rownames = "gene_set") %>%
          gene_set = str_remove(gene_set, "REACTOME_"),
          gene_set = fct_reorder(gene_set, the_rank,.desc = T)) %>%
   pivot_longer(cols = -c(gene_set, the_rank), names_to = "component", values_to = "ES") %>% 
-  dplyr::filter(the_rank < 25 | the_rank > (nrow(gsvaRes)-25)) %>% 
+  dplyr::filter(the_rank < 20 | the_rank > (nrow(gsvaRes)-20)) %>% 
   mutate(component = if_else(component == "IC.6", "IC.6", "Other")) %>% 
   dplyr::select(!c(the_rank))
 
@@ -654,7 +655,7 @@ gsva_IC6 <- ggplot(gsvaTop, aes(x = ES, y = gene_set)) +
   rremove("legend") +
   rremove("ylab")
 
-ggsave(file="02_Output/Figures/gsva_IC6_TEs.svg", plot=gsva_IC6, width=10, height=6)
+ggsave(file="02_Output/Figures/gsva_IC6_TEs.svg", plot=gsva_IC6, width=9, height=6)
 
 #-------------------------------------------------------------------------------
 # THESIS PLOTS: Clinical and technical data + other components

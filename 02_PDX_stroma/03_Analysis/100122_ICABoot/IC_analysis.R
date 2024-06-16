@@ -622,7 +622,7 @@ random_significant <- dplyr::filter(random_correlations, sig_FDR) %>%
   dplyr::summarise(mean = mean(count), sd = sd(count))
 
 
-dplyr::filter(RBPs_corrs, sig_FDR) %>% 
+rbps_empirical_corr <- dplyr::filter(RBPs_corrs, sig_FDR) %>% 
   ggplot(aes(measure2)) +
   geom_bar(stat = "count", fill = "grey69") +
   geom_point(inherit.aes = FALSE, random_significant, mapping = aes(x = measure2, y = mean), color = "red") +
@@ -635,6 +635,11 @@ dplyr::filter(RBPs_corrs, sig_FDR) %>%
   labs(x = "component", y = "count") +
   scale_y_continuous(breaks=seq(0,12,2)) +
   rotate_x_text(angle = 90)
+
+ggsave( "02_Output/Figures/rbps_empirical_corr.svg",
+      rbps_empirical_corr,
+       width = 4,
+       height = 3)
 
 ### component specific significantly correlated components
 plot_IC6_RBPstotal <- dplyr::filter(RBPs_corrs, sig_FDR,
