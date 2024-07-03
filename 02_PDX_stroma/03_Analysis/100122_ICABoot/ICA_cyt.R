@@ -482,12 +482,13 @@ clinical_technical_full_corrplot <- sample_info %>%
          measure2 %in% names(A_mat)) %>% #not square corr
   dplyr::mutate(measure1 = factor(measure1,
                                   levels = levels)) %>% 
+  mutate(r = abs(r)) %>% 
   ggplot(aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
   geom_tile() +
   labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICAcyt ~ multiqc",
        subtitle="Only significant correlation coefficients shown (95% I.C.)") +
-  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
-  geom_text() +
+  scale_fill_gradient(low="#FBFEF9",high="black", limits=c(0,1)) +
+  geom_text(colour = "white") +
   theme_classic() +
   scale_x_discrete(expand=c(0,0)) +
   scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
