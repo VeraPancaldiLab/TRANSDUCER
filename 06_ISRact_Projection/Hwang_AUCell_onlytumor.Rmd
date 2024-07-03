@@ -23,6 +23,7 @@ library(msigdbr)
 library(Hmisc)
 library(ggrepel)
 library(patchwork)
+library(scCustomize)
 
 source("src/plot_bar_enrich.R")
 source("src/Get_mostvar.R")
@@ -204,27 +205,54 @@ seurat_object <- AddMetaData(seurat_object, metadata = ISRact_diffAUC)
 Now here I create the plots I will share, starting with some parameters as the features to plot
 ```{r}
 features = "ISR_ratio" # "ISR_ratio" | AUC_names[1/2]
+basalclassical_source = "Raghavan_tableS3" # "Raghavan_tableS3" | "Raghavan_figures2d
+top_genes = 115 # 115 is the standard as its the max number for Hybrid
+
 plot1 <- FeaturePlot(seurat_object, reduction = "umap",  features = features) & 
   scale_colour_gradient2(low = 'blue', mid = 'white', high = 'red') # change reductuion to "UMAP" | "umap" 
 
-# basal classical sc markers from Raghavan et al 2021
-scclassical <- c("FOXA3","GATA6","PDX1","MUC5AC","CEACAM6","LYZ","TFF2","EPCAM")
-scbasal <- c("TGFB2", "IFIT3", "S100A2", "MT2A", "CAV1", "CD44", "COL6A1", "TGFB1", "WNT7B", "DKK1", "KRT6A", "TP63")
+# basal classical sc markers from Raghavan et al 2020
+if (basalclassical_source == "Raghavan_figures2d"){
+  scclassical <- c("FOXA3","GATA6","PDX1","MUC5AC","CEACAM6","LYZ","TFF2","EPCAM")
+  scbasal <- c("TGFB2", "IFIT3", "S100A2", "MT2A", "CAV1", "CD44", "COL6A1", "TGFB1", "WNT7B", "DKK1", "KRT6A", "TP63")
+  schybrid <- c(scclassical, scbasal)
+} else if (basalclassical_source == "Raghavan_tableS3"){
+  scclassical <- read.xlsx(file = "data/Other/Raghavan2020_TableS3.xlsx", sheetName = "S3 scClassical score correlates", startRow = 5) %>%
+    dplyr::slice_head(n=top_genes) %>%
+    dplyr::filter(Gene %in% rownames(seurat_object@assays$RNA$data)) %>%
+    dplyr::select(Gene) %>%
+    deframe() # min cor 115 = 	0.312117985869206
+  
+  scbasal <- read.xlsx(file = "data/Other/Raghavan2020_TableS3.xlsx", sheetName = "S3 scBasal score correlates", startRow = 5) %>%
+    dplyr::slice_head(n=top_genes) %>%
+    dplyr::filter(Gene %in% rownames(seurat_object@assays$RNA$data)) %>%
+    dplyr::select(Gene) %>%
+    deframe() # min cor 115 = 	0.229487232334561
+  
+  schybrid <- read.xlsx(file = "data/Other/Raghavan2020_TableS3.xlsx", sheetName = "S3 IC score corrected corr.", startRow = 5) %>%
+    dplyr::slice_head(n=top_genes) %>%
+    dplyr::filter(Gene %in% rownames(seurat_object@assays$RNA$data)) %>%
+    dplyr::select(Gene) %>%
+    deframe() 
+}
+
 mean.exp <- colMeans(x = seurat_object@assays$RNA$data[scbasal, ], na.rm = TRUE) %>%
   as_tibble(rownames = "CellID") %>%
   dplyr::rename(Raghavan_scbasal = value) %>%
   dplyr::mutate(Raghavan_scclassical = colMeans(x = seurat_object@assays$RNA$data[scclassical, ], na.rm = TRUE),
-                Raghavan_schybrid = colMeans(x = seurat_object@assays$RNA$data[c(scclassical, scbasal), ], na.rm = TRUE)) %>%
+                Raghavan_schybrid = colMeans(x = seurat_object@assays$RNA$data[schybrid, ], na.rm = TRUE)) %>%
   column_to_rownames("CellID") 
 
 seurat_object <- AddMetaData(seurat_object, metadata = mean.exp)
 
 #
-plot_basalclassical <-  FeaturePlot_scCustom(seurat_object, reduction = "umap",  features = c("Raghavan_scbasal", "Raghavan_scclassical"), colors_use = viridis_magma_dark_high) # change reductuion to "UMAP" | "umap" 
+plot_UMAPbasal <-  FeaturePlot_scCustom(seurat_object, reduction = "umap",  features = c("Raghavan_scbasal"), colors_use = viridis_magma_dark_high) 
 
-plot_hybrid <- FeaturePlot_scCustom(seurat_object, reduction = "umap",  features = c("Raghavan_schybrid"), colors_use = viridis_magma_dark_high) # change 
+plot_UMAPclassical <-  FeaturePlot_scCustom(seurat_object, reduction = "umap",  features = c("Raghavan_scclassical"), colors_use = viridis_magma_dark_high)
 
-plot_NRL <- FeaturePlot_scCustom(seurat_object$, reduction = "umap",  features = c("Raghavan_schybrid"), colors_use = viridis_magma_dark_high) # change reductuion to "UMAP" | "umap" 
+plot_UMAPhybrid <- FeaturePlot_scCustom(seurat_object, reduction = "umap",  features = c("Raghavan_schybrid"), colors_use = viridis_magma_dark_high) 
+
+# plot_NRL <- FeaturePlot_scCustom(seurat_object$, reduction = "umap",  features = c("Raghavan_schybrid"), colors_use = viridis_magma_dark_high) # change 
 
 
 
@@ -251,10 +279,10 @@ plot7 <- VlnPlot_scCustom(seurat_object, features = c("Raghavan_schybrid"), grou
 
 
 
-(plot2 & NoLegend()) / (plot3 | plot1 ) / (plot_basalclassical) / (plot5 | plot6) + plot_layout(heights = c(2,1,1,1), guides = 'collect')
+(plot2 & NoLegend()) / (plot3 | plot1 ) / (plot5 | plot_UMAPbasal) / (plot6 | plot_UMAPclassical) / (plot7 | plot_UMAPhybrid) + plot_layout(heights = c(2,1,1,1,1), guides = 'collect')
 ggsave("results/Figures/umap_hwang_isractpca.svg",
        width = 7,
-       height = 10)
+       height = 12)
 ```
 Now the cluster 10 seems to be specific of ISRactlow. What are their marker genes?
 
