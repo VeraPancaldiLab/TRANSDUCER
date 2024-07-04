@@ -202,7 +202,7 @@ seurat_object <- AddMetaData(seurat_object, metadata = ISRact_diffAUC)
 
 ```
 
-Now here I create the plots I will share, starting with some parameters as the features to plot
+Now here I create the plots of comparison with basal and classical signatures in a cell wise way
 ```{r}
 features = "ISR_ratio" # "ISR_ratio" | AUC_names[1/2]
 basalclassical_source = "Raghavan_tableS3" # "Raghavan_tableS3" | "Raghavan_figures2d
@@ -252,9 +252,24 @@ plot_UMAPclassical <-  FeaturePlot_scCustom(seurat_object, reduction = "umap",  
 
 plot_UMAPhybrid <- FeaturePlot_scCustom(seurat_object, reduction = "umap",  features = c("Raghavan_schybrid"), colors_use = viridis_magma_dark_high) 
 
-# plot_NRL <- FeaturePlot_scCustom(seurat_object$, reduction = "umap",  features = c("Raghavan_schybrid"), colors_use = viridis_magma_dark_high) # change 
+data_heatmap_markers <- GetAssayData(seurat_object, layer = "scale.data") %>% 
+  as_tibble(rownames="Gene") %>% 
+  dplyr::filter(Gene %in% c(scclassical, scbasal, schybrid)) %>% column_to_rownames("Gene")
 
+annot_cols =  dplyr::select(seurat_object@meta.data, cnv_score, ISR_ratio, seurat_clusters, Raghavan_scbasal, Raghavan_scclassical, Raghavan_schybrid) %>% dplyr::arrange(seurat_clusters)
 
+annot_rows = stack(list("scclassical" = scclassical, "scbasal" = scbasal, "schybrid" = schybrid)) %>% 
+  dplyr::rename(signature = "ind") %>% dplyr::filter(values %in% rownames(data_heatmap_markers)) %>%
+  column_to_rownames("values")
+
+annot_colors = list(ISR_ratio = c('blue','white','red'),
+                     signature = c(scbasal = "#FF7F00", schybrid = "chartreuse4", scclassical = "#377DB8"),
+                     Raghavan_scbasal = c("white", "#FF7F00"),
+                    Raghavan_scclassical = c("white", "#377DB8"),
+                    Raghavan_schybrid = c("white", "chartreuse4"),
+                    seurat_clusters = setNames(alphabet_pal, as.character(c(0:11))))
+  
+  pheatmap(data_heatmap_markers[rownames(annot_rows),rownames(annot_cols)], scale = "none", color = colorRampPalette(c("black", "yellow"))(100), annotation_col = annot_cols, annotation_row = annot_rows, annotation_colors = annot_colors, cluster_rows = F, cluster_cols = F, show_colnames = FALSE, show_rownames = FALSE)  
 
 ```
 
@@ -284,6 +299,50 @@ ggsave("results/Figures/umap_hwang_isractpca.svg",
        width = 7,
        height = 12)
 ```
+Before exploring each cluster individually I look at the pseudobulk of them related to basal/classical as the heatmap above was not very clear
+```{r}
+# Get Pseudobulk for clusters
+pseudo <- AggregateExpression(seurat_object, group.by = "seurat_clusters", return.seurat = T)
+pseudo_bulk_exp <- pseudo@assays$RNA$scale.data[c(scclassical, scbasal, schybrid),]
+pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("cnv_score", AUC_names, "seurat_clusters", "Raghavan_scbasal", "Raghavan_scclassical", "Raghavan_schybrid")) %>%
+  as_tibble() %>%
+  dplyr::group_by(seurat_clusters) %>%
+  dplyr::summarize(mean_ISRacthigh = mean(`ISRact_high(100)`),
+                   sd_ISRacthigh = sd(`ISRact_high(100)`),
+                   mean_ISRactlow = mean(`ISRact_low(100)`),
+                   sd_ISRactlow = sd(`ISRact_low(100)`),
+                   mean_scbasal = mean(Raghavan_scbasal),
+                   sd_scbasal = sd(Raghavan_scbasal),
+                   mean_scclassical = mean(Raghavan_scclassical),
+                   sd_scclassical = sd(Raghavan_scclassical),
+                   mean_schybrid = mean(Raghavan_schybrid),
+                   sd_schybrid = sd(Raghavan_schybrid),
+                   mean_cnv_score = mean(cnv_score)) %>% 
+  dplyr::mutate(rownames = paste0("g", seurat_clusters)) %>%
+  column_to_rownames("rownames")
+
+annot_cols =  pseudo_bulk_annot
+
+annot_rows = stack(list("scclassical" = scclassical, "scbasal" = scbasal, "schybrid" = schybrid)) %>% 
+  dplyr::rename(signature = "ind") %>% dplyr::filter(values %in% rownames(pseudo_bulk_exp)) %>%
+  column_to_rownames("values")
+
+annot_colors = list(mean_ISRacthigh = c('white','red'),
+                    sd_ISRacthigh = c('white','black'),
+                    mean_ISRactlow = c('white','blue'),
+                    sd_ISRactlow = c('white','black'),
+                     signature = c(scbasal = "#FF7F00", schybrid = "chartreuse4", scclassical = "#377DB8"),
+                     mean_scbasal = c("white", "#FF7F00"),
+                    sd_scbasal = c("white", "black"),
+                    mean_scclassical = c("white", "#377DB8"),
+                    sd_scclassical = c("white", "black"),
+                    mean_schybrid = c("white", "chartreuse4"),
+                    sd_schybrid = c("white", "black"),
+                    seurat_clusters = setNames(alphabet_pal, as.character(c(0:11))))
+  
+pheatmap(pseudo_bulk_exp[rownames(annot_rows),rownames(annot_cols)], scale = "none", color = colorRampPalette(c("purple", "black", "yellow"))(100), annotation_col = annot_cols, annotation_row = annot_rows, annotation_colors = annot_colors, cluster_rows = F, cluster_cols = T, show_colnames = TRUE, show_rownames = FALSE)  
+```
+
 Now the cluster 10 seems to be specific of ISRactlow. What are their marker genes?
 
 ```{r}
