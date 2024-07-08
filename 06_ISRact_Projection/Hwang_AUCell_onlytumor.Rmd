@@ -24,6 +24,7 @@ library(Hmisc)
 library(ggrepel)
 library(patchwork)
 library(scCustomize)
+library(car)
 
 source("src/plot_bar_enrich.R")
 source("src/Get_mostvar.R")
@@ -153,9 +154,11 @@ AUC_results <- slot(slot(cells_AUC, "assays"), "data")$AUC %>%
   as_tibble(rownames="CellID") %>%
   column_to_rownames("CellID")
 
-  barplot(height = deframe(AUC_results))
+rownames_to_column(AUC_results, "CellID") %>% 
+  pivot_longer(- CellID, names_to = "signature") %>% ggplot(aes(x = value, fill = signature, alpha=3)) +
+    geom_density()
 ```
-
+Add the metadata to the scRNAseq expression and explore the distribution on the initial UMAP
 ```{r}
 seurat_object <- AddMetaData(seurat_object, metadata = AUC_results)
 
@@ -163,7 +166,6 @@ seurat_object <- AddMetaData(seurat_object, metadata = AUC_results)
 AUC_names = names(AUC_results)
 FeaturePlot(seurat_object, reduction = "UMAP", features = AUC_names)
 ```
-
 
 Finally now I compute a specific UMAP, precomputed only on the Tumor cells
 
@@ -341,6 +343,10 @@ annot_colors = list(mean_ISRacthigh = c('white','red'),
                     seurat_clusters = setNames(alphabet_pal, as.character(c(0:11))))
   
 pheatmap(pseudo_bulk_exp[rownames(annot_rows),rownames(annot_cols)], scale = "none", color = colorRampPalette(c("purple", "black", "yellow"))(100), annotation_col = annot_cols, annotation_row = annot_rows, annotation_colors = annot_colors, cluster_rows = F, cluster_cols = T, show_colnames = TRUE, show_rownames = FALSE)  
+```
+Also, what is the distribution of marker genes as PHGDH, CBS and IL18?
+```{r}
+Stacked_VlnPlot(seurat_object, features = c("PHGDH", "CBS", "IL18"), group.by = "seurat_clusters", pt.size = 0, colors_use = alphabet_pal, add.noise = T) + geom_hline(yintercept=0, linetype = "dashed")
 ```
 
 Now the cluster 10 seems to be specific of ISRactlow. What are their marker genes?
@@ -769,6 +775,7 @@ pheatmap(pseudo_bulk_TFact, annotation_col = pseudo_bulk_annot, cluster_cols = T
 
 ```
 Now, explore individual correlations, like the one with Myc
+
 ```{r}
 explore_scatter <- pseudo_bulk_TFact %>%
   t() %>%
@@ -791,22 +798,239 @@ scatterplot_with_stats(explore_scatter, "JUN", "mean_cnv_score", "cluster", "spe
 scatterplot_with_stats(explore_scatter, "ASCL1", "mean_ISRactlow", "cluster", "spearman", "ASCL1 vs mean_ISRactlow")
 ```
 
+How does the ISRact scores relate to known metadata of Hwang et al?
+- patient distribution
+- treatment
+- Responses
 
+For this, from the 64K cells I select the top and bottom 10K as high and low and check the distribution comapred with the middle ones
 ```{r}
-explore_scAUCscores <- FetchData(object = seurat_object, vars = c("seurat_clusters", AUC_names, "cnv_score")) %>%
-  dplyr::rename(ISRact_high = 2, ISRact_low = 3)
+threshold_n = 10000
+feature = "response"
+isrvsmetadata <- FetchData(object = seurat_object, vars = c("seurat_clusters", "ISR_ratio", "pid", "treatment_status", "response")) %>%
+  rownames_to_column("CellID") %>%
+  dplyr::arrange(ISR_ratio)
 
-scatterplot_with_stats(explore_scAUCscores, "ISRact_high", "ISRact_low", type = "spearman", label = FALSE, title = "ISRacthigh vs ISRactlow AUC scores")
+bottom_th = slice(isrvsmetadata, threshold_n)$ISR_ratio
+top_th = slice(isrvsmetadata, nrow(isrvsmetadata)-threshold_n)$ISR_ratio
+
+isrvsmetadata <- dplyr::mutate(isrvsmetadata, 
+                               ISR_class = if_else(ISR_ratio < bottom_th, "ISRact_low", if_else(ISR_ratio > top_th, "ISRact_high", "uncategorised")),
+                               ISR_class = fct(ISR_class, levels = c("ISRact_high", "uncategorised", "ISRact_low")))
+ggplot(isrvsmetadata, aes(x = get(feature), fill = ISR_class)) +
+  geom_bar(position="fill", stat="count") +
+  scale_fill_manual(values = c(ISRact_high = "red", ISRact_low = "blue", uncategorised = "grey"))+
+  theme_classic()+
+  scale_x_discrete(guide = guide_axis(angle = 90)) +
+  xlab(feature) +
+  ylab("proportion")
+
+ggplot(isrvsmetadata, aes(x = get(feature), y=ISR_ratio)) +
+  geom_violin() +
+  geom_boxplot(width=0.1)+ 
+  geom_hline(yintercept = 0, linetype = "dashed")+
+  theme_classic()+
+  scale_x_discrete(guide = guide_axis(angle = 90)) +
+  xlab(feature) +
+  ylab("ISR_ratio")
 ```
 
-Another way of looking at this proposed by Matthieu
+So, response and treatment could be explaining something there... what is the status of these patients separately? lets see dispersions
+```{r}
+threshold_n = 10000
+feature = "pid"
+order_pid = "treatment_status"
+isrvsmetadata <- FetchData(object = seurat_object, vars = c("seurat_clusters", "ISR_ratio", "pid", "treatment_status", "response")) %>%
+  rownames_to_column("CellID") %>%
+  dplyr::arrange(ISR_ratio)
+
+bottom_th = slice(isrvsmetadata, threshold_n)$ISR_ratio
+top_th = slice(isrvsmetadata, nrow(isrvsmetadata)-threshold_n)$ISR_ratio
+
+pid_ordered = dplyr::group_by(isrvsmetadata, pid) %>%
+    dplyr::summarize(mean_ISR_ratio = mean(`ISR_ratio`),
+                     treatment_status = unique(treatment_status),
+                     response = unique(response)) %>% 
+    dplyr::arrange( get(order_pid), mean_ISR_ratio) %>%
+  dplyr::select(pid) %>%
+  deframe() %>%
+  as.character()
+
+
+isrvsmetadata <- dplyr::mutate(isrvsmetadata, 
+                               ISR_class = if_else(ISR_ratio < bottom_th, "ISRact_low", if_else(ISR_ratio > top_th, "ISRact_high", "uncategorised")),
+                               ISR_class = fct(ISR_class, levels = c("ISRact_high", "uncategorised", "ISRact_low")),
+                               pid = fct(as.character(pid), levels = pid_ordered))
+
+n_cells <- ggplot(isrvsmetadata, aes(x = get(feature), fill = ISR_class)) +
+  geom_bar(position="stack", stat="count") +
+  scale_fill_manual(values = c(ISRact_high = "red", ISRact_low = "blue", uncategorised = "grey"))+
+  theme_classic()+
+  scale_x_discrete(guide = guide_axis(angle = 90)) +
+  scale_y_log10() +
+  xlab("") +
+  ylab("log10 (number of cells)")
+
+p_cells <- ggplot(isrvsmetadata, aes(x = pid, fill = ISR_class)) +
+  geom_bar(position="fill", stat="count") +
+  scale_fill_manual(values = c(ISRact_high = "red", ISRact_low = "blue", uncategorised = "grey"))+
+  theme_classic()+
+  scale_x_discrete(guide = guide_axis(angle = 90)) +
+  xlab("") +
+  ylab("proportion")
+
+violin <- ggplot(isrvsmetadata, aes(x = pid, y=ISR_ratio, fill = get(order_pid))) +
+  geom_violin() +
+  geom_hline(yintercept = 0, linetype = "dashed")+
+  theme_classic()+
+  scale_x_discrete(guide = guide_axis(angle = 90)) +
+  scale_fill_viridis_d(option = "H", name = order_pid)+
+  geom_boxplot(width=0.1, fill = "white")+ 
+  xlab("") +
+  ylab("ISR_ratio")
+
+(n_cells & NoLegend())/ p_cells / violin + plot_layout(heights = c(1,1,1), guides = 'collect')
+```
+
+There is a big difference with CRTx treated patients. Is this the persistent cell population upon CRTx treatment? Lets do some statistics!
 
 ```{r}
+treatment = "CRTl"
+# ISRact in Untreated vs CRTX (CAREFUL DIFFERENT SIZE)
+## Is variance equal (yes -> ttest, no -> welsch)
+filt_data <- dplyr::filter(isrvsmetadata, treatment_status %in% c("Untreated", treatment)) %>%
+  dplyr::mutate(treatment_status = fct(treatment_status, levels = c("Untreated", treatment)))
+leveneTest(ISR_ratio ~ treatment_status, filt_data) #p=5.371e-05 -> H0 is discarded, unequal variance
 
-df=seurat_object[[AUC_names]] %>% dplyr::rename(ISRacthigh = 1, ISRactlow = 2) %>% t() %>% CreateAssayObject()
+## statistical test
+stats <- t.test(ISR_ratio ~ treatment_status, filt_data, alternative = "two.sided", var.equal = FALSE)
 
-all(colnames(seurat_object)==rownames(df))
-seurat_object[["ISR"]] = df
+stats_text <- paste0("Welch’s t-test: pval = ", format(stats$p.value, scientific=T))
 
-FeatureScatter(seurat_object, feature1 ="ISRacthigh", feature2 =  "ISRactlow")
+
+ggplot(filt_data, aes(x = treatment_status, y=ISR_ratio, fill = treatment_status))+
+  geom_violin() +
+  geom_hline(yintercept = 0, linetype = "dashed")+
+  scale_fill_manual(values = c("white", "grey"))+
+  theme_classic()+
+  scale_x_discrete(guide = guide_axis(angle = 90)) +
+  geom_boxplot(width=0.1, fill = "white")+ 
+  #geom_jitter(shape=1, position=position_jitter(0.2))+
+  ylab("ISR_ratio") +
+  labs(subtitle = stats_text)
+
+
+# ISRact in responders vs non responders
+comparison =  c("Poor response", "Moderate response") # "Poor response" | "Minimal response" | "Moderate response" | "Responders"
+
+
+filt_data <- dplyr::filter(isrvsmetadata, response %in%comparison) %>%
+  dplyr::mutate(response = fct(response, levels = comparison))
+
+leveneTest(ISR_ratio ~ response, filt_data) #p=5.371e-05 -> H0 is discarded, unequal variance
+
+## statistical test
+stats <- t.test(ISR_ratio ~ response, filt_data, alternative = "two.sided", var.equal = FALSE)
+
+stats_text <- paste0("Welch’s t-test: pval = ", format(stats$p.value, scientific=T))
+
+
+ggplot(filt_data, aes(x = response, y=ISR_ratio, fill = response))+
+  geom_violin() +
+  geom_hline(yintercept = 0, linetype = "dashed")+
+  scale_fill_manual(values = c("white", "grey"))+
+  theme_classic()+
+  scale_x_discrete(guide = guide_axis(angle = 90)) +
+  geom_boxplot(width=0.1, fill = "white")+ 
+  #geom_jitter(shape=1, position=position_jitter(0.2))+
+  ylab("ISR_ratio") +
+  labs(subtitle = stats_text)
+
+ 
+```
+No, whats up with PHGDH and CBS upon this? are they correlated with ISRact score?
+
+```{r}
+# Parameters
+interest_genes = c("PHGDH", "CBS", "IL18")
+filter_for_corr = F
+
+isractvsinterestgenes <- as_tibble(seurat_object@assays$RNA$data[interest_genes,], rownames = "GeneID") %>% 
+  pivot_longer(-GeneID, names_to = "CellID", values_to = "value") %>%
+  pivot_wider(id_cols = CellID, names_from = GeneID) %>% 
+  dplyr::inner_join(isrvsmetadata, by = "CellID") %>% 
+  dplyr::mutate(PHGDH_expression = if_else(PHGDH > 0, "expressed", "absent"),
+                CBS_expression = if_else(CBS > 0, "expressed", "absent"),
+                IL18_expression = if_else(IL18 > 0, "expressed", "absent"))
+
+## Correlation Analysis
+interest_gene_plots = list()
+for(gene in interest_genes){
+  if (filter_for_corr){
+    isractvsinterestgenes_filt <- dplyr::filter(isractvsinterestgenes, get(paste0(gene, "_expression")) == "expressed")
+  } else{
+    isractvsinterestgenes_filt <- isractvsinterestgenes
+  }
+  
+  corr_pearson <- rcorr(isractvsinterestgenes_filt$ISR_ratio, isractvsinterestgenes_filt[[gene]], type = "pearson")
+  stats_text <- paste0("Pearson: R = ", round(corr_pearson$r["x","y"], 2), ", pval = ", format(corr_pearson$P["x","y"], scientific = T))
+interest_gene_plots[[gene]] <- ggplot(isractvsinterestgenes_filt, aes(x = ISR_ratio, y = get(gene))) +
+  geom_point() +
+   geom_smooth(method=lm) +
+    theme_minimal() +
+  labs(subtitle = stats_text) +
+    ylab(gene)
+  print(interest_gene_plots[[gene]])
+
+}
+
+## binnarizing in expressed and non expressing cells vs ISR_ratio
+interest_gene_binned_plots = list()
+for(gene in interest_genes){
+  gene_expression = paste0(gene, "_expression")
+  leveneTest(ISR_ratio ~ get(gene_expression), isractvsinterestgenes)
+
+## statistical test
+stats <- t.test(ISR_ratio ~ get(gene_expression), isractvsinterestgenes, alternative = "two.sided", var.equal = FALSE)
+
+stats_text <- paste0("Welch’s t-test: pval = ", format(stats$p.value, scientific=T))
+interest_gene_binned_plots[[gene]] <-  ggplot(isractvsinterestgenes, aes(x = get(gene_expression), y = ISR_ratio, fill = get(gene_expression))) +
+  geom_violin() +
+  geom_hline(yintercept = 0, linetype = "dashed")+
+  scale_fill_manual(values = c("white", "grey"))+
+  theme_classic()+
+  scale_x_discrete(guide = guide_axis(angle = 90)) +
+  geom_boxplot(width=0.1, fill = "white")+
+  labs(subtitle = stats_text)+
+  xlab(gene)
+
+print(interest_gene_binned_plots[[gene]])
+}
+
+## binnarizing in expressed and non expressing cells vs binned ISR_ratio
+count_double_binned_plots = list()
+prop_double_binned_plots = list()
+for(gene in interest_genes){
+  gene_expression = paste0(gene, "_expression")
+
+  count_double_binned_plots[[gene]] <- ggplot(isractvsinterestgenes, aes(x = get(gene_expression), fill = ISR_class)) +
+    geom_bar(position="stack", stat="count") +
+    scale_fill_manual(values = c(ISRact_high = "red", ISRact_low = "blue", uncategorised = "grey"))+
+    theme_classic()+
+    scale_x_discrete(guide = guide_axis(angle = 90)) +
+    scale_y_log10() +
+    xlab(gene) +
+    ylab("log10 (number of cells)")
+  
+  prop_double_binned_plots[[gene]] <- ggplot(isractvsinterestgenes, aes(x = PHGDH_expression, fill = ISR_class)) +
+    geom_bar(position="fill", stat="count") +
+    scale_fill_manual(values = c(ISRact_high = "red", ISRact_low = "blue", uncategorised = "grey"))+
+    theme_classic()+
+    scale_x_discrete(guide = guide_axis(angle = 90)) +
+    xlab(gene) +
+    ylab("proportion")
+  print(count_double_binned_plots[[gene]])
+  print(prop_double_binned_plots[[gene]])
+}
+
 ```
