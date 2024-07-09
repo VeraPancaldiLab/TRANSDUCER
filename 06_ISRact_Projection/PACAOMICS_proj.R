@@ -128,10 +128,10 @@ projection_scatter_pacaomics <- dplyr::mutate(show_projection) %>%
   #ylim(-250,15) +
   theme_bw()
 
-ggsave(projection_scatter_pacaomics,
-       filename = "results/Figures/projection_scatter_pacaomics.svg",
-       width = 7,
-       height = 3)
+# ggsave(projection_scatter_pacaomics,
+#        filename = "results/Figures/projection_scatter_pacaomics.svg",
+#        width = 7,
+#        height = 3)
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Check ISR marker genes
@@ -154,10 +154,10 @@ for (mgene in marker_genes) {
     geom_boxplot(width=0.1, fill="white")+
     labs(title = mgene)
   
-  ggsave(mgene_plot,
-         filename = paste0("results/Figures/pacaomics_",mgene,".svg"),
-         width = 3,
-         height = 2)
+  # ggsave(mgene_plot,
+  #        filename = paste0("results/Figures/pacaomics_",mgene,".svg"),
+  #        width = 3,
+  #        height = 2)
 }
 
 #-------------------------------------------------------------------------------
@@ -168,27 +168,62 @@ scatter_pacaomics_isractvsisractpca <- dplyr::select(PACAOMICS_PC1, -ISRact) %>%
   dplyr::rename(ISRactPCA = "PC1", ISRact = "ICA3") %>% 
   correlation_plotter(data = ., col1 = "ISRact", col2 = "ISRactPCA", data_name = "PaCaOmics PDX")
 
-ggsave(scatter_pacaomics_isractvsisractpca,
-       filename = "results/Figures/scatter_pacaomics_isractvsisractpca.svg",
-       width = 2,
-       height = 2)
+# ggsave(scatter_pacaomics_isractvsisractpca,
+#        filename = "results/Figures/scatter_pacaomics_isractvsisractpca.svg",
+#        width = 2,
+#        height = 2)
 
 ## PAMG vs ISRactPCA
 scatter_pacaomics_pamgvsisractpca <- dplyr::select(PACAOMICS_PC1, -ISRact) %>% 
   dplyr::rename(ISRactPCA = "PC1", ISRact = "ICA3") %>% 
   correlation_plotter(data = ., col1 = "PAMG", col2 = "ISRactPCA", data_name = "PaCaOmics PDX")
 
-ggsave(scatter_pacaomics_pamgvsisractpca,
-       filename = "results/Figures/scatter_pacaomics_pamgvsisractpca.svg",
-       width = 2,
-       height = 2)
+# ggsave(scatter_pacaomics_pamgvsisractpca,
+#        filename = "results/Figures/scatter_pacaomics_pamgvsisractpca.svg",
+#        width = 2,
+#        height = 2)
 
 ## ISRact vs PAMG
 scatter_pacaomics_isractvspamg <- dplyr::select(PACAOMICS_PC1, -ISRact) %>% 
   dplyr::rename(ISRactPCA = "PC1", ISRact = "ICA3") %>% 
   correlation_plotter(data = ., col1 = "ISRact", col2 = "PAMG", data_name = "PaCaOmics PDX")
 
-ggsave(scatter_pacaomics_isractvspamg,
-       filename = "results/Figures/scatter_pacaomics_isractvspamg.svg",
-       width = 2,
-       height = 2)
+# ggsave(scatter_pacaomics_isractvspamg,
+#        filename = "results/Figures/scatter_pacaomics_isractvspamg.svg",
+#        width = 2,
+#        height = 2)
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
+# Comparisons with DNA damage mutations
+## load gene set and mutation data
+BRCAness_gs <- read_tsv("data/Other/mGuo2022_BRCAness.tsv", col_names = F) %>%
+  #dplyr::filter(X1 != "TP53") %>% 
+  deframe()
+mut_PDX_raw <- read_tsv("data/PACAOMICs/DNA/somaticMutations.tsv") # keep the original file for ref
+mut_PDX <- dplyr::select(mut_PDX_raw, Gene.refGene, Sample_Name) %>%
+  dplyr::rename(GeneID = "Gene.refGene", sample = "Sample_Name") %>%
+  dplyr::mutate(mutated = 1) %>% 
+  dplyr::distinct() %>% #there are like 40 genes mutated in multiple sites (2,385 vs 2,342)
+  pivot_wider(names_from = "sample", values_from = "mutated") %>% 
+  replace(is.na(.), 0)
+
+##pheatmap of BRCANess genes
+annot_cols =  dplyr::select(PACAOMICS_PC1, sample, ICA3, ISRact, PC1, PAMG) %>%
+  dplyr::rename(ISRactPCA = "PC1", ISRact_binned = "ISRact", ISRact = "ICA3") %>%
+  column_to_rownames("sample")
+
+annot_colors = list(ISRactPCA = c("seagreen", "white", "tomato3"),
+                    ISRact_binned = c(`high_ISRact` = "brown", `intermediate_ISRact` = "grey", `low_ISRact` = "#006837"),
+                    PAMG = c("#FF7F00", "white", "#377DB8"),
+                    ISRact  = c("#FFFFCC", "#006837"))
+                    
+order = dplyr::arrange(PACAOMICS_PC1, get("PC1"))
+dplyr::select(mut_PDX, GeneID, matches(order$sample)) %>%
+  filter(GeneID %in% BRCAness_gs) %>%
+  column_to_rownames("GeneID") %>% pheatmap(color = c("white", "black"), annotation_col = annot_cols,
+                                            annotation_colors = annot_colors,cluster_cols = T)
+
+
+
