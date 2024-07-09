@@ -199,7 +199,7 @@ scatter_pacaomics_isractvspamg <- dplyr::select(PACAOMICS_PC1, -ISRact) %>%
 # Comparisons with DNA damage mutations
 ## load gene set and mutation data
 BRCAness_gs <- read_tsv("data/Other/mGuo2022_BRCAness.tsv", col_names = F) %>%
-  #dplyr::filter(X1 != "TP53") %>% 
+  dplyr::filter(X1 != "TP53") %>% 
   deframe()
 mut_PDX_raw <- read_tsv("data/PACAOMICs/DNA/somaticMutations.tsv") # keep the original file for ref
 mut_PDX <- dplyr::select(mut_PDX_raw, Gene.refGene, Sample_Name) %>%
@@ -209,21 +209,53 @@ mut_PDX <- dplyr::select(mut_PDX_raw, Gene.refGene, Sample_Name) %>%
   pivot_wider(names_from = "sample", values_from = "mutated") %>% 
   replace(is.na(.), 0)
 
+order = dplyr::arrange(PACAOMICS_PC1, get("PC1"))
+mut_PDX_BRCAness <- dplyr::select(mut_PDX, GeneID, matches(order$sample)) %>%
+  dplyr::filter(GeneID %in% BRCAness_gs)
+
 ##pheatmap of BRCANess genes
 annot_cols =  dplyr::select(PACAOMICS_PC1, sample, ICA3, ISRact, PC1, PAMG) %>%
-  dplyr::rename(ISRactPCA = "PC1", ISRact_binned = "ISRact", ISRact = "ICA3") %>%
-  column_to_rownames("sample")
+  dplyr::rename(ISRactPCA = "PC1", ISRact_binned = "ISRact", ISRact = "ICA3")
 
 annot_colors = list(ISRactPCA = c("seagreen", "white", "tomato3"),
                     ISRact_binned = c(`high_ISRact` = "brown", `intermediate_ISRact` = "grey", `low_ISRact` = "#006837"),
                     PAMG = c("#FF7F00", "white", "#377DB8"),
                     ISRact  = c("#FFFFCC", "#006837"))
                     
-order = dplyr::arrange(PACAOMICS_PC1, get("PC1"))
-dplyr::select(mut_PDX, GeneID, matches(order$sample)) %>%
-  filter(GeneID %in% BRCAness_gs) %>%
-  column_to_rownames("GeneID") %>% pheatmap(color = c("white", "black"), annotation_col = annot_cols,
+column_to_rownames(mut_PDX_BRCAness, "GeneID") %>% pheatmap(color = c("white", "black"), annotation_col = column_to_rownames(annot_cols, "sample"),
                                             annotation_colors = annot_colors,cluster_cols = T)
 
 
+## Statistic analysis: ISractPCA any mutated vs not
+only_BRCAness = T
 
+### general
+if (only_BRCAness){
+mutated_genes <- dplyr::filter(mut_PDX, GeneID %in% BRCAness_gs) %>%
+  dplyr::summarise(across(where(is.double), sum)) %>%
+  pivot_longer(everything(),names_to = "sample", values_to = "mutated_genes") %>%
+  inner_join(annot_cols, by = "sample")
+} else {
+  mutated_genes <- dplyr::summarise(mut_PDX, across(where(is.double), sum)) %>%
+    pivot_longer(everything(),names_to = "sample", values_to = "mutated_genes") %>%
+    inner_join(annot_cols, by = "sample")
+}
+### correlation
+correlation_plotter(mutated_genes, "ISRact", "mutated_genes", "PaCaOmics")
+correlation_plotter(mutated_genes, "ISRactPCA", "mutated_genes", "PaCaOmics")
+## ttest low vs high
+mutated_genes_filt <- dplyr::filter(mutated_genes, ISRact_binned != "intermediate_ISRact") %>%
+  dplyr::mutate(ISRact_binned = fct(ISRact_binned, levels= c("low_ISRact", "high_ISRact")))
+leveneTest(mutated_genes ~ ISRact_binned, mutated_genes_filt) # unsignificant -> we can use t test
+
+stats <- t.test(mutated_genes ~ ISRact_binned, mutated_genes_filt, alternative = "two.sided", var.equal = T)
+
+stats_text <- paste0("t-test: pval = ", format(stats$p.value, scientific=T))
+
+ggplot(mutated_genes_filt, aes(x=ISRact_binned, y=mutated_genes)) +
+  geom_dotplot(binaxis='y', stackdir='center') +
+  stat_summary(fun.y=median, geom="point", shape=18,
+               size=3, color="red") +
+  #scale_y_log10() +
+  labs(subtitle = stats_text)+
+  theme_bw()
