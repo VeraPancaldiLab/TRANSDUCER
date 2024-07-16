@@ -15,6 +15,8 @@ library(data.table)
 library(ggplot2)
 library(survival)
 library(survminer)
+library(readxl)
+library(pheatmap)
 
 ################################################################################
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
@@ -99,8 +101,8 @@ projection_TCGA <-  predict(pca_pdx, human_data) %>%
 
 
 TCGA_PC1 <- arrange(projection_TCGA, PC1) %>%
-  mutate(PC1status = if_else(PC1 < quantile(projection_TCGA$PC1, probs = 0.3333), "low_PC1",
-                             if_else(PC1 < quantile(projection_TCGA$PC1, probs = 0.6666), "medium_PC1", "high_PC1"))) %>%
+  mutate(PC1status = if_else(PC1 < quantile(projection_TCGA$PC1, probs = 0.3333), "low_ISRact",
+                             if_else(PC1 < quantile(projection_TCGA$PC1, probs = 0.6666), "intermediate_ISRact", "high_ISRact"))) %>%
   dplyr::select(sample, PC1,  PC1status) %>%
   left_join(sample_info_TCGA, by = "sample")
 
@@ -120,11 +122,11 @@ show_projection <- bind_rows(as_tibble(pca_full_df) %>% mutate(dataset = "Sauyeu
 
 dplyr::mutate(show_projection, ISRact = str_replace(ISRact, 'ICA3', 'ISRact')) %>%
   dplyr::filter(dataset %in% c("Sauyeun PDX","PACAOMICS PDX", "TCGA"), # "Sauyeun PDX","PACAOMICS PDX", "CPTAC", "CCLE"
-                ISRact %in% c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) %>% 
+                ISRact %in% c('low_ISRact', 'high_ISRact', 'intermediate_ISRact', 'Unknown')) %>% 
   ggplot(aes(x=PC1, y=PC2, color = ISRact, shape = dataset)) +
   geom_point() +
   scale_shape_discrete(limits = c("Sauyeun PDX", "PACAOMICS PDX", "TCGA")) +
-  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown')) +  #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
+  scale_color_discrete(limits = c('low_ISRact', 'high_ISRact', 'intermediate_ISRact', 'Unknown')) +  #c('low_ISRact', 'high_ISRact', 'medium_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
   geom_rect(xmin = min(projection_TCGA$PC1),
             xmax = quantile(projection_TCGA$PC1, probs = 0.3333), 
             ymin = min(projection_TCGA$PC2), ymax = max(projection_TCGA$PC2), linewidth = 0, fill = "red", alpha =0.002) +
@@ -144,7 +146,7 @@ surv_data <- dplyr::rename(TCGA_PC1, case_id = sample)
 ## OS
 ### Kaplan Meyer 33up vs 33down
 fit <-  survfit(Surv(OS, OS_event) ~ PC1status, 
-                data = dplyr::filter(surv_data, PC1status != "medium_PC1"))
+                data = dplyr::filter(surv_data, PC1status != "intermediate_ISRact"))
 print(fit)
 
 #### Change color, linetype by strata, risk.table color by strata
@@ -187,7 +189,7 @@ ggadjustedcurves(cox.mod, data=as.data.frame(surv_data))
 ## PFS
 ### Kaplan Meyer 33up vs 33down
 fit <-  survfit(Surv(PFS, PFS_event) ~ PC1status, 
-                data = dplyr::filter(surv_data, PC1status != "medium_PC1"))
+                data = dplyr::filter(surv_data, PC1status != "intermediate_ISRact"))
 print(fit)
 
 #### Change color, linetype by strata, risk.table color by strata
@@ -292,4 +294,59 @@ kmpfs_tcga <- ggsurvplot(fit,
 print(kmpfs_tcga)
 ggsave(paste0("results/survplots/FIGURES/kmpfs_tcga_", measure ,"_phgdhcbs.svg"),
        kmpfs_tcga$plot, height = 4 , width = 4)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Somatic mutations
+## Parameters
+mutation_type = "germline"
+exclude_TP53 = F
+## Load data from m. Guo et al 2022 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9738094/ 
+somatic_BRCANess_raw <- read_xlsx("data/Other/mGuo2022_TableS3.xlsx",skip = 2) %>%
+  dplyr::filter(Cancer_Type == "PAAD")
+
+germline_BRCANess_raw <- read_xlsx("data/Other/mGuo2022_TableS4.xlsx",skip = 2) %>%
+  dplyr::filter(Norm_Sample_Barcode == "PAAD") # there is a erratum in the excell and this is the column name
+
+order = dplyr::arrange(TCGA_PC1, get("PC1"))
+if (mutation_type == "somatic") {
+  BRCAness <- dplyr::select(somatic_BRCANess_raw, Gene, `Sample Barcode`) %>% 
+    dplyr::rename(GeneID = "Gene", sample = "Sample Barcode") %>%
+    dplyr::mutate(mutated = 1,
+                  sample = str_replace(sample, "^(.*-01)A.*", "\\1")) %>% 
+    dplyr::group_by(GeneID, sample) %>%
+    summarise_all(sum) %>% # there are 3 genes with multiple mutations (110 vs 107)
+    pivot_wider(names_from = "sample", values_from = "mutated") %>% 
+    replace(is.na(.), 0) %>%
+    dplyr::select(GeneID, matches(order$sample)) %>% # From 95 to 84 samples, so 11 non PAAD originally included
+    dplyr::filter(if_else(exclude_TP53, GeneID != "TP53", is.character(GeneID)))
+  
+} else if (mutation_type == "germline") {
+  BRCAness <- dplyr::select(germline_BRCANess_raw, Gene, Sample_Barcode) %>% 
+    dplyr::rename(GeneID = "Gene", sample = "Sample_Barcode") %>%
+    dplyr::mutate(mutated = 1,
+                  sample = str_replace(sample, "^(.*-01)A.*", "\\1")) %>% 
+    dplyr::group_by(GeneID, sample) %>%
+    summarise_all(sum) %>% # there are no multiple mutatins (72 before and after)
+    pivot_wider(names_from = "sample", values_from = "mutated") %>% 
+    replace(is.na(.), 0) %>%
+    dplyr::select(GeneID, matches(order$sample)) %>% # From 71 to 65 samples, so 6 non PAAD originally included
+    dplyr::filter(if_else(exclude_TP53, GeneID != "TP53", is.character(GeneID)))
+  }
+
+## pheatmap of BRCANess genes
+annot_cols =  dplyr::select(TCGA_PC1, sample, PC1, PC1status, PAMG) %>%
+  dplyr::rename(ISRactPCA = "PC1", ISRactPCA_binned = "PC1status") %>%
+  dplyr::mutate(ISRactPCA = scale(ISRactPCA)) %>%
+  dplyr::filter(sample %in% names(BRCAness))
+
+annot_colors = list(ISRactPCA = c("seagreen", "white", "tomato3"),
+                    ISRactPCA_binned = c(`high_ISRact` = "brown", `intermediate_ISRact` = "grey", `low_ISRact` = "#006837"),
+                    PAMG = c("#FF7F00", "white", "#377DB8"))
+
+column_to_rownames(BRCAness, "GeneID") %>% pheatmap(color = c("white", "grey", "grey", "black"),
+                                                    annotation_col = column_to_rownames(annot_cols, "sample"),
+                                                    annotation_colors = annot_colors, cluster_cols = F, show_colnames = F,
+                                                    main = paste0("BRCAness ", mutation_type, " mutations"))
+
+
 #-------------------------------------------------------------------------------
