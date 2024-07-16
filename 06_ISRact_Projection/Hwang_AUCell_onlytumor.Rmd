@@ -895,20 +895,26 @@ violin <- ggplot(isrvsmetadata, aes(x = pid, y=ISR_ratio, fill = get(order_pid))
 There is a big difference with CRTx treated patients. Is this the persistent cell population upon CRTx treatment? Lets do some statistics!
 
 ```{r}
-treatment = "CRTl"
-# ISRact in Untreated vs CRTX (CAREFUL DIFFERENT SIZE)
-## Is variance equal (yes -> ttest, no -> welsch)
-filt_data <- dplyr::filter(isrvsmetadata, treatment_status %in% c("Untreated", treatment)) %>%
+treatment = "CRTx" 
+comparison = "rest" # "Untreated" | "rest"
+# ISRact in comparison vs treatment (CAREFUL DIFFERENT SIZE)
+## processing
+if (comparison == "Untreated"){
+  filt_data <- dplyr::filter(isrvsmetadata, treatment_status %in% c("Untreated", treatment)) %>%
   dplyr::mutate(treatment_status = fct(treatment_status, levels = c("Untreated", treatment)))
-leveneTest(ISR_ratio ~ treatment_status, filt_data) #p=5.371e-05 -> H0 is discarded, unequal variance
+} else if (comparison == "rest"){
+  filt_data <- dplyr::mutate(isrvsmetadata, 
+                            treatment_status =  if_else(treatment_status == treatment, treatment, "Others"),
+                            treatment_status = fct(treatment_status, levels = c("Others", treatment)))
+}
 
 ## statistical test
+leveneTest(ISR_ratio ~ treatment_status, filt_data) #p=5.371e-05 -> H0 is discarded, unequal variance, should do Welch
 stats <- t.test(ISR_ratio ~ treatment_status, filt_data, alternative = "two.sided", var.equal = FALSE)
-
 stats_text <- paste0("Welch’s t-test: pval = ", format(stats$p.value, scientific=T))
 
 
-ggplot(filt_data, aes(x = treatment_status, y=ISR_ratio, fill = treatment_status))+
+violin_treatment <- ggplot(filt_data, aes(x = treatment_status, y=ISR_ratio, fill = treatment_status))+
   geom_violin() +
   geom_hline(yintercept = 0, linetype = "dashed")+
   scale_fill_manual(values = c("white", "grey"))+
@@ -919,6 +925,14 @@ ggplot(filt_data, aes(x = treatment_status, y=ISR_ratio, fill = treatment_status
   ylab("ISR_ratio") +
   labs(subtitle = stats_text)
 
+plot_name <- paste0("results/Figures/violin_treatment_", treatment, "VS", comparison, ".svg")
+print(paste0("plotting to: ", plot_name))
+ggsave(plot_name,
+       width = 4,
+       height = 3)
+```
+Now the same plots but with relation to response
+```{r}
 
 # ISRact in responders vs non responders
 comparison =  c("Poor response", "Moderate response") # "Poor response" | "Minimal response" | "Moderate response" | "Responders"
@@ -946,8 +960,8 @@ ggplot(filt_data, aes(x = response, y=ISR_ratio, fill = response))+
   ylab("ISR_ratio") +
   labs(subtitle = stats_text)
 
- 
 ```
+
 No, whats up with PHGDH and CBS upon this? are they correlated with ISRact score?
 
 ```{r}
@@ -1034,3 +1048,35 @@ for(gene in interest_genes){
 }
 
 ```
+
+In these last chunks we have seen how ISRactPCAdiff high cells are specially abundant in these patients. But on the other hand, cluster 5 cells are the ones that show the ISR-like phenotype. How does cluster 5 relate to the CRTx BRCAness etc
+
+```{r}
+# UMAP to check distribution of CRTx treated patient vs the rest
+## processing
+filt_data <- dplyr::mutate(isrvsmetadata,
+  treatment_status = if_else(treatment_status == treatment, treatment, "Others"),
+  treatment_status = fct(treatment_status, levels = c("Others", treatment))
+)
+
+is_CRTx <- dplyr::rename(filt_data, is_CRTx = "treatment_status") %>%
+  dplyr::select(CellID, is_CRTx) %>%
+  column_to_rownames("CellID")
+
+seurat_object <- AddMetaData(seurat_object, metadata = is_CRTx)
+
+## plot
+umap_crtx <- DimPlot_scCustom(seurat_object, group.by = "is_CRTx", reduction = "umap",colors_use = c("lightgrey", "black"))
+
+# Barplot to assess distribution of CRTx vs Other in each cluster
+bar_crtx <- ggplot(filt_data, aes(x = seurat_clusters, fill = treatment_status)) +
+  geom_bar(position = "stack", stat = "count") +
+  scale_fill_manual(values = c(CRTx = "black", Others = "lightgrey")) +
+  theme_classic() +
+  scale_x_discrete(guide = guide_axis(angle = 90)) +
+  scale_y_log10() +
+  ylab("log10(nCells)")
+
+(plot2) / (umap_crtx) / (bar_crtx) + plot_layout(heights = c(2, 2, 1), guides = "collect")
+```
+
