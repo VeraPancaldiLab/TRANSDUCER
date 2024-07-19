@@ -56,7 +56,14 @@ counts <- dplyr::select(rawTumor_Cyt, -EnsemblID) %>%
 
 # Import Projection
 pdx_PC1 <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
-Sauyeun_PC1 <- read_tsv("results/Sauyeun_PDX/Shin_ISRactPCA.tsv")
+Shin_ISRactPCA <- read_tsv("results/Sauyeun_PDX/Shin_ISRactPCA.tsv")
+provisional_ISRactICA <- read_rds("../06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/ISRactICA_IC3.RDS")
+
+## add provisionally ISRactICA
+Shin_ISRactPCA <- as_tibble(provisional_ISRactICA$A, rownames = "sample") %>% 
+  dplyr::select(sample, IC.3) %>%
+  dplyr::rename(ISRactICA = "IC.3") %>% 
+  inner_join(Shin_ISRactPCA, by = "sample")
 
 # DGEA following the Limma Voom pipeline from https://ucdavis-bioinformatics-training.github.io/2018-June-RNA-Seq-Workshop/thursday/DE.html
 ################################################################################
@@ -64,9 +71,9 @@ filter_intermediate_beforeDGEA <- F # T/F
 ################################################################################
 ## initial sample filtering
 if (filter_intermediate_beforeDGEA) {
-  sample_info <- dplyr::filter(Sauyeun_PC1, ISRact_bin != "intermediate_ISRact")
+  sample_info <- dplyr::filter(Shin_ISRactPCA, ISRact_bin != "intermediate_ISRact")
 } else {
-  sample_info <- Sauyeun_PC1
+  sample_info <- Shin_ISRactPCA
 }
 
 ## Processing and object building
@@ -341,6 +348,7 @@ regulons <- dorothea_hs_pancancer %>%
   dplyr::filter(confidence %in% c("A", "B", "C"))
 
 ### VIPER Analysis
+n <- 15 # n TFs to plot in heatmaps
 minsize <- 5
 ges.filter <- FALSE
 
@@ -358,7 +366,6 @@ tf_act_ <- as_tibble(tf_act__, rownames = "TF") %>%
 ### Visualisation
 #### Most variable TFs
 ##### Calculate the n most variable TFs
-n <- 50
 tf_50_var <- summarise(tf_act_, across(where(is.double), var)) %>%
   pivot_longer(cols = everything(), names_to = "TF", values_to = "var") %>%
   dplyr::arrange(desc(var)) %>%
@@ -368,10 +375,11 @@ tf_50_var <- summarise(tf_act_, across(where(is.double), var)) %>%
 annotation_row_var <- tf_50_var %>%
   column_to_rownames(var = "TF")
 
-annotation_col <- dplyr::select(sample_info, sample, Diabetes, PAMG, ISRact, ISRact_bin, ISRactPCA) %>%
+annotation_col <- dplyr::select(sample_info, sample, Diabetes, PAMG, ISRact, ISRact_bin, ISRactPCA, ISRactICA) %>%
   column_to_rownames(var = "sample")
 
 ann_colors <- list(
+  ISRactICA = c("seagreen", "white", "tomato3"),
   ISRactPCA = c("seagreen", "white", "tomato3"),
   ISRact = c("#FFFFCC", "#006837"),
   ISRact_bin = c(`high_ISRact` = "brown", `intermediate_ISRact` = "grey", `low_ISRact` = "#006837"),
@@ -414,7 +422,6 @@ tf_ISRact_cor <- tf_act_ %>%
   dplyr::select(TF, ISRact)
 
 ##### filter by absolute correlation
-n <- 30
 top_tf_ISRact <- mutate(tf_ISRact_cor, ISRact = abs(ISRact)) %>%
   dplyr::filter(!str_detect(TF, "ISRact")) %>%
   arrange(desc(ISRact)) %>%
@@ -455,21 +462,19 @@ tf_ISRactPCA_cor <- tf_act_ %>%
   column_to_rownames("sample") %>% # select continuous variables
   as.matrix() %>%
   cor(method = "spearman") %>%
-  as.data.frame() %>%
-  dplyr::select("ISRactPCA")
+  as_tibble(rownames = "TF") %>%
+  dplyr::select(TF, ISRactPCA)
 
 ##### filter by absolute correlation
-n <- 30
 top_tf_ISRactPCA <- mutate(tf_ISRactPCA_cor, ISRactPCA = abs(ISRactPCA)) %>%
+  dplyr::filter(!str_detect(TF, "ISRact")) %>%
   arrange(desc(ISRactPCA)) %>%
   dplyr::slice(1:n) %>%
-  dplyr::rename(abscor = ISRactPCA) %>%
-  rownames_to_column(var = "TF")
+  dplyr::rename(abscor = ISRactPCA)
 
 ##### Define annotations
-annotation_row_cor_ISRactPCA <- rownames_to_column(tf_ISRactPCA_cor, "TF") %>%
-  inner_join(dplyr::select(top_tf_ISRactPCA, TF), by = "TF") %>%
-  rename(cor = ISRactPCA) %>%
+annotation_row_cor_ISRactPCA <- dplyr::filter(tf_ISRactPCA_cor, TF %in% top_tf_ISRactPCA$TF) %>%
+  dplyr::rename(cor = ISRactPCA) %>%
   column_to_rownames(var = "TF")
 
 ##### Heatmap
@@ -486,9 +491,60 @@ as_tibble(tf_act__, rownames = "TF") %>%
     breaks = breaksList,
     fontsize = 12,
     annotation_names_row = FALSE,
-    main = "Activity of the 50 most correlated transcription factor with ISRactPCA on the Sauyeun PDX dataset"
+    main = paste0("Activity of the ", n, " most correlated transcription factor  with ICA3 on the Shin dataset")
   )
 
+#### Most correlated with ISRactICA
+##### calculate correlation TF ISRactICA
+tf_ISRactICA_cor <- tf_act_ %>%
+  dplyr::rename(sample = bcr_patient_barcode) %>%
+  inner_join(dplyr::select(sample_info, sample, ISRactPCA, ISRactICA, ISRact, PAMG), by = "sample") %>% # make the two table in same order
+  arrange(sample) %>%
+  column_to_rownames("sample") %>% # select continuous variables
+  as.matrix() %>%
+  cor(method = "spearman") %>%
+  as_tibble(rownames = "TF") %>%
+  dplyr::select(TF, ISRactICA)
 
-# Proportion of common top correlated TF with PC1 and ICA3
-length(Reduce(intersect, list(top_tf_ISRact$TF, top_tf_ISRactPCA$TF))) / n
+##### filter by absolute correlation
+top_tf_ISRactICA <- mutate(tf_ISRactICA_cor, ISRactICA = abs(ISRactICA)) %>%
+  dplyr::filter(!str_detect(TF, "ISRact")) %>%
+  arrange(desc(ISRactICA)) %>%
+  dplyr::slice(1:n) %>%
+  dplyr::rename(abscor = ISRactICA)
+
+##### Define annotations
+annotation_row_cor_ISRactICA <- dplyr::filter(tf_ISRactICA_cor, TF %in% top_tf_ISRactICA$TF) %>%
+  dplyr::rename(cor = ISRactICA) %>%
+  column_to_rownames(var = "TF")
+
+##### Heatmap
+as_tibble(tf_act__, rownames = "TF") %>%
+  dplyr::select(TF, sample_info$sample) %>%
+  dplyr::filter(TF %in% top_tf_ISRactICA$TF) %>%
+  column_to_rownames("TF") %>%
+  as.matrix() %>%
+  pheatmap(
+    annotation_col = annotation_col,
+    annotation_row = annotation_row_cor_ISRactICA,
+    annotation_colors = ann_colors, scale = "row", show_colnames = FALSE,
+    color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(length(breaksList)), # Defines the vector of colors for the legend (it has to be of the same lenght of breaksList)
+    breaks = breaksList,
+    fontsize = 12,
+    annotation_names_row = FALSE,
+    main = paste0("Activity of the ", n, " most correlated transcription factor  with ISRactICA on the Shin dataset"))
+
+#### TF correlation consistency
+##### ISRact vs ISRactPCA
+library(UpSetR)
+compare <- list("ISRact" = top_tf_ISRact$TF, "ISRactPCA" =  top_tf_ISRactPCA$TF, "ISRactICA" = top_tf_ISRactICA$TF)
+
+upset(fromList(compare),
+      order.by = "freq", 
+      mainbar.y.label = "most correlated\n TF activities\n intersections")
+
+
+
+
+
+
