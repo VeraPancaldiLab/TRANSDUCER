@@ -502,3 +502,166 @@ ggsave(pamgneg_commonvsunique,
   height = 2
 )
 #-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Gene weight comparison with GemPred
+GemPred_gw <- read_xlsx("data/Other/NicolleAnnalsOncology2021_TableS3.xlsx", skip = 2) %>%
+  dplyr::rename(GeneName = "Gene", GemPred = "Weight")
+
+signature_var = "ISRactICA" # "ISRactPCA"
+if (signature_var == "ISRactPCA"){
+signature_gw <- as_tibble(pca_pdx$rotation, rownames = "EnsemblID") %>%
+  mutate(GeneName = translate[EnsemblID]) %>%
+  dplyr::select(GeneName, PC1) %>%
+  dplyr::rename(ISRactPCA = PC1)
+} else if (signature_var == "ISRactICA"){
+  signature_gw <- read_rds("../06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/ISRactICA_IC3.RDS")$S %>% 
+    as_tibble(., rownames = "EnsemblID") %>%
+    mutate(GeneName = translate[EnsemblID])%>% 
+    dplyr::select(GeneName, IC.3) %>%
+    dplyr::rename(ISRactICA = "IC.3")
+}
+
+## discrete
+compare <- list(GemPred_gw$GeneName, signature_gw$GeneName)
+
+compare_names <- c("GemPred", signature_var)
+my_breaks <- c(500, 1000, 5000, 10000, 20000)
+isractpcavsGemPred_venn <- ggVennDiagram(
+  compare,
+  category.names = compare_names,
+  label = "count",
+  label_geom = "text"
+) + scale_fill_gradient(low = "grey90", high = "red", trans = "log", breaks = my_breaks)
+
+# ggsave(isractpcavsGemPred_venn,
+#        filename = paste0("results/Figures/isractpcavsGemPred_venn.svg"),
+#        width = 4,
+#        height = 2
+# )
+## Quantitative comparison of common genes
+GemPred_ISRact_quantc <- full_join(GemPred_gw, signature_gw, by = "GeneName") %>%
+  mutate(na_GemPred = is.na(GemPred), na_ISRact_signature = is.na(get(signature_var)))
+
+GemPred_ISRact_quantc %>%
+  drop_na() %>%
+  correlation_plotter(col1 = signature_var, col2 = "GemPred", data_name = "gene weights")
+
+## Whats the gene weight of ISRactPCA and GemPred unique genes?
+## ISRact vs GemPred presence
+### positive
+GemPred_ISRact_quantc_ISRactpos <- dplyr::filter(GemPred_ISRact_quantc, get(signature_var) > 0 | is.na(get(signature_var)))
+
+GemPred_absence_test <- wilcox.test(
+  x = dplyr::filter(GemPred_ISRact_quantc_ISRactpos, na_GemPred == T) %>% dplyr::select(all_of(signature_var)) %>% deframe() %>% abs(),
+  y = dplyr::filter(GemPred_ISRact_quantc_ISRactpos, na_GemPred == F) %>% dplyr::select(all_of(signature_var)) %>% deframe() %>% abs(),
+  alternative = "two.sided"
+)
+
+isractpos_commonvsunique <- ggplot(GemPred_ISRact_quantc_ISRactpos, aes(x = na_GemPred, y = get(signature_var))) +
+  geom_violin(aes(fill = na_GemPred)) +
+  scale_fill_grey(start = 0.4, end = 0.9) +
+  geom_boxplot(width = 0.1) +
+  scale_x_discrete(labels = c("common", paste0("unique ", signature_var))) +
+  labs(
+    title = paste0("Are ", signature_var, " positive contributions different between common and unique genes"),
+    subtitle = paste0(
+      "Wilcoxon test two sided p-value = ",
+      formatC(GemPred_absence_test$p.value, format = "e", digits = 2)
+    )
+  ) +
+  theme_bw() +
+  ylab(signature_var)
+
+# ggsave(isractpos_commonvsunique,
+#        filename = paste0("results/Figures/isractpos_commonvsunique.svg"),
+#        width = 4,
+#        height = 2
+# )
+
+### negative
+GemPred_ISRact_quantc_ISRactneg <- dplyr::filter(GemPred_ISRact_quantc, get(signature_var) < 0 | is.na(get(signature_var)))
+
+GemPred_absence_test <- wilcox.test(
+  x = dplyr::filter(GemPred_ISRact_quantc_ISRactneg, na_GemPred == T) %>% dplyr::select(all_of(signature_var)) %>% deframe() %>% abs(),
+  y = dplyr::filter(GemPred_ISRact_quantc_ISRactneg, na_GemPred == F) %>% dplyr::select(all_of(signature_var)) %>% deframe() %>% abs(),
+  alternative = "two.sided"
+)
+
+isractneg_commonvsunique <- ggplot(GemPred_ISRact_quantc_ISRactneg, aes(x = na_GemPred, y = get(signature_var))) +
+  geom_violin(aes(fill = na_GemPred)) +
+  scale_fill_grey(start = 0.4, end = 0.9) +
+  geom_boxplot(width = 0.1) +
+  scale_x_discrete(labels = c("common", paste0("unique ", signature_var))) +
+  labs(
+    title = paste0("Are ", signature_var, " negative contributions different between common and unique genes"),
+    subtitle = paste0(
+      "Wilcoxon test two sided p-value = ",
+      formatC(GemPred_absence_test$p.value, format = "e", digits = 2)
+    )
+  ) +
+  theme_bw() +
+  ylab(signature_var)
+
+# ggsave(isractneg_commonvsunique,
+#        filename = paste0("results/Figures/isractneg_commonvsunique.svg"),
+#        width = 4,
+#        height = 2
+# )
+
+
+## GemPred vs ISRact presence
+### positive
+GemPred_ISRact_quantc_GemPredpos <- dplyr::filter(GemPred_ISRact_quantc, GemPred > 0 | is.na(GemPred))
+ISRact_absence_test <- wilcox.test(
+  x = dplyr::filter(GemPred_ISRact_quantc_GemPredpos, na_ISRact_signature == T) %>% dplyr::select(GemPred) %>% deframe() %>% abs(),
+  y = dplyr::filter(GemPred_ISRact_quantc_GemPredpos, na_ISRact_signature == F) %>% dplyr::select(GemPred) %>% deframe() %>% abs(),
+  alternative = "two.sided"
+)
+GemPredpos_commonvsunique <- ggplot(GemPred_ISRact_quantc_GemPredpos, aes(x = na_ISRact_signature, y = GemPred)) +
+  geom_violin(aes(fill = na_ISRact_signature)) +
+  scale_fill_grey(start = 0.4, end = 0.9) +
+  geom_boxplot(width = 0.1) +
+  scale_x_discrete(labels = c("common", "unique for GemPred")) +
+  labs(
+    title = "Are GemPred positive contributions different between common and unique genes",
+    subtitle = paste0(
+      "Wilcoxon test two sided p-value = ",
+      formatC(ISRact_absence_test$p.value, format = "e", digits = 2)
+    )
+  ) +
+  theme_bw()
+
+# ggsave(GemPredpos_commonvsunique,
+#        filename = paste0("results/Figures/GemPredpos_commonvsunique.svg"),
+#        width = 4,
+#        height = 2
+# )
+
+### negative
+GemPred_ISRact_quantc_GemPredneg <- dplyr::filter(GemPred_ISRact_quantc, GemPred < 0 | is.na(GemPred))
+ISRact_absence_test <- wilcox.test(
+  x = dplyr::filter(GemPred_ISRact_quantc_GemPredneg, na_ISRact_signature == T) %>% dplyr::select(GemPred) %>% deframe() %>% abs(),
+  y = dplyr::filter(GemPred_ISRact_quantc_GemPredneg, na_ISRact_signature == F) %>% dplyr::select(GemPred) %>% deframe() %>% abs(),
+  alternative = "two.sided"
+)
+GemPredneg_commonvsunique <- ggplot(GemPred_ISRact_quantc_GemPredneg, aes(x = na_ISRact_signature, y = GemPred)) +
+  geom_violin(aes(fill = na_ISRact_signature)) +
+  scale_fill_grey(start = 0.4, end = 0.9) +
+  geom_boxplot(width = 0.1) +
+  scale_x_discrete(labels = c("common", "unique for GemPred")) +
+  labs(
+    title = "Are GemPred negative contributions different between common and unique genes",
+    subtitle = paste0(
+      "Wilcoxon test two sided p-value = ",
+      formatC(ISRact_absence_test$p.value, format = "e", digits = 2)
+    )
+  ) +
+  theme_bw()
+
+# ggsave(GemPredneg_commonvsunique,
+#        filename = paste0("results/Figures/GemPredneg_commonvsunique.svg"),
+#        width = 4,
+#        height = 2
+# )
+#-------------------------------------------------------------------------------
+
