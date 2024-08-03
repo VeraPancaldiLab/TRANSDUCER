@@ -4,6 +4,7 @@ library(tidyverse)
 library(org.Hs.eg.db)
 library(AnnotationDbi)
 library(readxl)
+library(biomaRt)
 
 setwd("~/Documents/02_TRANSDUCER/06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/")
 source(file = "../The-Molecular-Signature-Generator/R/functions.R")
@@ -174,7 +175,7 @@ msigdbr_list <- split(x = use_genesets$ensembl_gene, f = use_genesets$gs_name)
 msigdb_descriptions <- use_genesets[c("gs_name", "gs_description")] %>%
   unique() %>% column_to_rownames("gs_name")
 
-gsvaRes <- gsva(data.matrix(best_ica$S), msigdbr_list, min.sz = 15)
+gsvaRes <- gsva(gsvaParam(exprData = data.matrix(best_ica$S), geneSets = msigdbr_list, minSize = 15))
 
 # best for IC.4
 gsvaRes[order(gsvaRes[,"IC.3"]),]
@@ -185,7 +186,7 @@ gsvaTop <- as_tibble(gsvaRes, rownames = "gene_set") %>%
          gene_set = str_remove(gene_set, gset_remove_prefix),
          gene_set = fct_reorder(gene_set, the_rank,.desc = T)) %>%
   pivot_longer(cols = -c(gene_set, the_rank), names_to = "component", values_to = "ES") %>% 
-  dplyr::filter(the_rank < 15 | the_rank > (nrow(gsvaRes)-15)) %>% 
+  dplyr::filter(the_rank < 25 | the_rank > (nrow(gsvaRes)-25)) %>% 
   mutate(component = if_else(component == "IC.3", "IC.3", "Other")) %>% 
   dplyr::select(!c(the_rank))
 
@@ -196,3 +197,6 @@ gsva_IC3 <- ggplot(gsvaTop, aes(x = ES, y = gene_set)) +
   labs(title = "IC.3", subtitle = paste0("Best ",gset_db, " gene sets")) +
   rremove("legend") +
   rremove("ylab")
+
+# Write RDS with ICA results for projection 
+write_rds(best_ica, "ISRactICA_IC3.RDS")
