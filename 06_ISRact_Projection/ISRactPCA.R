@@ -1,60 +1,17 @@
-# Import library
+# Import libraries
 library(tidyverse)
 library(biomaRt)
 library(edgeR)
 library(factoextra)
 library(ggpubr)
 library(ggVennDiagram)
-################################################################################
-# List the n most absolute correlated genes with ICA3
-#' @description
-#' this function calculate the chosen absolute correlation between genes and ICA3 component
-#' with either full samples (best overall) or ISR samples (best subset) and then subset the top n
-#' @param normdf data frame of normalized RNA-seq count data. Lines are samples and columns are genes
-#' @param select_method "bestsubset" to select ISR samples before doing the correlation or
-#' "bestoverall" to keep all the samples
-#' @param n number of gene to keep
-#' @param cormethod "pearson" or "spearman"
-#' @param top_samples data frame of top sample info
-#' @param sample_info data frame of every sample info
+library(pdacmolgrad) # devtools::install_github("RemyNicolle/pdacmolgrad")
 
-mostCorrGenes <- function(normdf, select_method, n, cormethod, top_samples, sample_info) {
-  # Keep only top samples if selection method is bestsubset
-  if (select_method == "bestsubset") {
-    normdf <- dplyr::filter(normdf, sample %in% top_samples$sample) %>%
-      arrange(sample)
-    sample_df <- top_samples
-  } else if (select_method == "bestoverall") {
-    normdf <- arrange(normdf, sample)
-    sample_df <- sample_info
-  }
-
-  # Calculate absolute correlation for each gene
-  genes_ic3_cor <- normdf %>%
-    dplyr::filter(!sample == "!") %>%
-    column_to_rownames("sample") %>% # select continuous variables
-    as.matrix() %>%
-    cor(y = sample_df$ICA3, method = cormethod) %>%
-    as.data.frame()
-
-  # keep the 1000 most absolute correlated genes
-  top_genes <- mutate(genes_ic3_cor, V1 = abs(V1)) %>%
-    arrange(desc(V1)) %>%
-    dplyr::slice(1:n) %>%
-    rownames_to_column(var = "EnsemblID")
-
-
-  return(top_genes)
-}
-################################################################################
-
-
-## devtools::install_github("RemyNicolle/pdacmolgrad")
+## setwd and import local functions
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
-
-# Import filter function
 source("src/human_cohort_data_filter.R")
 source("src/correlation_plotter.R")
+source("src/mostCorrGenes.R")
 
 # Import datasets
 ## Sauyeun PDX
@@ -286,13 +243,13 @@ ggsave(dist_isract,
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Plot projecion of full cohort
-pca_full_df <- pca_pdx[["x"]] %>% # ! rename as pca_training
+pca_training <- pca_pdx[["x"]] %>% # ! rename as pca_training
   as.data.frame() %>%
   rownames_to_column("sample") %>%
   inner_join(top_samples[, c("sample", "ISRact_bin")])
 
 show_projection <- bind_rows(
-  as_tibble(pca_full_df) %>% mutate(dataset = "Shin et al. PDX"),
+  as_tibble(pca_training) %>% mutate(dataset = "Shin et al. PDX"),
   mutate(Shin_PCAspace,
     sample = paste0(sample, "_test"),
     dataset = "Shin et al. PDX"
@@ -507,16 +464,16 @@ ggsave(pamgneg_commonvsunique,
 GemPred_gw <- read_xlsx("data/Other/NicolleAnnalsOncology2021_TableS3.xlsx", skip = 2) %>%
   dplyr::rename(GeneName = "Gene", GemPred = "Weight")
 
-signature_var = "ISRactICA" # "ISRactPCA"
-if (signature_var == "ISRactPCA"){
-signature_gw <- as_tibble(pca_pdx$rotation, rownames = "EnsemblID") %>%
-  mutate(GeneName = translate[EnsemblID]) %>%
-  dplyr::select(GeneName, PC1) %>%
-  dplyr::rename(ISRactPCA = PC1)
-} else if (signature_var == "ISRactICA"){
-  signature_gw <- read_rds("../06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/ISRactICA_IC3.RDS")$S %>% 
+signature_var <- "ISRactICA" # "ISRactPCA"
+if (signature_var == "ISRactPCA") {
+  signature_gw <- as_tibble(pca_pdx$rotation, rownames = "EnsemblID") %>%
+    mutate(GeneName = translate[EnsemblID]) %>%
+    dplyr::select(GeneName, PC1) %>%
+    dplyr::rename(ISRactPCA = PC1)
+} else if (signature_var == "ISRactICA") {
+  signature_gw <- read_rds("../06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/ISRactICA_IC3.RDS")$S %>%
     as_tibble(., rownames = "EnsemblID") %>%
-    mutate(GeneName = translate[EnsemblID])%>% 
+    mutate(GeneName = translate[EnsemblID]) %>%
     dplyr::select(GeneName, IC.3) %>%
     dplyr::rename(ISRactICA = "IC.3")
 }
@@ -664,4 +621,3 @@ GemPredneg_commonvsunique <- ggplot(GemPred_ISRact_quantc_GemPredneg, aes(x = na
 #        height = 2
 # )
 #-------------------------------------------------------------------------------
-
