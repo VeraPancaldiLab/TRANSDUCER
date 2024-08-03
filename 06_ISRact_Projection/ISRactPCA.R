@@ -1,3 +1,12 @@
+# ISRactPCA generation and ISRactPCA/ICA gene weight analysis
+
+################################################################################
+#' Import different files
+#' Filter data to produce ISRactPCA and export it
+#' Predict ISRActPCA on the full cohort
+#' Produce several plots fort thesis figures and beyond
+################################################################################
+
 # Import libraries
 library(tidyverse)
 library(biomaRt)
@@ -174,7 +183,7 @@ fviz_pca_ind(pca_pdx,
 
 ## export PCA for projection
 # write_rds(pca_pdx, "data/Classifiers/pca_pdx.RDS")
-pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS")
+pca_pdx <- read_rds("data/Classifiers/pca_pdx_ENZO.RDS") #read originally produced PCA by Enzo
 
 ## Predict Full Shin et al cohort for further comparisons
 Shin_PCAspace <- predict(pca_pdx, Sauyeun_norm) %>%
