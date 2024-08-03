@@ -25,6 +25,7 @@ library(ggrepel)
 library(patchwork)
 library(scCustomize)
 library(car)
+library(xlsx)
 
 source("src/plot_bar_enrich.R")
 source("src/Get_mostvar.R")
@@ -185,7 +186,7 @@ if (unsupervised == F){
 
 seurat_object <- RunPCA(seurat_object, features=features)
 seurat_object <- RunHarmony(seurat_object,"pid")
-seurat_object <- RunUMAP(seurat_object, reduction = "harmony",dims=c(1:30))
+seurat_object <- RunUMAP(seurat_object, reduction = "harmony",dims=c(2:5))
 
 ```
 
@@ -219,13 +220,13 @@ if (basalclassical_source == "Raghavan_figures2d"){
   scbasal <- c("TGFB2", "IFIT3", "S100A2", "MT2A", "CAV1", "CD44", "COL6A1", "TGFB1", "WNT7B", "DKK1", "KRT6A", "TP63")
   schybrid <- c(scclassical, scbasal)
 } else if (basalclassical_source == "Raghavan_tableS3"){
-  scclassical <- read.xlsx(file = "data/Other/Raghavan2020_TableS3.xlsx", sheetName = "S3 scClassical score correlates", startRow = 5) %>%
+  scclassical <- read.xlsx("data/Other/Raghavan2020_TableS3.xlsx", sheetName =  "S3 scClassical score correlates", startRow = 5) %>%
     dplyr::slice_head(n=top_genes) %>%
     dplyr::filter(Gene %in% rownames(seurat_object@assays$RNA$data)) %>%
     dplyr::select(Gene) %>%
     deframe() # min cor 115 = 	0.312117985869206
   
-  scbasal <- read.xlsx(file = "data/Other/Raghavan2020_TableS3.xlsx", sheetName = "S3 scBasal score correlates", startRow = 5) %>%
+  scbasal <- read.xlsx("data/Other/Raghavan2020_TableS3.xlsx", sheetName = "S3 scBasal score correlates", startRow = 5) %>%
     dplyr::slice_head(n=top_genes) %>%
     dplyr::filter(Gene %in% rownames(seurat_object@assays$RNA$data)) %>%
     dplyr::select(Gene) %>%
@@ -280,7 +281,7 @@ And now I compute the neighbours and cluster this umap to compare with ISRact
 ```{r}
 # calculate clusters
 seurat_object <- FindNeighbors(seurat_object,reduction = "umap", dims=1:2)
-seurat_object <- FindClusters(seurat_object, resolution = 0.1)
+seurat_object <- FindClusters(seurat_object, resolution = 0.01)
 alphabet_pal <- DiscretePalette_scCustomize(num_colors = 12, palette = "alphabet")
 
 plot2 <- DimPlot_scCustom(seurat_object, group.by =  "seurat_clusters", reduction = "umap",  colors_use = alphabet_pal)
@@ -352,10 +353,10 @@ Stacked_VlnPlot(seurat_object, features = c("PHGDH", "CBS", "IL18"), group.by = 
 Now the cluster 10 seems to be specific of ISRactlow. What are their marker genes?
 
 ```{r}
-# cluster_to_explore <- "10"
-# markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
-# save.image(file = "Hwang_AUCell_onlytumor_untilCluster10.RDATA")
-load("Hwang_AUCell_onlytumor_untilCluster10.RDATA")
+cluster_to_explore <- "1"
+markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
+save.image(file = "Hwang_AUCell_onlytumor_untilCluster1_alternativeclustering.RDATA")
+# load("Hwang_AUCell_onlytumor_untilCluster10.RDATA")
 ```
 
 ```{r}
