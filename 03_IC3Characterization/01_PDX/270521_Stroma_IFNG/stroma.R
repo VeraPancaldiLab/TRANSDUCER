@@ -33,7 +33,7 @@ ic3 <- read_tsv("../Remy_processed_data/samplesIC3_custom.csv") %>%
 ic3
 
 # Deconvolution
-## mMCPcounter
+## mMCPcounter devtools::install_github("cit-bioinfo/mMCP-counter")
 ?mMCPcounter::mMCPcounter.estimate # runnable with EnsemblIDs
 Mcpmallrna_mMCPcounter <- mMCPcounter.estimate(exp = Mcpmallrna,
                                                features = "ENSEMBL.ID")
