@@ -122,7 +122,7 @@ if (signature_ISRact == "ISRactPCA") {
       ISRact_bin = replace_na(ISRact_bin, "Unknown")
     )
 
-  PACAOMICS_ISRactPCA <- arrange(PACAOMICS_PCAspace, PC1) %>%
+  PACAOMICS_ISRact_projection <- arrange(PACAOMICS_PCAspace, PC1) %>%
     dplyr::filter(!sample == "!") %>%
     mutate(ISRactPCA_bin = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3 / 3))), labels = c("low_ISRactPCA", "intermediate_ISRactPCA", "high_ISRactPCA"), include.lowest = TRUE)) %>%
     dplyr::select(sample, PC1, ISRactPCA_bin, ISRact_bin) %>%
@@ -137,6 +137,7 @@ if (signature_ISRact == "ISRactPCA") {
     rownames_to_column("sample") %>%
     inner_join(top_samples[, c("sample", "ISRact", "ISRact_bin")])
 } else if (signature_ISRact == "ISRactICA") {
+  signature_bin = paste0(signature_ISRact, "_bin")
   # Import the projection
   ## ISRactPCA
   ica_pdx <- read_rds("../06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/ISRactICA_IC3.RDS")
@@ -265,7 +266,7 @@ if (signature_ISRact == "ISRactPCA") {
     )
   
 
-  PACAOMICS_ISRactPCA <- arrange(PACAOMICS_PCAspace, ISRactICA) %>% 
+  PACAOMICS_ISRact_projection <- arrange(PACAOMICS_PCAspace, ISRactICA) %>% 
     dplyr::filter(!sample == "!") %>%
     mutate(ISRactICA_bin = cut(.$ISRactICA, breaks = c(quantile(.$ISRactICA, c(0:3 / 3))), labels = c("low_ISRactICA", "intermediate_ISRactICA", "high_ISRactICA"), include.lowest = TRUE)) %>%
     dplyr::select(sample, ISRactICA, ISRactICA_bin, ISRact_bin) %>%
@@ -278,6 +279,7 @@ if (signature_ISRact == "ISRactPCA") {
     dplyr::select(sample, IC.3, IC.2) %>%
     dplyr::rename(ISRactICA = "IC.3", other_comp = "IC.2") %>% 
     left_join(sample_info[, c("sample", "ICA3", "PAMG")]) %>% 
+    left_join(PACAOMICS_ISRact_projection[, c("sample", "ISRact_bin")]) %>% 
     dplyr::rename(ISRact = "ICA3")
   }
 
@@ -290,19 +292,20 @@ show_projection <- bind_rows(
     sample = paste0(sample, "_OG"),
     dataset = "PaCaOmics PDX"
   )
-) %>%
-  dplyr::rename(ISRactPCA = "PC1")
+)
 
 projection_scatter_pacaomics <- dplyr::mutate(show_projection, ISRact_bin = fct(ISRact_bin, levels = c("low_ISRact", "intermediate_ISRact", "high_ISRact", "Unknown"))) %>%
   dplyr::filter(
     dataset %in% c("PaCaOmics PDX"), # "Shin et al. PDX","PACAOMICS PDX", "CPTAC", "CCLE"
     ISRact_bin %in% c("low_ISRact", "high_ISRact", "intermediate_ISRact", "Unknown")
   ) %>%
-  ggplot(aes(x = ISRactPCA, y = PC2, color = ISRact_bin, shape = dataset)) +
+  ggplot(aes(x = get(signature_ISRact), y = other_comp, color = ISRact_bin, shape = dataset)) +
   geom_point() +
   scale_shape_manual(values = c(`Shin et al. PDX` = 16, `PaCaOmics PDX` = 17, CPTAC = 15, CCLE = 18)) +
   scale_color_manual(values = c(low_ISRact = "seagreen", high_ISRact = "tomato3", intermediate_ISRact = "grey", Unknown = "#619CFF")) + # c('low_ISRact', 'high_ISRact', 'intermediate_ISRact', 'Unknown'))unique(projection_ccle$primary_tissue))
   # ylim(-250,15) +
+  ylab("Other Component") +
+  xlab(signature_ISRact) +
   theme_bw()
 
 # ggsave(projection_scatter_pacaomics,
@@ -314,20 +317,22 @@ projection_scatter_pacaomics <- dplyr::mutate(show_projection, ISRact_bin = fct(
 # Check ISR marker genes associated with ISRActPCA extreme samples
 marker_genes <- c("PHGDH", "CBS", "IL18")
 
-Gene_ISRactPCA_comparison <- as_tibble(PACAOMICS_norm_GeneNames, rownames = "Gene") %>%
+Gene_ISRact_projection_comparison <- as_tibble(PACAOMICS_norm_GeneNames, rownames = "Gene") %>%
   pivot_longer(-Gene, names_to = "sample") %>%
   dplyr::filter(Gene %in% marker_genes) %>%
-  inner_join(PACAOMICS_ISRactPCA, by = "sample") %>%
-  dplyr::filter(ISRactPCA_bin != "intermediate_ISRactPCA")
+  inner_join(PACAOMICS_ISRact_projection, by = "sample") %>%
+  dplyr::filter(!str_detect(get(signature_bin), "intermediate_ISRact"))
 
 for (mgene in marker_genes) {
-  mgene_plot <- dplyr::filter(Gene_ISRactPCA_comparison, Gene == mgene) %>%
-    ggplot(aes(y = value, x = ISRactPCA_bin, fill = ISRactPCA_bin)) +
+  mgene_plot <- dplyr::filter(Gene_ISRact_projection_comparison, Gene == mgene) %>%
+    ggplot(aes(y = value, x = get(signature_bin), fill = get(signature_bin))) +
     geom_violin() +
-    scale_fill_manual(values = c(low_ISRactPCA = "seagreen", high_ISRactPCA = "tomato3")) +
+    scale_fill_manual(values = c("seagreen", "tomato3")) +
     rotate_x_text(90) +
     geom_boxplot(width = 0.1, fill = "white") +
-    labs(title = mgene)
+    labs(title = mgene) +
+    rremove("xlab") +
+    rremove("legend.title")
 
   print(mgene_plot)
   # ggsave(mgene_plot,
@@ -340,7 +345,7 @@ for (mgene in marker_genes) {
 
 # Plot comparisons with Basal/Classical and ISRact
 ## ISR vs ISRactPCA
-scatter_pacaomics_isractvsisractpca <- correlation_plotter(data = PACAOMICS_ISRactPCA, col1 = "ISRact", col2 = "ISRactPCA", data_name = "PaCaOmics PDX")
+scatter_pacaomics_isractvsisractpca <- correlation_plotter(data = PACAOMICS_ISRact_projection, col1 = "ISRact", col2 = signature_ISRact, data_name = "PaCaOmics PDX")
 
 # ggsave(scatter_pacaomics_isractvsisractpca,
 #        filename = "results/Figures/scatter_pacaomics_isractvsisractpca.svg",
@@ -348,7 +353,7 @@ scatter_pacaomics_isractvsisractpca <- correlation_plotter(data = PACAOMICS_ISRa
 #        height = 2)
 
 ## PAMG vs ISRactPCA
-scatter_pacaomics_pamgvsisractpca <- correlation_plotter(data = PACAOMICS_ISRactPCA, col1 = "PAMG", col2 = "ISRactPCA", data_name = "PaCaOmics PDX")
+scatter_pacaomics_pamgvsisractpca <- correlation_plotter(data = PACAOMICS_ISRact_projection, col1 = "PAMG", col2 = signature_bin, data_name = "PaCaOmics PDX")
 
 # ggsave(scatter_pacaomics_pamgvsisractpca,
 #        filename = "results/Figures/scatter_pacaomics_pamgvsisractpca.svg",
@@ -356,7 +361,7 @@ scatter_pacaomics_pamgvsisractpca <- correlation_plotter(data = PACAOMICS_ISRact
 #        height = 2)
 
 ## ISRact vs PAMG
-scatter_pacaomics_isractvspamg <- correlation_plotter(data = PACAOMICS_ISRactPCA, col1 = "ISRact", col2 = "PAMG", data_name = "PaCaOmics PDX")
+scatter_pacaomics_isractvspamg <- correlation_plotter(data = PACAOMICS_ISRact_projection, col1 = "ISRact", col2 = "PAMG", data_name = "PaCaOmics PDX")
 
 # ggsave(scatter_pacaomics_isractvspamg,
 #        filename = "results/Figures/scatter_pacaomics_isractvspamg.svg",
@@ -382,16 +387,18 @@ mut_PDX <- dplyr::select(mut_PDX_raw, Gene.refGene, Sample_Name) %>%
   pivot_wider(names_from = "sample", values_from = "mutated") %>%
   replace(is.na(.), 0)
 
-order <- dplyr::arrange(PACAOMICS_ISRactPCA, ISRact) # PC1, ICA3
+order <- dplyr::arrange(PACAOMICS_ISRact_projection, ISRact) # PC1, ICA3
 mut_PDX_BRCAness <- dplyr::select(mut_PDX, GeneID, matches(order$sample)) %>%
   dplyr::filter(GeneID %in% BRCAness_gs)
 
 ## pheatmap of BRCANess genes
-annot_cols <- dplyr::select(PACAOMICS_ISRactPCA, sample, ISRact, ISRact_bin, ISRactPCA, ISRactPCA_bin, PAMG)
+annot_cols <- dplyr::select(PACAOMICS_ISRact_projection, sample, ISRact, ISRact_bin, matches(signature_ISRact), matches(signature_bin), PAMG)
 
 annot_colors <- list(
   ISRactPCA = c("seagreen", "white", "tomato3"),
+  ISRactICA = c("seagreen", "white", "tomato3"),
   ISRactPCA_bin = c(`high_ISRactPCA` = "brown", `intermediate_ISRactPCA` = "grey", `low_ISRactPCA` = "#006837"),
+  ISRactICA_bin = c(`high_ISRactICA` = "brown", `intermediate_ISRactICA` = "grey", `low_ISRactICA` = "#006837"),
   ISRact_bin = c(`high_ISRact` = "brown", `intermediate_ISRact` = "grey", `low_ISRact` = "#006837", Unknown = "#619CFF"),
   PAMG = c("#FF7F00", "white", "#377DB8"),
   ISRact = c("#FFFFCC", "#006837")
@@ -417,17 +424,17 @@ if (only_BRCAness) {
 }
 ### correlation
 correlation_plotter(mutated_genes, "ISRact", "mutated_genes", "PaCaOmics")
-correlation_plotter(mutated_genes, "ISRactPCA", "mutated_genes", "PaCaOmics")
+correlation_plotter(mutated_genes, signature_ISRact, "mutated_genes", "PaCaOmics")
 
 ## ttest low vs high
-mutated_genes_filt <- dplyr::filter(mutated_genes, ISRactPCA_bin != "intermediate_ISRactPCA")
-leveneTest(mutated_genes ~ ISRactPCA_bin, mutated_genes_filt) # unsignificant -> we can use t test
+mutated_genes_filt <- dplyr::filter(mutated_genes, !str_detect(get(signature_bin), "intermediate_ISRact"))
+leveneTest(mutated_genes ~ get(signature_bin), mutated_genes_filt) # unsignificant -> we can use t test
 
-stats <- t.test(mutated_genes ~ ISRactPCA_bin, mutated_genes_filt, alternative = "two.sided", var.equal = T)
+stats <- t.test(mutated_genes ~ get(signature_bin), mutated_genes_filt, alternative = "two.sided", var.equal = T)
 
 stats_text <- paste0("t-test: pval = ", format(stats$p.value, scientific = T))
 
-ggplot(mutated_genes_filt, aes(x = ISRactPCA_bin, y = mutated_genes)) +
+ggplot(mutated_genes_filt, aes(x = get(signature_bin), y = mutated_genes)) +
   geom_dotplot(binaxis = "y", stackdir = "center") +
   stat_summary(
     fun.y = median, geom = "point", shape = 18,
@@ -436,5 +443,6 @@ ggplot(mutated_genes_filt, aes(x = ISRactPCA_bin, y = mutated_genes)) +
   # scale_y_log10() +
   labs(subtitle = stats_text) +
   ylab("BRCAness mutated genes") +
+  rremove("xlab") +
   theme_bw()
 #-------------------------------------------------------------------------------
