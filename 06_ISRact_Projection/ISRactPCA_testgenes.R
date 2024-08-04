@@ -4,27 +4,28 @@
 #' Import rawcount
 #' follow the limma voom workflow for DGEA analysis
 #' GSEA on ranking regarding DGEA results
+#' Comparative analysis of most correlated TF activities
 ################################################################################
 
-library(readr)
-library(readxl)
-library(edgeR)
-library(biomaRt)
-library(limma)
-library(ggplot2)
-library(ggpubr)
+# Import libraries
 library(tidyverse)
-library(EnhancedVolcano)
+library(biomaRt)
+library(ggpubr)
+library(edgeR)
 library(FactoMineR)
 library(factoextra)
-library(fgsea)
+library(EnhancedVolcano)
 library(msigdbr)
+library(fgsea)
+library(pheatmap)
 library(RColorBrewer)
 library(dorothea)
-library(pheatmap)
-library(viridis)
 
+
+## setwd and import local functions
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
+source("src/plot_PCs.R")
+source("src/plotBestPathways.R")
 
 # Import data
 rawTumor_Cyt <- read_delim("data/Sauyeun_PDX/rawTumor_Cyt.tsv",
@@ -60,14 +61,14 @@ Shin_ISRactPCA <- read_tsv("results/Sauyeun_PDX/Shin_ISRactPCA.tsv")
 provisional_ISRactICA <- read_rds("../06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/ISRactICA_IC3.RDS")
 
 ## add provisionally ISRactICA
-Shin_ISRactPCA <- as_tibble(provisional_ISRactICA$A, rownames = "sample") %>% 
+Shin_ISRactPCA <- as_tibble(provisional_ISRactICA$A, rownames = "sample") %>%
   dplyr::select(sample, IC.3) %>%
-  dplyr::rename(ISRactICA = "IC.3") %>% 
+  dplyr::rename(ISRactICA = "IC.3") %>%
   inner_join(Shin_ISRactPCA, by = "sample")
 
 # DGEA following the Limma Voom pipeline from https://ucdavis-bioinformatics-training.github.io/2018-June-RNA-Seq-Workshop/thursday/DE.html
 ################################################################################
-filter_intermediate_beforeDGEA <- F # T/F
+filter_intermediate_beforeDGEA <- F # T/F , controls whether the model uses these intermediate samples for calibration
 ################################################################################
 ## initial sample filtering
 if (filter_intermediate_beforeDGEA) {
@@ -94,7 +95,7 @@ d0 <- dplyr::select(counts, sample_info$sample) %>%
   DGEList()
 
 ### Calculate normalization factors
-d0 <- calcNormFactors(d0, method = "TMM")
+d0 <- calcNormFactors(d0, method = "TMM") # as projection is done this normalisation can be different.
 d0
 
 ### Filter low-expressed genes
@@ -117,12 +118,10 @@ dim(d) # number of genes left
 ## Visualize before DGEA
 dnorm <- cpm(d)
 
-data2 <- as.data.frame(dnorm[, random10]) %>%
+as.data.frame(dnorm[, random10]) %>%
   rownames_to_column("Prot") %>%
-  pivot_longer(cols = 2:11, names_to = "sample", values_to = "count_norm")
-
-### Custom ggplot counts
-ggplot(data2, mapping = aes(x = sample, y = count_norm, fill = sample)) +
+  pivot_longer(cols = 2:11, names_to = "sample", values_to = "count_norm") %>%
+  ggplot(mapping = aes(x = sample, y = count_norm, fill = sample)) +
   geom_violin() +
   theme(legend.position = "none") +
   coord_flip() +
@@ -132,7 +131,6 @@ ggplot(data2, mapping = aes(x = sample, y = count_norm, fill = sample)) +
 plotMDS(d, col = as.numeric(group))
 
 ### PCA plot regarding clinical and phenotype data
-
 dnorm.t <- t(dnorm)
 dnorm.pca <- PCA(dnorm.t, ncp = 10, graph = FALSE)
 summary(dnorm.pca)
@@ -140,41 +138,6 @@ summary(dnorm.pca)
 fviz_eig(dnorm.pca, addlabels = TRUE, ylim = c(0, 50))
 eig.val <- get_eigenvalue(dnorm.pca)
 eig.val # 63 dimensions to reach 90% of explained variance
-
-#' Plot PCA components in relation to a given factor
-#' @description
-#' this function does a parplot of the desired n of components and color
-#' them according to a given factor.
-#'
-#' prints a list of spearman correlations of the desired metadata factor
-#' with the IC that best correlate with it, from the ICAs with the different number of components
-#'
-#' @param pca_toplot data frame containing the PCs and the factors
-#' you want to use to correlate
-#' @param feat name of the feature to color
-#' @param ncomp number of PCs to plot
-#' @param dotsize to adjust the dotsize manually
-#'
-#' TBD
-#' continuous coloring
-#'
-plot_PCs <- function(pca_toplot, feat, ncomp, dotsize) {
-  col_factor <- as.factor(pca_toplot[[feat]])
-  col_n <- nlevels(col_factor)
-  cols <- brewer.pal(col_n, "Spectral")
-  cols <- colorRampPalette(cols)(col_n)
-  pairs(pca_toplot[, paste("Dim", 1:ncomp, sep = ".")],
-    col = cols[as.numeric(col_factor)],
-    pch = 19,
-    cex = dotsize,
-    lower.panel = NULL,
-    main = feat
-  )
-  par(xpd = TRUE)
-  # x11()
-  plot.new()
-  legend(x = "center", fill = cols, legend = levels(col_factor), horiz = F, title = feat)
-}
 
 pca_fulldf <- dnorm.pca$ind$coord %>%
   as_tibble(rownames = "sample") %>%
@@ -184,7 +147,7 @@ for (feat in colnames(pca_fulldf)[-c(1:(dim(dnorm.pca$ind$coord)[2] + 1))]) {
   plot_PCs(pca_fulldf, feat, dim(dnorm.pca$ind$coord)[2], 1)
 }
 
-### Voom transformation and calculation of variance weights
+## Voom transformation and calculation of variance weights
 y <- voom(d, mm, plot = T)
 
 ## Fitting linear models in limma
@@ -230,7 +193,7 @@ dt <- decideTests(fit)
 summary(dt)
 vennDiagram(dt[, c(1, 3)], circle.col = c("turquoise", "salmon"))
 
-# GSEA
+# GSEA on l2FC
 ## load gene sets
 msigdbr_reactome_df <- msigdbr(species = "Homo sapiens", category = "C2", subcategory = "CP:REACTOME") %>%
   mutate(gs_name = str_remove(gs_name, "REACTOME_"))
@@ -251,30 +214,8 @@ msigdbr_list_hallmark <- split(x = msigdbr_hallmark_df$gene_symbol, f = msigdbr_
 gsea_res_reactome <- fgsea(pathways = msigdbr_list_reactome, stats = ranked_genes, minSize = 15)
 gsea_res_hallmark <- fgsea(pathways = msigdbr_list_hallmark, stats = ranked_genes, minSize = 15)
 
-head(gsea_res_reactome[order(pval), ])
-head(gsea_res_hallmark[order(pval), ])
-
-## Visualisation
-### fGSEA plots
-# Function to plot the top 10 low ES and high ES pathways regarding to the pvalue of the gsea
-#' @description
-#' this function plots table of enrichment graphs for the 10
-#' pathways with positive enrichment score and lowest pvalue
-#' and the 10 pathways with negative enrichment score and lowest pvalue
-#'
-#' @param gsea.res data frame of a gsea result returned by fgsea function
-#' @param msigdbr_list list of genes name for each pathway from msigdb
-#' @param ranked_genes named vector where names are genes name and values are pca values
-plotBestPathways <- function(gsea.res, msigdbr_list, ranked_genes) {
-  topPathwaysUp <- gsea.res[ES > 0][head(order(pval), n = 10), pathway]
-  topPathwaysDown <- gsea.res[ES < 0][head(order(pval), n = 10), pathway]
-  topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
-  plot.new()
-  plotGseaTable(msigdbr_list[topPathways], ranked_genes, gsea.res,
-    gseaParam = 0.5
-  )
-}
-
+## Plots
+### Official viggnette plots
 plotBestPathways(gsea_res_reactome, msigdbr_list_reactome, ranked_genes)
 plotBestPathways(gsea_res_hallmark, msigdbr_list_hallmark, ranked_genes)
 
@@ -340,7 +281,7 @@ ggsave(shinbarplot_DEGEA_hallmark,
 )
 
 
-# most associated TF activities
+# most correlated TF activities
 ## Generate TF act
 ### Select the regulon data
 data(dorothea_hs_pancancer, package = "dorothea")
@@ -348,10 +289,11 @@ regulons <- dorothea_hs_pancancer %>%
   dplyr::filter(confidence %in% c("A", "B", "C"))
 
 ### VIPER Analysis
+################################################################################
 n <- 15 # n TFs to plot in heatmaps
 minsize <- 5
 ges.filter <- FALSE
-
+################################################################################
 tf_act__ <- dorothea::run_viper(counts, regulons,
   options = list(
     minsize = minsize, eset.filter = ges.filter,
@@ -532,19 +474,15 @@ as_tibble(tf_act__, rownames = "TF") %>%
     breaks = breaksList,
     fontsize = 12,
     annotation_names_row = FALSE,
-    main = paste0("Activity of the ", n, " most correlated transcription factor  with ISRactICA on the Shin dataset"))
+    main = paste0("Activity of the ", n, " most correlated transcription factor  with ISRactICA on the Shin dataset")
+  )
 
 #### TF correlation consistency
 ##### ISRact vs ISRactPCA
 library(UpSetR)
-compare <- list("ISRact" = top_tf_ISRact$TF, "ISRactPCA" =  top_tf_ISRactPCA$TF, "ISRactICA" = top_tf_ISRactICA$TF)
+compare <- list("ISRact" = top_tf_ISRact$TF, "ISRactPCA" = top_tf_ISRactPCA$TF, "ISRactICA" = top_tf_ISRactICA$TF)
 
 upset(fromList(compare),
-      order.by = "freq", 
-      mainbar.y.label = "most correlated\n TF activities\n intersections")
-
-
-
-
-
-
+  order.by = "freq",
+  mainbar.y.label = "most correlated\n TF activities\n intersections"
+)

@@ -13,8 +13,10 @@ library(biomaRt)
 library(edgeR)
 library(factoextra)
 library(ggpubr)
+library(Hmisc)
 library(ggVennDiagram)
 library(pdacmolgrad) # devtools::install_github("RemyNicolle/pdacmolgrad")
+library(readxl)
 
 ## setwd and import local functions
 setwd("~/Documents/02_TRANSDUCER/06_ISRact_Projection/")
