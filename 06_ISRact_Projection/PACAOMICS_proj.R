@@ -4,7 +4,7 @@
 #' Import different files
 #' Filter data and project ISRactPCA or ISRactICA
 #' Produce projection scatterplot
-#' Comapre marker gene trasncription
+#' Compare marker gene transcription
 #' Explore relation with PAMG sample score
 #' Explore mutation status compared with ISRactPCA/ISRactICA
 ################################################################################
@@ -51,7 +51,8 @@ top_samples <- arrange(sample_info, ICA3) %>%
 # PARAMETERS
 PACAOMICS_raw <- RN2017_raw # RN2017_raw | PACAOMICs_90_raw
 norm_method <- "upperquartile" # TMM | upperquartile
-signature_ISRact <- "ISRactICA" # ISRactPCA | ISRactICA
+signature_ISRact <- "ISRactPCA" # ISRactPCA | ISRactICA
+signature_bin = paste0(signature_ISRact, "_bin")
 ################################################################################
 
 # Translate EnsemblID to gene names
@@ -137,7 +138,6 @@ if (signature_ISRact == "ISRactPCA") {
     rownames_to_column("sample") %>%
     inner_join(top_samples[, c("sample", "ISRact", "ISRact_bin")])
 } else if (signature_ISRact == "ISRactICA") {
-  signature_bin = paste0(signature_ISRact, "_bin")
   # Import the projection
   ## ISRactPCA
   ica_pdx <- read_rds("../06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/ISRactICA_IC3.RDS")
