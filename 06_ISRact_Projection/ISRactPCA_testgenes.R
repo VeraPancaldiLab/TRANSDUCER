@@ -173,7 +173,7 @@ EnhancedVolcano(top_diff_gene,
 
 
 
-### other visualisations of teh viggnettes
+### other visualisations of the viggnettes
 top.table <- topTable(tmp, sort.by = "P", n = Inf) %>%
   mutate(
     Expression = case_when(
@@ -186,9 +186,6 @@ top.table <- topTable(tmp, sort.by = "P", n = Inf) %>%
 
 head(top.table, 20)
 
-# How many DE genes are there?
-length(which(top.table$adj.P.Val < 0.05))
-
 dt <- decideTests(fit)
 summary(dt)
 vennDiagram(dt[, c(1, 3)], circle.col = c("turquoise", "salmon"))
@@ -199,7 +196,6 @@ msigdbr_reactome_df <- msigdbr(species = "Homo sapiens", category = "C2", subcat
   mutate(gs_name = str_remove(gs_name, "REACTOME_"))
 msigdbr_hallmark_df <- msigdbr(species = "Homo sapiens", category = "H") %>%
   mutate(gs_name = str_remove(gs_name, "HALLMARK_"))
-
 
 ## extract ranked list
 ranked_genes <- top_diff_gene %>%
@@ -219,7 +215,7 @@ gsea_res_hallmark <- fgsea(pathways = msigdbr_list_hallmark, stats = ranked_gene
 plotBestPathways(gsea_res_reactome, msigdbr_list_reactome, ranked_genes)
 plotBestPathways(gsea_res_hallmark, msigdbr_list_hallmark, ranked_genes)
 
-### customn plots thesis
+### custom plots thesis
 #### Reactome
 topPathwaysUp <- gsea_res_reactome[ES > 0][head(order(pval), n = 10), pathway]
 topPathwaysDown <- gsea_res_reactome[ES < 0][head(order(pval), n = 10), pathway]
@@ -274,11 +270,11 @@ shinbarplot_DEGEA_hallmark <- dplyr::filter(gsea_res_hallmark, pathway %in% topP
   ylab("")
 
 print(shinbarplot_DEGEA_hallmark)
-ggsave(shinbarplot_DEGEA_hallmark,
-  filename = "results/Figures/shinbarplot_DEGEA_hallmark.svg",
-  width = 8,
-  height = 5
-)
+# ggsave(shinbarplot_DEGEA_hallmark,
+#   filename = "results/Figures/shinbarplot_DEGEA_hallmark.svg",
+#   width = 8,
+#   height = 5
+# )
 
 
 # most correlated TF activities
