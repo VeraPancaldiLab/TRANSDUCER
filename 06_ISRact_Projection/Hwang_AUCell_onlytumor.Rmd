@@ -4,9 +4,14 @@ output: pdf_document
 date: "2024-01-24"
 ---
 
+# Hwang AUCell enrichment analysis seeking a ISRact scRNAseq population
+
+## Package loading
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(Seurat)
+library(harmony)
 library(future)
 library(tidyverse)
 library(biomaRt)
@@ -26,13 +31,16 @@ library(patchwork)
 library(scCustomize)
 library(car)
 library(xlsx)
+library(UpSetR)
 
 source("src/plot_bar_enrich.R")
 source("src/Get_mostvar.R")
 source("src/scatterplot_with_stats.R")
 ```
 
-First point is to load the data, get it into seurat and filter for tumor cells
+## Data loading and preprocessing
+
+First point is to load the data, get it into Seurat and filter for tumor cells
 
 ```{r}
 # Load sparse expression matrix
@@ -69,7 +77,7 @@ seurat_object <- subset(x = seurat_object,
 rm(expression_matrix)
 rm(metadata)
 ```
-
+## ISRact scRNAseq Scoring
 Then load and create the ISRact signature, dividing it in high and low
 
 ```{r, echo=FALSE}
@@ -129,6 +137,7 @@ ISRactGeneSets <- c(
 
 geneSets <- GeneSetCollection(c(ISRactGeneSets))
 ```
+
 Now, Lets filter the seurat object so it only consider ISRact_high genes and standardize it
 
 ```{r, echo=FALSE}
@@ -139,6 +148,7 @@ input_AUCell <- seurat_f@assays$RNA$scale.data
 ```
 
 Then I run AUCell and adhere the results to Seurat object
+
 ```{r}
 
 ## Calculate ranking
@@ -147,6 +157,7 @@ cells_rankings <- AUCell_buildRankings(input_AUCell, plotStats=TRUE)
 ## calculate AUC score
 cells_AUC <- AUCell_calcAUC(geneSets = geneSets, cells_rankings)
 ```
+
 Now some exploratory plots of the AUC_scores
 
 ```{r}
@@ -159,7 +170,9 @@ rownames_to_column(AUC_results, "CellID") %>%
   pivot_longer(- CellID, names_to = "signature") %>% ggplot(aes(x = value, fill = signature, alpha=3)) +
     geom_density()
 ```
+
 Add the metadata to the scRNAseq expression and explore the distribution on the initial UMAP
+
 ```{r}
 seurat_object <- AddMetaData(seurat_object, metadata = AUC_results)
 
@@ -167,11 +180,10 @@ seurat_object <- AddMetaData(seurat_object, metadata = AUC_results)
 AUC_names = names(AUC_results)
 FeaturePlot(seurat_object, reduction = "UMAP", features = AUC_names)
 ```
-
-Finally now I compute a specific UMAP, precomputed only on the Tumor cells
+## Exploration of Tumour cell population, clustering and availale metadata
+Seeing the lack of any specific population in the general UMAP, how are these cells distributed when only on the Tumor cells are considered? Using all the genes or only ISRact related?
 
 ```{r}
-library(harmony)
 # Filter or not to have specific ISRact clusters
 unsupervised = F
 if (unsupervised == F){
@@ -186,18 +198,18 @@ if (unsupervised == F){
 
 seurat_object <- RunPCA(seurat_object, features=features)
 seurat_object <- RunHarmony(seurat_object,"pid")
-seurat_object <- RunUMAP(seurat_object, reduction = "harmony",dims=c(2:5))
+seurat_object <- RunUMAP(seurat_object, reduction = "harmony",dims=c(1:30))
 
 ```
 
-And the visual representation, with an extra one for Basal/CLassical
+And the visual representation, with an extra one for Basal/Classical
 
 ```{r}
 FeaturePlot(seurat_object, reduction = "umap", features = AUC_names)
 FeaturePlot(seurat_object, reduction = "umap", features = c("Moffitt_basal", "Moffitt_classical", "Bailey_squamous", "Bailey_progenitor", "MALIGNANT CELLS", "GATA6", "cnv_score", "ISR_ratio", "n_genes_by_counts"))
 ```
 
-Now I create a ISRAct High minus low to get the differenece between both 
+Now I create a ISRact High minus low to get the differenece between both
 
 ```{r}
 ISRact_diffAUC <- dplyr::mutate(AUC_results, ISR_ratio = get(AUC_names[1]) - get(AUC_names[2])) %>% dplyr::select(ISR_ratio)
@@ -206,6 +218,7 @@ seurat_object <- AddMetaData(seurat_object, metadata = ISRact_diffAUC)
 ```
 
 Now here I create the plots of comparison with basal and classical signatures in a cell wise way
+
 ```{r}
 features = "ISR_ratio" # "ISR_ratio" | AUC_names[1/2]
 basalclassical_source = "Raghavan_tableS3" # "Raghavan_tableS3" | "Raghavan_figures2d
@@ -276,17 +289,18 @@ annot_colors = list(ISR_ratio = c('blue','white','red'),
 
 ```
 
-And now I compute the neighbours and cluster this umap to compare with ISRact
+And now I compute the neighbors and cluster this UMAP to compare with ISRact
 
 ```{r}
 # calculate clusters
 seurat_object <- FindNeighbors(seurat_object,reduction = "umap", dims=1:2)
-seurat_object <- FindClusters(seurat_object, resolution = 0.01)
+seurat_object <- FindClusters(seurat_object, resolution = 0.1)
 alphabet_pal <- DiscretePalette_scCustomize(num_colors = 12, palette = "alphabet")
 
 plot2 <- DimPlot_scCustom(seurat_object, group.by =  "seurat_clusters", reduction = "umap",  colors_use = alphabet_pal)
 ```
-And at this moment I compare all these clusters with some violin plots, as well as assert the n of cells of each cluster
+
+At this moment I compare all these clusters with some violin plots, as well as assert the n of cells of each cluster
 
 ```{r}
 plot3 <- VlnPlot_scCustom(seurat_object, features = c(features), group.by = "seurat_clusters", pt.size = 0,  colors_use = alphabet_pal) + geom_hline(yintercept=0, linetype = "dashed")
@@ -302,7 +316,9 @@ ggsave("results/Figures/umap_hwang_isractpca.svg",
        width = 7,
        height = 12)
 ```
+
 Before exploring each cluster individually I look at the pseudobulk of them related to basal/classical as the heatmap above was not very clear
+
 ```{r}
 # Get Pseudobulk for clusters
 pseudo <- AggregateExpression(seurat_object, group.by = "seurat_clusters", return.seurat = T)
@@ -345,22 +361,36 @@ annot_colors = list(mean_ISRacthigh = c('white','red'),
   
 pheatmap(pseudo_bulk_exp[rownames(annot_rows),rownames(annot_cols)], scale = "none", color = colorRampPalette(c("purple", "black", "yellow"))(100), annotation_col = annot_cols, annotation_row = annot_rows, annotation_colors = annot_colors, cluster_rows = F, cluster_cols = T, show_colnames = TRUE, show_rownames = FALSE)  
 ```
+
 Also, what is the distribution of marker genes as PHGDH, CBS and IL18?
+
 ```{r}
 Stacked_VlnPlot(seurat_object, features = c("PHGDH", "CBS", "IL18"), group.by = "seurat_clusters", pt.size = 0, colors_use = alphabet_pal, add.noise = T) + geom_hline(yintercept=0, linetype = "dashed")
 ```
+## Cluster exploration
 
-Now the cluster 10 seems to be specific of ISRactlow. What are their marker genes?
+Now to see what each cluster actually represents we compare each cluster gene expression with the rest of clusters. In this comparsion we will see what actually differentiates these populations.
+
+As a warning, this process takes up to 12h to run, and thus I recommend loading the precomputed data. To carry out the analysis un comment the lines in the following sections
+
+### ISRact low
+starting with cluster 10, which seems to be specific of ISRactlow. What are their marker genes?
+
+(At this point to explore a UMAP and clustering with 2 only clusters, independent of the log2countsperecell, that was originated from 
+- different UMAP: RunUMAP(seurat_object, reduction = "harmony",dims=c(2:5))
+- different resolution: seurat_object <- FindClusters(seurat_object, resolution = 0.01)
+
+you can load "Hwang_AUCell_onlytumor_untilCluster1_alternativeclustering.RDATA" and look at cluster 1)
 
 ```{r}
-cluster_to_explore <- "1"
-markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
-save.image(file = "Hwang_AUCell_onlytumor_untilCluster1_alternativeclustering.RDATA")
-# load("Hwang_AUCell_onlytumor_untilCluster10.RDATA")
+# cluster_to_explore <- "10"
+# markers <- FindMarkers(seurat_object, ident.1 = cluster_to_explore, group.by = 'seurat_clusters')
+# save.image(file = "Hwang_AUCell_onlytumor_untilCluster1_alternativeclustering.RDATA")
+load("Hwang_AUCell_onlytumor_untilCluster10.RDATA")
 ```
 
 ```{r}
-# Explore marker pct filtering
+# Explore marker gene filtering
 pct_l2fc_plot <-  dplyr::filter(markers, p_val_adj < 0.01) %>% ggplot(aes(x=pct.1, y=pct.2, colour=avg_log2FC))+
   geom_point() + 
   scale_colour_gradient2(limits = c(-2.4,4), oob = squish) +
@@ -397,8 +427,7 @@ clusterISRactlow_pos <- rownames(dplyr::filter(sign_markers, avg_log2FC > 0)) %>
 VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:6]), group.by = "seurat_clusters", pt.size = 0.1) + geom_hline(yintercept=0, linetype = "dashed")
 ```
 
-
-Now For the enrichment analysis, first I check the distribution of L2FC and decide on hypergeometric or GSEA
+Now For the enrichment analysis, hypergeometric test comparing the marker genes with the array of all the possible genes is performed
 
 ```{r}
 # Visualize the scores
@@ -422,9 +451,6 @@ gene_to_entrez = deframe(annot_ensembl[c( "external_gene_name", "entrezgene_id")
 pos_markers <- dplyr::filter(sign_markers, avg_log2FC > 0) %>% rownames()
 neg_markers <- dplyr::filter(sign_markers, avg_log2FC < 0) %>% rownames()
 background <- rownames(markers)
-
-#rank_markers <- 
-
 
 
 ## Enrichment
@@ -499,7 +525,8 @@ ggsave("results/Figures/cluster10_enrichments.svg",
        width = 7,
        height = 13)
 ```
-Whats going on with that Sigature of Stress? 
+
+Whats going on with that Sigature of Stress?
 
 ```{r}
 # Extract genes of a signature
@@ -529,7 +556,7 @@ pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = F, 
 VlnPlot(seurat_object, features = c("JUN", "DNAJC3", "FNIP2", "SLC7A11"), group.by = "seurat_clusters", pt.size = 0.1) + geom_hline(yintercept=0, linetype = "dashed")
 
 ```
-
+### ISRact high
 Now the cluster 5 seems to be specific of ISRacthigh. What are their marker genes?
 
 ```{r}
@@ -575,22 +602,7 @@ sign_markers <- dplyr::filter(markers, p_val_adj<0.01, pct.1>0.1) %>% dplyr::arr
 VlnPlot(seurat_object, features = c(rownames(sign_markers)[1:5]), group.by = "seurat_clusters", pt.size = 0.1) + geom_hline(yintercept=0, linetype = "dashed")
 ```
 
-
-```{r}
-library(UpSetR)
-# overlap analysis (we are only centered in positive markers)
-clusterISRacthigh_pos <- rownames(dplyr::filter(sign_markers, avg_log2FC > 0)) %>% GeneSet(., setName=paste0("clusterISRacthigh_pos(", length(.),")"))
-
-geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  clusterISRacthigh_pos,  clusterISRactlow_pos))
-upset_marker_vs_isractpca <- upset(fromList(geneIds(geneSets_vs_markers)), nsets = 6)
-
-
-svg("results/Figures/upset_marker_vs_isractpca.svg", height = 4, width = 6)
-print(upset_marker_vs_isractpca)
-dev.off()
-
-```
-
+As before also check teh Enrichment analysis
 ```{r}
 # Visualize the scores
 sign_markers %>% ggplot(aes(x = avg_log2FC)) + geom_density() + geom_rug() + theme_classic()
@@ -662,7 +674,9 @@ halmark_pos_plot <-  pos_enrich_H@result %>%
     plot_bar_enrich(0.05,paste0("Hallmark Downregulated in cluster", cluster_to_explore)) %>% print()
 
 ```
+
 export plot FigR28
+
 ```{r}
 # create cluster 10 joint plot for export
 (go_plots[["MF"]]) /(go_plots[["BP"]]) /(go_plots[["CC"]]) / (halmark_pos_plot) / (reactome_pos_plot) + plot_layout(heights = c(1+20,
@@ -674,6 +688,7 @@ ggsave("results/Figures/cluster5_enrichments.svg",
        width = 8,
        height = 15)
 ```
+
 Now, what is that signature of Downregulation of cytoplasmic translation? rRNA processing? Traslation elongation? Metabolism of Aminoacids? Metabolism of Selenoaminoacids?
 
 ```{r}
@@ -703,108 +718,26 @@ pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("seurat_cluster
 pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = F, main = name_sign)
 ```
 
+### Cluster Marker genes Upsetplot
+Now that both the markers of high and low have been computed, explore the overlap of each with the AUCell signatures and with each other 
 ```{r}
-# Signaling by Rho GTPases, Miro GTPases and RHOBTB3
-Reactome_id <- "R-HSA-9716542"
-interest_genes <- neg_Reactome@result[Reactome_id,"geneID"] %>% str_split("/") %>% unlist(recursive = T)
-name_sign <- paste0(neg_Reactome@result[Reactome_id,"Description"], " (adj.pval = ", format(neg_Reactome@result[Reactome_id,"p.adjust"], scientific = TRUE, digits = 3), ")")
+# overlap analysis (we are only centered in positive markers)
+clusterISRacthigh_pos <- rownames(dplyr::filter(sign_markers, avg_log2FC > 0)) %>% GeneSet(., setName=paste0("clusterISRacthigh_pos(", length(.),")"))
+
+geneSets_vs_markers <- GeneSetCollection(c(ISRactGeneSets,  clusterISRacthigh_pos,  clusterISRactlow_pos))
+upset_marker_vs_isractpca <- upset(fromList(geneIds(geneSets_vs_markers)), nsets = 6)
 
 
+svg("results/Figures/upset_marker_vs_isractpca.svg", height = 4, width = 6)
+print(upset_marker_vs_isractpca)
+dev.off()
 
-# Get Pseudobulk for clusters
-pseudo <- AggregateExpression(seurat_object, group.by = "seurat_clusters", return.seurat = T)
-pseudo_bulk_exp <- pseudo@assays$RNA$scale.data[interest_genes,]
-pseudo_bulk_annot <-  FetchData(object = seurat_object, vars = c("seurat_clusters", AUC_names, "cnv_score")) %>%
-  as_tibble() %>%
-  dplyr::group_by(seurat_clusters) %>%
-  dplyr::summarize(mean_ISRacthigh = mean(`ISRact_high(100)`),
-                   sd_ISRacthigh = sd(`ISRact_high(100)`),
-                   mean_ISRactlow = mean(`ISRact_low(100)`),
-                   sd_ISRactlow = sd(`ISRact_low(100)`),
-                   mean_cnv_score = mean(cnv_score)) %>% 
-  dplyr::mutate(seurat_clusters = paste0("g", seurat_clusters)) %>%
-  column_to_rownames("seurat_clusters")
-
-# Plot Heatmap
-#DoHeatmap(pseudo, features = interest_genes, slot = "scale.data", label = T, draw.lines = F)
-pheatmap(pseudo_bulk_exp, annotation_col = pseudo_bulk_annot, cluster_cols = T, main = name_sign)
 ```
 
-Now, specially encouraged by Hallmark results lets explore the TF activity of the metacells for these clusters
-
-```{r}
-library(decoupleR)
-library(OmnipathR)
-net <- get_collectri(organism='human', split_complexes=FALSE)
-
-# Extract the normalized log-transformed pseudocounts
-mat <- as.matrix(pseudo@assays$RNA$data)
-# acts <- run_ulm(mat=mat, net=net, .source='source', .target='target',
-#                 .mor='mor', minsize = 5)
-
-acts <- run_viper(mat=mat, net=net, .source='source', .target='target',
-                .mor='mor', minsize = 5, method = 'scale')
-
-pseudo_bulk_TFact <- pivot_wider(acts,id_cols = source, values_from = score, names_from = condition) %>%
-  column_to_rownames("source")
-
-filter_TFs = "MostVar" # "MostCorr" |
-
-if (filter_TFs == "MostVar"){
-  top_50MostVarTF <- Get_mostvar(pseudo_bulk_TFact, 50)
-  pseudo_bulk_TFact <- top_50MostVarTF
-  phtitle <- "Top 50 MostVar TFs"
-  
-} else if (filter_TFs == "MostCorr"){ #!Need to change for cases with less than 4 clusters
-  var_tocorr <- "mean_ISRactlow"
-  top_50TF <- rcorr(t(pseudo_bulk_TFact), pseudo_bulk_annot[,var_tocorr,drop=T])$r[,"y"] %>%
-      abs() %>% 
-    sort(decreasing = T) %>%
-      .[2:(11)] %>% 
-    names()
-  
-  top_50MostCorrTF = pseudo_bulk_TFact[top_50TF,]
-  pseudo_bulk_TFact <- top_50MostCorrTF
-  phtitle <- paste0("top 50 Most Correlated TF to ", var_tocorr)
-  
-} else{
-  pseudo_bulk_TFact <- pseudo_bulk_TFact
-  phtitle <- "All TFs"
-  
-}
-pheatmap(pseudo_bulk_TFact, annotation_col = pseudo_bulk_annot, cluster_cols = T, show_rownames = T, main = phtitle)
-
-```
-Now, explore individual correlations, like the one with Myc
-
-```{r}
-explore_scatter <- pseudo_bulk_TFact %>%
-  t() %>%
-  cbind(pseudo_bulk_annot) %>%
-  rownames_to_column("cluster")
-
-# low vs high
-scatterplot_with_stats(explore_scatter, "mean_ISRacthigh", "mean_ISRactlow", "cluster", "spearman", "mean_ISRacthigh vs mean_ISRactlow")
-# MYC
-scatterplot_with_stats(explore_scatter, "MYC", "mean_ISRactlow", "cluster", "spearman", "MYC vs mean_ISRactlow")
-scatterplot_with_stats(explore_scatter, "MYC", "mean_ISRacthigh", "cluster", "spearman", "MYC vs mean_ISRacthigh")
-scatterplot_with_stats(explore_scatter, "MYC", "mean_cnv_score", "cluster", "spearman", "MYC vs mean_cnv_score")
-
-# JUN 
-
-scatterplot_with_stats(explore_scatter, "JUN", "mean_ISRacthigh", "cluster", "spearman", "JUN vs mean_ISRacthigh")
-scatterplot_with_stats(explore_scatter, "JUN", "mean_cnv_score", "cluster", "spearman", "JUN vs mean_cnv_score")
-
-# ASCL1
-scatterplot_with_stats(explore_scatter, "ASCL1", "mean_ISRactlow", "cluster", "spearman", "ASCL1 vs mean_ISRactlow")
-```
-
-How does the ISRact scores relate to known metadata of Hwang et al?
-- patient distribution
-- treatment
-- Responses
+How does the ISRact scores relate to known metadata of Hwang et al? - patient distribution - treatment - Responses
 
 For this, from the 64K cells I select the top and bottom 10K as high and low and check the distribution comapred with the middle ones
+
 ```{r}
 threshold_n = 10000
 feature = "response"
@@ -835,8 +768,10 @@ ggplot(isrvsmetadata, aes(x = get(feature), y=ISR_ratio)) +
   xlab(feature) +
   ylab("ISR_ratio")
 ```
+## Relation of ISRact clusters and signatures with Chemotherapy and response
 
 So, response and treatment could be explaining something there... what is the status of these patients separately? lets see dispersions
+
 ```{r}
 threshold_n = 10000
 feature = "pid"
@@ -932,7 +867,9 @@ ggsave(plot_name,
        width = 4,
        height = 3)
 ```
+
 Now the same plots but with relation to response
+
 ```{r}
 
 # ISRact in responders vs non responders
@@ -1079,5 +1016,77 @@ bar_crtx <- ggplot(filt_data, aes(x = seurat_clusters, fill = treatment_status))
   ylab("log10(nCells)")
 
 (plot2) / (umap_crtx) / (bar_crtx) + plot_layout(heights = c(2, 2, 1), guides = "collect")
+```
+
+## Other analysis performed in this data 
+
+Now, specially encouraged by Hallmark results lets explore the TF activity of the metacells for these clusters
+
+```{r}
+library(decoupleR)
+library(OmnipathR)
+net <- get_collectri(organism='human', split_complexes=FALSE)
+
+# Extract the normalized log-transformed pseudocounts
+mat <- as.matrix(pseudo@assays$RNA$data)
+# acts <- run_ulm(mat=mat, net=net, .source='source', .target='target',
+#                 .mor='mor', minsize = 5)
+
+acts <- run_viper(mat=mat, net=net, .source='source', .target='target',
+                .mor='mor', minsize = 5, method = 'scale')
+
+pseudo_bulk_TFact <- pivot_wider(acts,id_cols = source, values_from = score, names_from = condition) %>%
+  column_to_rownames("source")
+
+filter_TFs = "MostVar" # "MostCorr" |
+
+if (filter_TFs == "MostVar"){
+  top_50MostVarTF <- Get_mostvar(pseudo_bulk_TFact, 50)
+  pseudo_bulk_TFact <- top_50MostVarTF
+  phtitle <- "Top 50 MostVar TFs"
+  
+} else if (filter_TFs == "MostCorr"){ #!Need to change for cases with less than 4 clusters
+  var_tocorr <- "mean_ISRactlow"
+  top_50TF <- rcorr(t(pseudo_bulk_TFact), pseudo_bulk_annot[,var_tocorr,drop=T])$r[,"y"] %>%
+      abs() %>% 
+    sort(decreasing = T) %>%
+      .[2:(11)] %>% 
+    names()
+  
+  top_50MostCorrTF = pseudo_bulk_TFact[top_50TF,]
+  pseudo_bulk_TFact <- top_50MostCorrTF
+  phtitle <- paste0("top 50 Most Correlated TF to ", var_tocorr)
+  
+} else{
+  pseudo_bulk_TFact <- pseudo_bulk_TFact
+  phtitle <- "All TFs"
+  
+}
+pheatmap(pseudo_bulk_TFact, annotation_col = pseudo_bulk_annot, cluster_cols = T, show_rownames = T, main = phtitle)
+
+```
+
+Now, explore individual correlations, like the one with Myc
+
+```{r}
+explore_scatter <- pseudo_bulk_TFact %>%
+  t() %>%
+  cbind(pseudo_bulk_annot) %>%
+  rownames_to_column("cluster")
+
+# low vs high
+scatterplot_with_stats(explore_scatter, "mean_ISRacthigh", "mean_ISRactlow", "cluster", "spearman", "mean_ISRacthigh vs mean_ISRactlow")
+# MYC
+scatterplot_with_stats(explore_scatter, "MYC", "mean_ISRactlow", "cluster", "spearman", "MYC vs mean_ISRactlow")
+scatterplot_with_stats(explore_scatter, "MYC", "mean_ISRacthigh", "cluster", "spearman", "MYC vs mean_ISRacthigh")
+scatterplot_with_stats(explore_scatter, "MYC", "mean_cnv_score", "cluster", "spearman", "MYC vs mean_cnv_score")
+
+# JUN 
+
+scatterplot_with_stats(explore_scatter, "JUN", "mean_ISRacthigh", "cluster", "spearman", "JUN vs mean_ISRacthigh")
+scatterplot_with_stats(explore_scatter, "JUN", "mean_cnv_score", "cluster", "spearman", "JUN vs mean_cnv_score")
+
+# ASCL1
+scatterplot_with_stats(explore_scatter, "ASCL1", "mean_ISRactlow", "cluster", "spearman", "ASCL1 vs mean_ISRactlow")
 ```
 
