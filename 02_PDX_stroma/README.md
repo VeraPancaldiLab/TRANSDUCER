@@ -36,7 +36,7 @@ immune infiltration (pg 80)
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR1/FigR1.png" style="background-color:white;" />
+<img src="../FIGURESTHESIS/FigR1/FigR1.png" style="background-color:white;" />
 
 
 <h3 align="left">
