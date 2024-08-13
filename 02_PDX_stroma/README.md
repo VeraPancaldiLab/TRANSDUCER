@@ -36,7 +36,7 @@ immune infiltration (pg 80)
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR1/FigR1.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR1/FigR1.png" style="background-color:white;" />
 
 
 <h3 align="left">
@@ -46,7 +46,7 @@ phenotype (pg 87)
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR2/FigR2.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR2/FigR2.png" style="background-color:white;" />
 
 
 <h3 align="left">
@@ -56,7 +56,7 @@ correlations with Immune cell type proportions and TF activities (pg 89)
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR3/FigR3.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR3/FigR3.png" style="background-color:white;" />
 
 
 <h3 align="left">
@@ -65,7 +65,7 @@ FigR4: Analysis of IC.4cyt gene contributions confirms the relation of ISRact wi
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR4/FigR4.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR4/FigR4.png" style="background-color:white;" />
 
 
 ################################################################################
@@ -81,7 +81,7 @@ FigR5: Translation efficacy calculation and the exclusion of PDAC001 (pg 95)
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR5/FigR5.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR5/FigR5.png" style="background-color:white;" />
 
 <h3 align="left">
 
@@ -89,7 +89,7 @@ FigR6: IC.6_TEs as the stromal translational component representing ISRact lacks
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR6/FigR6.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR6/FigR6.png" style="background-color:white;" />
 
 <h3 align="left">
 
@@ -97,7 +97,7 @@ FigR7: mRNA levels of RBPs are specifically associated with IC.6_TEs suggesting 
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR7/FigR7.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR7/FigR7.png" style="background-color:white;" />
 
 <h3 align="left">
 
@@ -105,7 +105,7 @@ FigR8: Gene contribution analysis reveals a diverse array of signals being captu
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR8/FigR8.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR8/FigR8.png" style="background-color:white;" />
 
 <h3 align="left">
 
@@ -113,7 +113,7 @@ FigR9: The genes selected as Up translated and Downtranslated from IC.6_TEs show
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR9/FigR9.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR9/FigR9.png" style="background-color:white;" />
 
 <h3 align="left">
 
@@ -121,7 +121,7 @@ FigR10: Anota2seqUtils analysis of Translation related signatures suggest some c
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR10/FigR10.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR10/FigR10.png" style="background-color:white;" />
 
 <h3 align="left">
 
@@ -129,7 +129,7 @@ FigR11: Isolated Anota2seqUtils analysis of the different gene regions shows a r
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR11/FigR11.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR11/FigR11.png" style="background-color:white;" />
 
 <h3 align="left">
 
@@ -137,7 +137,7 @@ FigR12: Isolated Anota2seqUtils analysis of the different gene regions ATtRACT m
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR12/FigR12.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR12/FigR12.png" style="background-color:white;" />
 
 <h3 align="left">
 
@@ -145,7 +145,7 @@ FigR13: Integrated analysis of IC.6_TEs highly contributing genes shows sparsity
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR13/FigR13.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR13/FigR13.png" style="background-color:white;" />
 
 ################################################################################
 <h2 align="left">
@@ -161,7 +161,7 @@ FigR14: Correlation analysis between tumour translation components, and stromal 
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR14/FigR14.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR14/FigR14.png" style="background-color:white;" />
 
 
 ################################################################################
@@ -177,7 +177,7 @@ FigR15: Literature defined CAF subtypes do not seem associated with ISRact nor I
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR15/FigR15.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR15/FigR15.png" style="background-color:white;" />
 
 <h3 align="left">
 
@@ -185,7 +185,7 @@ FigR16: CAFs show different enrichment scores depending on whether total, effici
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR16/FigR16.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR16/FigR16.png" style="background-color:white;" />
 
 <h3 align="left">
 
@@ -193,7 +193,7 @@ FigR17: Stimulated CAF data is under a strong batch effect and individual stimul
 
 </h3>
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURES_THESIS/FigR17/FigR17.png" style="background-color:white;" />
+<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/FIGURESTHESIS/FigR17/FigR17.png" style="background-color:white;" />
 
 TEST
 
