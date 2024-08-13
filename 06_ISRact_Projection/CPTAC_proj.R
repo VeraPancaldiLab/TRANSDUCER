@@ -16,7 +16,6 @@ library(tidyverse)
 library(readxl)
 library(biomaRt)
 library(pdacmolgrad) # devtools::install_github("RemyNicolle/pdacmolgrad")
-
 library(edgeR)
 library(Hmisc)
 library(ggrepel)
@@ -197,7 +196,7 @@ CPTAC_ISRact_projection <- arrange(CPTAC_PCAspace, ISRactPCA) %>%
   dplyr::select(sample, ISRactPCA, ISRactPCA_bin, PAMG, KRAS_VAF)
 
 # Plot pca and projections
-# Add ISR status to PCA df
+## Add ISR status to PCA df
 pca_training <- pca_pdx[["x"]] %>%
   as.data.frame() %>%
   rownames_to_column("sample") %>%
