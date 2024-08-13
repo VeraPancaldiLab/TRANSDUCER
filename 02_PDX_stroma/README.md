@@ -197,5 +197,5 @@ FigR17: Stimulated CAF data is under a strong batch effect and individual stimul
 
 TEST
 
-<img src="https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/Figure1.png" style="background-color:white;" />
+<img src="https://github.com/j-solor/Drosophila-miRNA-PcG-circuits/blob/main/misc/Figure1.png" style="background-color:white;" />
 
