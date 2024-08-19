@@ -157,10 +157,10 @@ ggsave(projection_scatter_ccle,
 correlation_plotter(data = ccle_PCAspace, col1 = "PAMG", col2 = "ISRactPCA", data_name = "CCLE")
 
 ## Coloured version for thesis
-corr_spearman <- rcorr(ccle_toplot[["ISRactPCA"]], ccle_toplot[["PAMG"]], type = "spearman")
+corr_spearman <- rcorr(ccle_PCAspace[["ISRactPCA"]], ccle_PCAspace[["PAMG"]], type = "spearman")
 stats <- paste0("Spearman: R = ", round(corr_spearman$r["x", "y"], 2), ", pval = ", round(corr_spearman$P["x", "y"], 4))
 
-scatter_isractpcapamg_ccle <- ggplot(ccle_toplot, aes(x = ISRactPCA, y = PAMG, label = str_remove(ccle_name, "_PANCREAS"))) +
+scatter_isractpcapamg_ccle <- ggplot(ccle_PCAspace, aes(x = ISRactPCA, y = PAMG, label = str_remove(ccle_name, "_PANCREAS"))) +
   geom_point(aes(color = ISRact_bin)) +
   scale_color_manual(values = c(low_ISRact = "seagreen", high_ISRact = "tomato3", intermediate_ISRact = "grey", Unknown = "#619CFF")) +
   geom_smooth(method = lm) +
