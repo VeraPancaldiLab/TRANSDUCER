@@ -29,7 +29,7 @@ source("src/plot_PCs.R")
 source("src/plotBestPathways.R")
 
 ################################################################################
-subset_celltype <- "bulk" # epithelium | stroma | bulk
+subset_celltype <- "epithelium" # epithelium | stroma | bulk
 ################################################################################
 # Import data
 ## Expression
