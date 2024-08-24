@@ -43,13 +43,15 @@ Along this Document a quick summary is provided with references to the figures. 
 
 This Section of the repository covers the analysis performed on the PDX stroma to explore the context supporting ISRact tumour cells taking the advantage of the separation of tumour and stroma fractions of reads coming from Patient derived xenograft (PDX) models.
 
-To this aim, the stroma was analysed with supervised dimensionality reduction tools, where based in prior knowledge, gene transcription is codified into cell type proportions or transcription factor activities. For cell type proportions mMCPcounter and ImmuCC signatures were utilized. For estimating transcription factor activities we made use of the Dorothea PAN Cancer and GTEx regulons through Viper. Gtex used for stromal TF activity calculation, and PanCancer for the tumour TF activity (FigR1).
+To this aim, the stroma was analysed with supervised dimensionality reduction tools, where based in prior knowledge, gene transcription is codified into cell type proportions or transcription factor activities. For cell type proportions mMCPcounter and ImmuCC signatures were utilized. For estimating transcription factor activities we made use of the Dorothea PAN Cancer and GTEx regulons through Viper. Gtex used for stromal TF activity calculation, and PanCancer for the tumour TF activity (**FigR1**).
 
 Then, we proceed with the exploration of the stroma using Independent Component Analysis (ICA), first in the transcriptome and latter in the translatome.
 
 Code:
 
- * 02_PDX_stroma/03_Analysis/100122_ICABoot/ICA_cyt
+ * Preprocessing and normalisation -> [02_PDX_stroma/00_Data](https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/02_PDX_stroma/00_Data)
+ * [02_PDX_stroma/03_Analysis/180122_Various](https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/02_PDX_stroma/03_Analysis/180122_Various)
+
 
 
 <h2 align="left">
@@ -58,11 +60,12 @@ Code:
 
 </h2>
 
-Once ICA was performed using 6 components, their validity was assessed by comparison with technical data, and other variables of interest, as the molecular classification of the tumour (measured by [PAMG](https://github.com/RemyNicolle/pdacmolgrad)) or the ICA classification taht defined ISRact derived from Shin et al 2024 (FigR2). After detecting IC.4_cyt as one of the components most associated with ISRact, correlation with cell type proportions and TF activities revealed a relation with Immunity and Lymphocite recruitment (FigR3). Then a tailored analysis on the gene contributions of IC.4_cyt by GSVA and a exploration in the context of Protein protein interaction networks confirmed the relation of IC.4_cyt and thus ISRact with Interferon gamma signalling and antigen presentation (FigR4)
+Once ICA was performed using 6 components, their validity was assessed by comparison with technical data, and other variables of interest, as the molecular classification of the tumour (measured by [PAMG](https://github.com/RemyNicolle/pdacmolgrad)) or the ICA classification that defined ISRact derived from Shin et al 2024 (**FigR2**). After detecting IC.4_cyt as one of the components most associated with ISRact, correlation with cell type proportions and TF activities revealed a relation with Immunity and Lymphocite recruitment (**FigR3**). Then a tailored analysis on the gene contributions of IC.4_cyt by GSVA and a exploration in the context of Protein protein interaction networks confirmed the relation of IC.4_cyt and thus ISRact with Interferon gamma signalling and antigen presentation (**FigR4**).
 
 Code:
 
- * 02_PDX_stroma/03_Analysis/100122_ICABoot/ICA_cyt
+ * [02_PDX_stroma/03_Analysis/100122_ICABoot/ICA_cyt.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/02_PDX_stroma/03_Analysis/100122_ICABoot/ICA_cyt.R)
+
 
 <h2 align="left">
 
@@ -70,19 +73,23 @@ Code:
 
 </h2>
 
-Before analysing the translatome of PDX stroma, translation efficacy had to be calculated. For that the same approach as Shin et al 2024 was used (FigR5).
+Before analysing the translatome of PDX stroma, translation efficacy had to be calculated. For that the same approach as Shin et al 2024 was used (**FigR5**).
 
-Then, as before ICA was performed using 6 components, their validity was assessed by comparison with technical data, and other variables of interest, [PAMG](https://github.com/RemyNicolle/pdacmolgrad) or the Shin et al. 2024 ICA classification that defined ISRact. After detecting IC.6_TEs as the components most associated with ISRAct, this not showed relation with cell type proprtions or TF activities (#!REF FIGURE). Aiming to explore associations more relevant to the control of translatiom, correlation between sample scores and trasncription of RNA Binding Proteins (RBPs) showed a specific correlation of IC.6_TEs with this group of proteins, and specifically with m6Amethilationa and RNA degradation positively, and splicing and mRNA processing negatively (FigR7). While exploring the gene contributions in a similar way as in the transcriptional analysis, interestingly showed APP as translationally repressed, as well as DNA damage and methylation (FigR8). To explore the mechanisms behind this inherent translational regunlation in depth we carried out an analysis of differential translated genes over the most contributing genes using Anota2seqUtils (FigR9). First looking at enrichment of known alterations revealed some signals of ISR activation (FigR10). Then an analysis of association of transcript features was done separately by regulatory region (5'UTR, CDS, 3'UTR). The assessment of DRACH motif abundance was not enough to determine the m6A presence as demonstrated by similar distributions of the mirror motif HCARD, showing a difference in length (FigR11). Analysis of relevant features for each region, including individual nucleotide composition and the abundance of every motifs of length > 5nt of the ATtRACT db for mice point out to an alteration in codon composition related to the optimality. In this context longer and less stable transcripts are upregulated in IC.6_TEs high, and thus ISRact high stroma. Glutamate related codons (GAA/GAG) showed to be more abundant too (FigR12). This could be potentially explained by lack of resources in the TME provoked by the tumour's metabolic deficiency. 
+Then, as before ICA was performed using 6 components, their validity was assessed by comparison with technical data, and other variables of interest, [PAMG](https://github.com/RemyNicolle/pdacmolgrad) or the Shin et al. 2024 ICA classification that defined ISRact. After detecting IC.6_TEs as the components most associated with ISRAct, this not showed relation with cell type proprtions or TF activities (**FigR6**). 
 
-Exploring the relation between the most contributing genes utilizing again a PPI, this time segregating positive and negative contributing genes and considering their first neighbors revealed alterations in components from translation machinery biogenesis, to production of metabolism related components or cellular structure, potentially impacting immunity negatively. Lumican or LUM highlights as being highly downregulated, and the core of a Extra cellular matrix module, related to CAFs (FigR13). Importantly LUM was shown to be important for many processes relevant for PDAC and cancer biology as migration or inflammation (See Discussion Thesis manuscript)
+Aiming to explore associations more relevant to the control of translatiom, correlation between sample scores and transcription of RNA Binding Proteins (RBPs) showed a specific correlation of IC.6_TEs with this group of proteins, and specifically with m6A methilationa and RNA degradation positively, and splicing and mRNA processing negatively (**FigR7**). While exploring the gene contributions in a similar way as in the transcriptional analysis, interestingly showed APP as translationally repressed, as well as DNA damage and methylation (**FigR8**). To explore the mechanisms behind this inherent translational regulation in depth we carried out an analysis of differential translated genes over the most contributing genes using Anota2seqUtils (**FigR9**). First looking at enrichment of known alterations revealed some signals of ISR activation (**FigR10**). Then an analysis of association of transcript features was done separately by regulatory region (5'UTR, CDS, 3'UTR). The assessment of DRACH motif abundance was not enough to determine the m6A presence as demonstrated by similar distributions of the mirror motif HCARD, showing a difference in length (**FigR11**). Analysis of relevant features for each region, including individual nucleotide composition and the abundance of every motifs of length > 5nt of the ATtRACT db for mice point out to an alteration in codon composition related to the optimality. In this context longer and less stable transcripts are upregulated in IC.6_TEs high, and thus ISRact high stroma. Glutamate related codons (GAA/GAG) showed to be more abundant too (**FigR12**). This could be potentially explained by lack of resources in the TME provoked by the tumour's metabolic deficiency. 
 
+Exploring the relation between the most contributing genes utilizing again a PPI, this time segregating positive and negative contributing genes and considering their first neighbors revealed alterations in components from translation machinery biogenesis, to production of metabolism related components or cellular structure, potentially impacting immunity negatively. Lumican or LUM highlights as being highly downregulated, and the core of a Extra cellular matrix module, related to CAFs (**FigR13**). Importantly LUM was shown to be important for many processes relevant for PDAC and cancer biology as migration or inflammation (See Discussion Thesis manuscript)
+
+In this section the possibility of using a experimentaly defined RBP-target network generated from POSTAR3, and compare it with the ICA analysis to see whether some RBP was interacting with more IC.6_TEs highly contributing genes than expected randomly. We did this by Fisher exact test (**ABSENT IN MANUSCRIPT**). We are also planning on testing this by empirical randomisation.
 
 Code:
 
- * 02_PDX_stroma/03_Analysis/100122_ICABoot/ICA_cyt.R
- * 02_PDX_stroma/03_Analysis/100122_ICABoot/ICA_TEs.R
- * 02_PDX_stroma/03_Analysis/100122_ICABoot/IC_analysis.R
- * 02_PDX_stroma/03_Analysis/140923_ICA.TEs_Anota2seqUtils/*.R
+* [02_PDX_stroma/03_Analysis/100122_ICABoot/ICA_TEs.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/02_PDX_stroma/03_Analysis/100122_ICABoot/ICA_TEs.R)
+
+* [02_PDX_stroma/03_Analysis/100122_ICABoot/IC_analysis.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/02_PDX_stroma/03_Analysis/100122_ICABoot/IC_analysis.R)
+
+* [02_PDX_stroma/03_Analysis/140923_ICA.TEs_Anota2seqUtils](https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/02_PDX_stroma/03_Analysis/140923_ICA.TEs_Anota2seqUtils)
 
 
 <h3 align="left">
@@ -91,15 +98,18 @@ Code:
 
 </h3>
 
-As some CAFs seemed to support the growth of ISRact cells in vitro in Shin et al. 2024, we explored their involvement in the stroma of PDX. For that we first explroed the gene expression of marker genes of defined CAF subtypes in relation with ISRact, IC.4_cyt and PAMG scores without success. We also explored the distribution of IC.4_cyt gene contibutions of the different markers genes highlighting the difficulty of questioning the TME composition in a bulk setting, specially using single cell markers (FigR15).
+As some CAFs seemed to support the growth of ISRact cells in vitro in Shin et al. 2024, we explored their involvement in the stroma of PDX. For that we first explroed the gene expression of marker genes of defined CAF subtypes in relation with ISRact, IC.4_cyt and PAMG scores without success. We also explored the distribution of IC.4_cyt gene contibutions of the different markers genes highlighting the difficulty of questioning the TME composition in a bulk setting, specially using single cell markers (**FigR15**).
 
-To interrogate CAFs at the level of translation, after an initial exploration suggesting exploring translation could be of interest (FigR16), we designed an experiment to produce signatures of CAFs under specific stimuli of importance in the PDAC stroma. Sadly, the analysis revealed technical problems possibly associated to the experimental complexity (FigR17) 
+To interrogate CAFs at the level of translation, after an initial exploration suggesting exploring translation could be of interest (**FigR16**), we designed an experiment to produce signatures of CAFs under specific stimuli of importance in the PDAC stroma. Sadly, the analysis revealed technical problems possibly associated to the experimental complexity (**FigR17**). 
 
 Code:
 
- * 07_stimulated_CAFs/04_Deconvolution_TE/03_Sigantures/cell_types/fibroblast/PJ2003085/090921_FastqProcessing/GSEA.R
- * 07_stimulated_CAFs/07_stimulated_CAFs/00_Data/Fetch&Preporcessing.R
- * 07_stimulated_CAFs/02_17AC_NTvsCondition/anota2seq_17AC_NTvsCond.R
+* [04_Deconvolution_TE/03_Sigantures/cell_types/fibroblast/PJ2003085/090921_FastqProcessing/GSEA.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/04_Deconvolution_TE/03_Sigantures/cell_types/fibroblast/PJ2003085/090921_FastqProcessing/GSEA.R)
+
+* [07_stimulated_CAFs/00_Data/Fetch%26Preporcessing.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/07_stimulated_CAFs/00_Data/Fetch%26Preporcessing.R)
+
+* [07_stimulated_CAFs/02_17AC_NTvsCondition/anota2seq_17AC_NTvsCond.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/07_stimulated_CAFs/02_17AC_NTvsCondition/anota2seq_17AC_NTvsCond.R)
+
 
 ################################################################################
 
