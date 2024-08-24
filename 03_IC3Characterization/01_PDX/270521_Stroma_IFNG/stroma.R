@@ -29,7 +29,8 @@ Mcpmallrna_genenames <- Mcpmallrna_genenames[!is.na(rownames(Mcpmallrna_genename
 ic3 <- read_tsv("../Remy_processed_data/samplesIC3_custom.csv") %>%
   as.data.frame(.) %>%
   column_to_rownames(., var = "CITID") %>%
-  .[colnames(Mcpmallrna),"ICA3SampleWeight", drop=FALSE]
+  .[colnames(Mcpmallrna),"ICA3SampleWeight", drop = FALSE]
+
 
 ic3
 
@@ -39,9 +40,9 @@ ic3
 Mcpmallrna_mMCPcounter <- mMCPcounter.estimate(exp = Mcpmallrna,
                                                features = "ENSEMBL.ID")
 ## ImmuCC (CYBERSORT 4 mice)
-download.file(url = "https://raw.githubusercontent.com/wuaipinglab/ImmuCC/master/webserver/SignatureMatrix.rnaseq.csv"
-              destfile = "01_Input/SignatureMatrix.rnaseq.csv")
-unix sed 's/,/\t/g' 01_Input/SignatureMatrix.rnaseq.csv > 01_Input/SignatureMatrix.ImmuCC.tsv
+# download.file(url = "https://raw.githubusercontent.com/wuaipinglab/ImmuCC/master/webserver/SignatureMatrix.rnaseq.csv"
+#               destfile = "01_Input/SignatureMatrix.rnaseq.csv")
+#unix sed 's/,/\t/g' 01_Input/SignatureMatrix.rnaseq.csv > 01_Input/SignatureMatrix.ImmuCC.tsv
 
 ### Export to non log .tsv (ensembl IDs as the signature)
 Mcpmallrna_totsv <- as.data.frame(2**Mcpmallrna)
@@ -77,6 +78,7 @@ mmcp_immuCC$P <- mmcp_immuCC$P[rownames(Mcpmallrna_mMCPcounter), colnames(Mcpmal
 corrplot(mmcp_immuCC$r, order="original", type = "full", p.mat = mmcp_immuCC$P,
          sig.level = 0.05, method="color", insig = "label_sig",
          title = "Stroma Composition mMCPc. vs ImmuCC", mar=c(0,0,1,0))# http://stackoverflow.com/a/14754408/54964
+
 ### scaterplots
 #### mMCPcounter
 mcp_plots <- cbind(t(Mcpmallrna_mMCPcounter), as.data.frame(ic3))
@@ -142,7 +144,7 @@ ggplot(immuCC_plots, aes(x=ICA3SampleWeight, y= `Macrophages`, label = rownames(
 axon_gs <- read_tsv("01_Input/Farias2020_300axongenes.tsv") %>%
   rename_with(~c("EnsemblID", "Description", "GeneName"), everything())
 
-axon_enrich <- gsva(Mcpmallrna, axon_gs["EnsemblID"], min.sz = 15)["EnsemblID",]
+axon_enrich <- gsva(gsvaParam(exprData = Mcpmallrna, geneSets = as.list(axon_gs["EnsemblID"]), minSize = 15))["EnsemblID",]
 
 ## Visualization
 ### scatterplot
@@ -154,6 +156,7 @@ stats <- paste("Spearman: R = ", round(axonb_plots.cor$r["x","y"], 2),
 
 ggplot(axonb_plots, aes(x=ICA3SampleWeight, y=Farias2020_coreaxon, label = axonb_plots$samples)) + geom_point() + 
   geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
+
 ### heatmap
 Mcpmallrna[axon_gs$EnsemblID,] %>% 
   pheatmap(scale = "row", annotation_col = column_to_rownames(axonb_plots, "samples"),
@@ -196,79 +199,3 @@ stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
 ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Ido1, label = rownames(gene_plots))) + geom_point() + 
   geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
 
-
-#### IL18
-gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Il18, type = "spearman")
-stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
-               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
-
-ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Il18, label = rownames(gene_plots))) + geom_point() + 
-  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
-
-
-#### IFNG
-gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Ifng, type = "spearman")
-stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
-               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
-
-ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Ifng, label = rownames(gene_plots))) + geom_point() + 
-  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
-
-
-#### PDL1 (CD274)
-gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Cd274, type = "spearman")
-stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
-               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
-
-ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Cd274, label = rownames(gene_plots))) + geom_point() + 
-  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
-
-#### CD73 AKA NT5E (immunomodulator)
-gene_plots.cor <-rcorr(gene_plots$ICA3SampleWeight, gene_plots$Nt5e, type = "spearman")
-stats <- paste("Spearman: R = ", round(gene_plots.cor$r["x","y"], 2),
-               ", pval = ", round(gene_plots.cor$P["x","y"], 4), sep = "")
-
-ggplot(gene_plots, aes(x=ICA3SampleWeight, y=Nt5e, label = rownames(gene_plots))) + geom_point() + 
-  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
-
-
-
-### NSG vs Nude
-stopifnot(colnames(Mcpmallrna_genenames) == rownames(mcp_plots))
-micetype_plots <- cbind(t(Mcpmallrna_genenames), as.data.frame(mcp_plots))
-micetype_plots <- micetype_plots[,!duplicated(colnames(micetype_plots))]
-
-#### Il2rg expression
-##### vs ICA3
-micetype_plots.cor <-rcorr(micetype_plots$ICA3SampleWeight, micetype_plots$Il2rg, type = "spearman")
-stats <- paste("Spearman: R = ", round(micetype_plots.cor$r["x","y"], 2),
-               ", pval = ", round(micetype_plots.cor$P["x","y"], 4), sep = "")
-
-ggplot(micetype_plots, aes(x=ICA3SampleWeight, y=Il2rg, label = rownames(micetype_plots))) + geom_point() + 
-  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
-
-##### vs T Cells
-micetype_plots.cor <-rcorr(micetype_plots$`T cells`, micetype_plots$Il2rg, type = "spearman")
-stats <- paste("Spearman: R = ", round(micetype_plots.cor$r["x","y"], 2),
-               ", pval = ", round(micetype_plots.cor$P["x","y"], 4), sep = "")
-
-ggplot(micetype_plots, aes(x=`T cells`, y=Il2rg, label = rownames(micetype_plots))) + geom_point() + 
-  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
-
-#### Foxn1
-##### vs ICA3
-micetype_plots.cor <-rcorr(micetype_plots$ICA3SampleWeight, micetype_plots$Foxn1, type = "spearman")
-stats <- paste("Spearman: R = ", round(micetype_plots.cor$r["x","y"], 2),
-               ", pval = ", round(micetype_plots.cor$P["x","y"], 4), sep = "")
-
-ggplot(micetype_plots, aes(x=ICA3SampleWeight, y=Foxn1, label = rownames(micetype_plots))) + geom_point() + 
-  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
-
-#### Prkdc
-##### vs ICA3
-micetype_plots.cor <-rcorr(micetype_plots$ICA3SampleWeight, micetype_plots$Prkdc, type = "spearman")
-stats <- paste("Spearman: R = ", round(micetype_plots.cor$r["x","y"], 2),
-               ", pval = ", round(micetype_plots.cor$P["x","y"], 4), sep = "")
-
-ggplot(micetype_plots, aes(x=ICA3SampleWeight, y=Prkdc, label = rownames(micetype_plots))) + geom_point() + 
-  geom_smooth(method=lm) + theme_bw() + geom_text_repel() + labs(title="Stroma", subtitle = stats)
