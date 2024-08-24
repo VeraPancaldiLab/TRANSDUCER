@@ -57,9 +57,8 @@ cleanHost <- c(
   "PDAC026T",
   "PDAC019T",
   "PDAC015T",
-  "PDAC001T",
   "PDAC022T"
-) # 21
+) # 20
 
 # Separate reads by fraction and organism
 ## by species (ID)
@@ -122,6 +121,13 @@ countsHost$dataP %>%
   rownames_to_column("EnsemblID") %>%
   write_tsv("Processed_data/rawHost_Pol.tsv")
 
+## Get ncounts to test latter (just host samples)
+ncounts <- tibble(samples = cleanTumour)
+countsHost$dataT %>% dplyr::select(cleanTumour) %>% colSums() -> ncounts$cyt_host_counts
+countsHost$dataP %>% dplyr::select(cleanTumour) %>% colSums() -> ncounts$pol_host_counts
+countsTumor$dataT %>% dplyr::select(cleanTumour) %>% colSums() -> ncounts$cyt_tumor_counts
+countsTumor$dataP %>% dplyr::select(cleanTumour) %>% colSums() -> ncounts$pol_tumor_counts
+ncounts %>% write_tsv("Processed_data/ncounts.tsv")
 
 ## Remove 0 genes and normalize
 Clean_and_Norm <- function(data, clean_samples) {
