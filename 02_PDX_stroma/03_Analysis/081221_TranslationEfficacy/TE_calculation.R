@@ -192,10 +192,11 @@ TEs.unf[rownames(TEs), ] %>%
 
 
 ### Outliers
+png("02_Output/Figures/ANOTA2SEQ_residual_distribution_summary.png",width = 700, height = 480, units = "px", pointsize = 12)
 TEs %>%
   data.matrix() %>%
   OutlierTest(residualMatrix = .)
-
+dev.off()
 
 ### filtering relation with gene expression bias
 #### one sample
