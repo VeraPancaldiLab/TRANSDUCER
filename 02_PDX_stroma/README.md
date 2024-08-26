@@ -11,7 +11,7 @@
 ## Summary
 
 </h2>
-Along this Document a quick summary is provided with references to the figures. In each of the parts of this summary a list of the scripts that produce the named figures. Afterwards, if any modification has happened, or tried, it will be specified here. Later on, the figures are also provided for visualisation
+Along this Document a quick summary is provided with references to the figures. In each of the parts of this summary a list of the scripts that produce the named figures. Afterwards, if any modification has happened, or tried, it will be specified here. Later on, the figures are also provided for visualization
 
 <!-- TABLE OF CONTENTS -->
 
@@ -79,7 +79,7 @@ Then, as before ICA was performed using 6 components, their validity was assesse
 
 Aiming to explore associations more relevant to the control of translatiom, correlation between sample scores and transcription of RNA Binding Proteins (RBPs) showed a specific correlation of IC.6_TEs with this group of proteins, and specifically with m6A methilationa and RNA degradation positively, and splicing and mRNA processing negatively (**FigR7**). While exploring the gene contributions in a similar way as in the transcriptional analysis, interestingly showed APP as translationally repressed, as well as DNA damage and methylation (**FigR8**). To explore the mechanisms behind this inherent translational regulation in depth we carried out an analysis of differential translated genes over the most contributing genes using Anota2seqUtils (**FigR9**). First looking at enrichment of known alterations revealed some signals of ISR activation (**FigR10**). Then an analysis of association of transcript features was done separately by regulatory region (5'UTR, CDS, 3'UTR). The assessment of DRACH motif abundance was not enough to determine the m6A presence as demonstrated by similar distributions of the mirror motif HCARD, showing a difference in length (**FigR11**). Analysis of relevant features for each region, including individual nucleotide composition and the abundance of every motifs of length > 5nt of the ATtRACT db for mice point out to an alteration in codon composition related to the optimality. In this context longer and less stable transcripts are upregulated in IC.6_TEs high, and thus ISRact high stroma. Glutamate related codons (GAA/GAG) showed to be more abundant too (**FigR12**). This could be potentially explained by lack of resources in the TME provoked by the tumour's metabolic deficiency. 
 
-Exploring the relation between the most contributing genes utilizing again a PPI, this time segregating positive and negative contributing genes and considering their first neighbors revealed alterations in components from translation machinery biogenesis, to production of metabolism related components or cellular structure, potentially impacting immunity negatively. Lumican or LUM highlights as being highly downregulated, and the core of a Extra cellular matrix module, related to CAFs (**FigR13**). Importantly LUM was shown to be important for many processes relevant for PDAC and cancer biology as migration or inflammation (See Discussion Thesis manuscript)
+Exploring the relation between the most contributing genes utilizing again a PPI, this time segregating positive and negative contributing genes and considering their first neighbors revealed alterations in components from translation machinery biogenesis, to production of metabolism related components or cellular structure, potentially impacting immunity negatively. Lumican or LUM highlights as being highly downregulated, and the core of a Extra cellular matrix module, related to cancer associated fibroblasts (CAFs) (**FigR13**). Importantly LUM was shown to be important for many processes relevant for PDAC and cancer biology as migration or inflammation (See Discussion Thesis manuscript)
 
 In this section the possibility of using a experimentaly defined RBP-target network generated from POSTAR3, and compare it with the ICA analysis to see whether some RBP was interacting with more IC.6_TEs highly contributing genes than expected randomly. We did this by Fisher exact test (**ABSENT IN MANUSCRIPT**). We are also planning on testing this by empirical randomisation.
 
@@ -100,7 +100,11 @@ Code:
 
 As some CAFs seemed to support the growth of ISRact cells in vitro in Shin et al. 2024, we explored their involvement in the stroma of PDX. For that we first explroed the gene expression of marker genes of defined CAF subtypes in relation with ISRact, IC.4_cyt and PAMG scores without success. We also explored the distribution of IC.4_cyt gene contibutions of the different markers genes highlighting the difficulty of questioning the TME composition in a bulk setting, specially using single cell markers (**FigR15**).
 
-To interrogate CAFs at the level of translation, after an initial exploration suggesting exploring translation could be of interest (**FigR16**), we designed an experiment to produce signatures of CAFs under specific stimuli of importance in the PDAC stroma. Sadly, the analysis revealed technical problems possibly associated to the experimental complexity (**FigR17**). 
+To interrogate CAFs at the level of translation, after an initial exploration suggesting exploring translation could be of interest (**FigR16**), we designed an experiment to produce signatures of CAFs under specific stimuli of importance in the PDAC stroma. Sadly, the analysis revealed technical problems possibly associated to the experimental complexity (**FigR17**).
+
+In this topic, for the ease of usage of CAF sequencing data, and the exploration of CAF subtypes signatures among many other things I created a tool named  [CAFCOMPARER](https://github.com/j-solor/CAFCOMPARER) with the help of Margaux Dore (**ABSENT IN MANUSCRIPT**). 
+
+With the increase in relevance, and abundance of different CAF subtypes, an in depth comparison using the team CAF library and scRNAseq data was carried out by Margaux Dore [m-dore](https://github.com/m-dore) under my supervision for her master thesis. This work will be continued in her PhD, starting on October 2024.
 
 Code:
 

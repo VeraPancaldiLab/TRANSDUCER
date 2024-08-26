@@ -149,6 +149,24 @@ Code:
 * [06_ISRact_Projection/Puleo_Proj.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/06_ISRact_Projection/Puleo_Proj.R)
 * [06_ISRact_Projection/TCGA_proj.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/06_ISRact_Projection/TCGA_proj.R)
 
+################################################################################
+
+<h2 align="left">
+
+## ISRactICA (**ABSENT IN MANUSCRIPT**)
+
+</h2>
+
+Given the relationship seen of ISRactPCA with Basal Classical, we tried to develop an ICA based classifier, which we termed ISRactICA. For this I applied the ICA based approach I developed in the Molecular Signature Generator, where ICA is applied iteratively with different number of components to find the best match to ISRact, in the transcriptome. Then by doing the same in PACAOMICS, now trying to match the source signal of the ISRactICA. This showed similar trends of TF activities, enrichment terms, and relation with PAMG, but not so much with BRCAness. 
+
+Code:
+
+* Generation of ISRactICA using [The Molecular Signature Generator](https://github.com/j-solor/The-Molecular-Signature-Generator?tab=readme-ov-file) -> [06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/ISR_act_first.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/ISR_act_first.R)
+
+* [06_ISRact_Projection/ISRactPCA_testgenes.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/06_ISRact_Projection/ISRactPCA_testgenes.R)
+
+* [06_ISRact_Projection/PACAOMICS_proj.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/06_ISRact_Projection/PACAOMICS_proj.R)
+
 
 
 ################################################################################
