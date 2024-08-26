@@ -65,7 +65,7 @@ The main structure match that of the manuscript:
 
 1. **PDX stroma analysis:** from the initial assessment of cell type proportions or transcription factor activities to the ICA and the posterior analysis. A second readme with details regarding this section can be found [here](https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/02_PDX_stroma).
 
-2. **ISRact projection:** this includes all the efforts carried out to detect ISRact in transcription. This includes the generation of ISRactPCA but also the usage of the Molecular signature generator to produce ISRactICA, a novel classifier not included in the thesis. A second readme with the details regarding this section can be found [here](https://github.com/VeraPancaldiLab/TRANSDUCER/tree/06_Human_Cohort_Projection/06_ISRact_Projection).
+2. **ISRact projection:** this includes all the efforts carried out to detect ISRact in transcription. This includes the generation of ISRactPCA but also the usage of the Molecular signature generator to produce ISRactICA, a novel classifier not included in the thesis. A second readme with the details regarding this section can be found [here](https://github.com/VeraPancaldiLab/TRANSDUCER/tree/main/06_ISRact_Projection).
 
 In both detailed documents the results of each section and figures, connected to the scripts that produce them is indicated for easy tracking.
 
