@@ -1,16 +1,10 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
 <!-- PROJECT SHIELDS -->
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url] [![MIT
-License][license-shield]][license-url]
+[![Issues][issues-shield]][issues-url] 
+[![MIT License][license-shield]][license-url]
 
 <!-- PROJECT LOGO -->
 
@@ -90,5 +84,5 @@ Project Link: [https://github.com/VeraPancaldiLab/TRANSDUCER](https://github.com
 [stars-url]: https://github.com/VeraPancaldiLab/TRANSDUCER/stargazers
 [issues-shield]: https://img.shields.io/github/issues/VeraPancaldiLab/TRANSDUCER?style=for-the-badge
 [issues-url]: https://github.com/othneildrew/VeraPancaldiLab/TRANSDUCER/issues
-[license-shield]: https://img.shields.io/github/license/VeraPancaldiLab/TRANSDUCER?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
 [license-url]: https://github.com/VeraPancaldiLab/TRANSDUCER/blob/master/LICENSE.txt
