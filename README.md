@@ -23,8 +23,6 @@ TRANSDUCER
 <p align="center">
 
 Code utilised for my (Jacobo Solorzano) Thesis manuscript <br />
-<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><strong> Explore
-the docs »</strong></a> <br /> <br /> ·
 
 </p>
 
@@ -38,15 +36,7 @@ the docs »</strong></a> <br /> <br /> ·
 
 <ol>
 
-<li>
-
-<a href="#about-the-project">About The Project</a>
-
-<ul>
-
-<li><a href="#built-with">Built With</a></li>
-
-</ul>
+<li><a href="#about-the-repository">About The Repository</a></li>
 
 <li><a href="#license">License</a></li>
 
@@ -69,20 +59,6 @@ The main structure match that of the manuscript:
 
 In both detailed documents the results of each section and figures, connected to the scripts that produce them is indicated for easy tracking.
 
-### Built With (#! UPDATE!)
-
-* R version 4.1.2 
-* [tidyverse](https://www.tidyverse.org/)
-* [JADE](https://cran.r-project.org/web/packages/JADE/index.html)
-* [Hmisc](https://cran.r-project.org/web/packages/Hmisc/index.html)
-* [pheatmap](https://cran.r-project.org/web/packages/pheatmap/)
-* [scales](https://scales.r-lib.org/)
-* [ggpubr](https://cran.r-project.org/web/packages/ggpubr/index.html)
-* [ggplotify](https://cran.r-project.org/web/packages/ggplotify/index.html)
-* [patchwork](https://patchwork.data-imaginist.com/)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 <!-- LICENSE -->
 ## License
 
@@ -102,14 +78,6 @@ Project Link: [https://github.com/VeraPancaldiLab/TRANSDUCER](https://github.com
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-
-<!-- FUTURE IMPROVEMENTS -->
-## Future improvements
-* Merge all the branches
-* Create sub parts with figures of thesis and the code/plot files
-* add other ICA algorithms·
-* Little changes specified in each function documentation.
-* Review documentation.
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
