@@ -9,7 +9,7 @@ library(ggrepel)
 library(ReactomePA)
 library(clusterProfiler)
 library(RColorBrewer)
-library(anota2seqUtils)
+library(anota2seqUtils) # devtools::install('/home/jacobo/Anota2seq_handson/anota2sequtils-main')
 
 source("../100122_ICABoot/functions.R")
 ################################################################################
