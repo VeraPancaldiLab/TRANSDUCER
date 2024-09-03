@@ -8,6 +8,7 @@ library(msigdbr)
 library(GSVA)
 library(ggplotify)
 library(ggpubr)
+library(ggrepel)
 ################################################################################
 setwd("/home/jacobo/Documents/02_TRANSDUCER/02_PDX_stroma/03_Analysis/100122_ICABoot/")
 source("functions.R")
@@ -370,14 +371,13 @@ stroma_tf_corrplot <- ggplot(stroma_tf_corr, aes(measure1, measure2, fill=r, lab
 ggsave(file="02_Output/Figures/stroma_tf_corrplot.svg", plot=stroma_tf_corrplot, width=10, height=6)
 
 #-------------------------------------------------------------------------------
-
 # FIGURE SPECIFIC PLOTS: all the correlation plots of above together
 #-------------------------------------------------------------------------------
 sampleweight_corrplots <- ggarrange(plotlist = list(clinical_technical_corrplot, deconvolution_corrplot, stroma_tf_corrplot), ncol = 3, common.legend = T, align = "h", widths = c(0.12, 0.4, 0.5), legend = "right")
 ggsave(file="02_Output/Figures/sampleweight_corrplots.svg", plot=sampleweight_corrplots, width=20, height=6)
 
-#-------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------------
 # FIGURE SPECIFIC PLOTS: IC.4 Gene weights bottom and top genes
 #-------------------------------------------------------------------------------
 # Get best genes
@@ -618,9 +618,41 @@ tumour_tf_small_corrplot <- ggplot(tumour_tf_corr, aes(measure1, measure2, fill=
 
 ggsave(file="02_Output/Figures/tumour_tf_small_corrplot.svg", plot=tumour_tf_small_corrplot, width=10, height=6)
 
+#-------------------------------------------------------------------------------
+# THESIS PLOTS: Foxp3 target gene expression correlation vs ICA components
+#-------------------------------------------------------------------------------
+genes <- dplyr::filter(dorothea::dorothea_mm, tf == "Foxp3")$target
+genes_expression <- mutate(cyt, GeneID = translate[EnsemblID]) %>%
+  dplyr::filter(GeneID %in% genes) %>%
+  dplyr::select(-EnsemblID) %>%
+  column_to_rownames("GeneID")
+
+genes_expression_corr <- complete_annotation %>%
+  as_tibble(rownames = "CITID") %>%
+  inner_join(as_tibble(t(genes_expression), rownames = "CITID")) %>%
+  column_to_rownames("CITID") %>%
+  formatted_cors("spearman") %>%
+  filter(measure1 %in% genes,
+         measure2 %in% names(complete_annotation))
+
+clust <- dplyr::select(genes_expression_corr, measure1, measure2, r) %>% 
+  pivot_wider(names_from=measure2, values_from = r) %>%
+  column_to_rownames("measure1") %>%
+  dist() %>%
+  hclust()
+
+genes_expression_corrplot <- ggplot(genes_expression_corr, aes(measure1, measure2, fill=r, label=round(r_if_sig,2))) +
+  geom_tile() +
+  labs(x = NULL, y = NULL, fill = "Spearman's\nAbsolute\nCorrelation", title="Correlations ICAcyt ~ FOXP3 targets",
+       subtitle="Only significant correlation coefficients shown (95% I.C.)") +
+  scale_fill_gradient2(mid="#FBFEF9",low="#0C6291",high="#A63446", limits=c(-1,1)) +
+  geom_text() +
+  theme_classic() +
+  scale_x_discrete(expand=c(0,0),limits = clust$labels[clust$order]) +
+  scale_y_discrete(expand=c(0,0), limits = paste("IC", rev(1:elected_ncomp), sep = ".")) +
+  ggpubr::rotate_x_text(angle = 90)
 
 #-------------------------------------------------------------------------------
-
 sed -i "s/ textLength='[^']*'//" file.svg
 #-------------------------------------------------------------------------------
 
