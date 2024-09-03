@@ -1,0 +1,98 @@
+.:
+total 120K
+32K drwxr-xr-x 4 jsolorzano UMR1037  51 30 août  11:55 data
+24K -rw-r--r-- 1 jsolorzano UMR1037   0  3 sept. 11:14 savedir.structure
+32K drwxr-xr-x 3 jsolorzano UMR1037  23 29 août  16:18 scripts
+32K drwxr-xr-x 4 jsolorzano UMR1037 131 30 août  09:55 software
+
+./data:
+total 64K
+32K drwxr-xr-x 2 jsolorzano UMR1037 1,7K 29 août  16:17 caflib
+32K drwxr-xr-x 2 jsolorzano UMR1037  867  2 sept. 12:03 cafstimul
+
+./data/caflib:
+total 21G
+501M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:17 D208R086.R1.fastq
+403M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:18 D208R086.R2.fastq
+503M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:18 D208R087.R1.fastq
+407M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:18 D208R087.R2.fastq
+480M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:19 D208R088.R1.fastq
+388M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:19 D208R088.R2.fastq
+484M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:19 D208R089.R1.fastq
+392M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:19 D208R089.R2.fastq
+495M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:20 D208R090.R1.fastq
+400M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:20 D208R090.R2.fastq
+461M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:20 D208R091.R1.fastq
+375M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:20 D208R091.R2.fastq
+470M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:21 D208R092.R1.fastq
+382M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:21 D208R092.R2.fastq
+458M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:21 D208R093.R1.fastq
+370M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:21 D208R093.R2.fastq
+427M -rwxr-xr-x 1 jsolorzano UMR1037 1,2G 29 août  14:21 D208R094.R1.fastq
+349M -rwxr-xr-x 1 jsolorzano UMR1037 1,2G 29 août  14:22 D208R094.R2.fastq
+507M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:22 D208R095.R1.fastq
+410M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:22 D208R095.R2.fastq
+494M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:22 D208R096.R1.fastq
+401M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:23 D208R096.R2.fastq
+451M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:23 D208R097.R1.fastq
+371M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:23 D208R097.R2.fastq
+454M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:23 D208R098.R1.fastq
+387M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:24 D208R098.R2.fastq
+486M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:24 D208R099.R1.fastq
+430M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:24 D208R099.R2.fastq
+448M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:24 D208R100.R1.fastq
+370M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:25 D208R100.R2.fastq
+476M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:25 D208R101.R1.fastq
+390M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:25 D208R101.R2.fastq
+469M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:25 D208R102.R1.fastq
+387M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:26 D208R102.R2.fastq
+521M -rwxr-xr-x 1 jsolorzano UMR1037 1,5G 29 août  14:26 D208R103.R1.fastq
+427M -rwxr-xr-x 1 jsolorzano UMR1037 1,5G 29 août  14:26 D208R103.R2.fastq
+557M -rwxr-xr-x 1 jsolorzano UMR1037 1,6G 29 août  14:27 D208R104.R1.fastq
+454M -rwxr-xr-x 1 jsolorzano UMR1037 1,6G 29 août  14:27 D208R104.R2.fastq
+506M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:27 D208R105.R1.fastq
+409M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:27 D208R105.R2.fastq
+448M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:28 D208R106.R1.fastq
+386M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:28 D208R106.R2.fastq
+470M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:28 D208R107.R1.fastq
+397M -rwxr-xr-x 1 jsolorzano UMR1037 1,3G 29 août  14:28 D208R107.R2.fastq
+561M -rwxr-xr-x 1 jsolorzano UMR1037 1,6G 29 août  14:29 D208R108.R1.fastq
+456M -rwxr-xr-x 1 jsolorzano UMR1037 1,6G 29 août  14:29 D208R108.R2.fastq
+485M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:29 D208R109.R1.fastq
+395M -rwxr-xr-x 1 jsolorzano UMR1037 1,4G 29 août  14:30 D208R109.R2.fastq
+
+./data/cafstimul:
+total 38G
+1,9G -rwxr-xr-x 1 jsolorzano UMR1037 6,4G 30 août  11:56 02_136_p8_hTert_p10_IFNg_rep1_S4_R1_001.fastq
+1,9G -rwxr-xr-x 1 jsolorzano UMR1037 6,4G 30 août  11:57 02_136_p8_hTert_p10_IFNg_rep1_S4_R2_001.fastq
+2,2G -rwxr-xr-x 1 jsolorzano UMR1037 7,5G 30 août  17:44 02_136_p8_hTert_p11_IFNg_rep2_S8_R1_001.fastq
+1,9G -rwxr-xr-x 1 jsolorzano UMR1037 6,1G 30 août  17:44 17AG06373_p8_hTert_p13_IFNg_rep2_S16_R1_001.fastq
+1,8G -rwxr-xr-x 1 jsolorzano UMR1037 6,1G 30 août  17:45 17AG06373_p8_hTert_p13_IFNg_rep2_S16_R2_001.fastq
+2,6G -rwxr-xr-x 1 jsolorzano UMR1037 8,7G 30 août  17:45 17AG06373_p8_hTert_p9_IFNg_rep1_S12_R1_001.fastq
+2,6G -rwxr-xr-x 1 jsolorzano UMR1037 8,7G 30 août  17:46 17AG06373_p8_hTert_p9_IFNg_rep1_S12_R2_001.fastq
+2,7G -rwxr-xr-x 1 jsolorzano UMR1037 9,2G  2 sept. 11:36 DPC6_hTert_p22_IFNg_S12_R1_001.fastq
+2,7G -rwxr-xr-x 1 jsolorzano UMR1037 9,2G  2 sept. 11:37 DPC6_hTert_p22_IFNg_S12_R2_001.fastq
+2,8G -rwxr-xr-x 1 jsolorzano UMR1037 9,5G  2 sept. 11:38 DPC6_hTert_p24_IFNg_S16_R1_001.fastq
+2,8G -rwxr-xr-x 1 jsolorzano UMR1037 9,5G  2 sept. 11:39 DPC6_hTert_p24_IFNg_S16_R2_001.fastq
+3,0G -rwxr-xr-x 1 jsolorzano UMR1037 8,3G  2 sept. 11:40 hPSC975_IFNg_1_S20_R1_001.fastq
+2,4G -rwxr-xr-x 1 jsolorzano UMR1037 8,3G  2 sept. 11:41 hPSC975_IFNg_1_S20_R2_001.fastq
+3,5G -rwxr-xr-x 1 jsolorzano UMR1037  12G  2 sept. 11:42 hPSC975_IFNg_2_S25_R1_001.fastq
+3,5G -rwxr-xr-x 1 jsolorzano UMR1037  12G  2 sept. 11:43 hPSC975_IFNg_2_S25_R2_001.fastq
+
+./scripts:
+total 32K
+32K drwxr-xr-x 2 jsolorzano UMR1037 32 29 août  16:24 hlahd
+
+./scripts/hlahd:
+total 24K
+24K -rw-r--r-- 1 jsolorzano UMR1037 481 30 août  10:03 program_module
+
+./software:
+total 9,2M
+ 32K drwxr-xr-x 8 jsolorzano UMR1037  500 30 août  11:39 hlahd.1.3.0.2
+2,7M -rwxr-xr-x 1 jsolorzano UMR1037 2,1M 30 août  09:55 hlahd.1.3.0.2.tar.gz
+ 32K drwxr-xr-x 8 jsolorzano UMR1037  408  6 févr.  2023 hlahd.1.7.0
+6,5M -rwxr-xr-x 1 jsolorzano UMR1037  30M 29 août  15:21 hlahd.1.7.0.tar
+
+######################################################################### removed lines for synthesis
+
