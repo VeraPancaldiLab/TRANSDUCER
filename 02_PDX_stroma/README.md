@@ -100,7 +100,8 @@ Code:
 
 As some CAFs seemed to support the growth of ISRact cells in vitro in Shin et al. 2024, we explored their involvement in the stroma of PDX. For that we first explroed the gene expression of marker genes of defined CAF subtypes in relation with ISRact, IC.4_cyt and PAMG scores without success. We also explored the distribution of IC.4_cyt gene contibutions of the different markers genes highlighting the difficulty of questioning the TME composition in a bulk setting, specially using single cell markers (**FigR15**).
 
-To interrogate CAFs at the level of translation, after an initial exploration suggesting exploring translation could be of interest (**FigR16**), we designed an experiment to produce signatures of CAFs under specific stimuli of importance in the PDAC stroma. Sadly, the analysis revealed technical problems possibly associated to the experimental complexity (**FigR17**).
+To interrogate CAFs at the level of translation, after an initial exploration suggesting exploring translation could be of interest (**FigR16**), we designed an experiment to produce signatures of CAFs under specific stimuli of importance in the PDAC stroma. Sadly, the analysis revealed technical problems possibly associated to the experimental complexity (**FigR17**). As part of this effort, and given the involvement with immunity I performed a profiling on MHCI and MHCII of 4 CAF cell lines under IFNG stimuli using [HLAHD](https://w3.genome.med.kyoto-u.ac.jp/HLA-HD/) (**ABSENT IN MANUSCRIPT**). 
+
 
 In this topic, for the ease of usage of CAF sequencing data, and the exploration of CAF subtypes signatures among many other things I created a tool named  [CAFCOMPARER](https://github.com/j-solor/CAFCOMPARER) with the help of Margaux Dore (**ABSENT IN MANUSCRIPT**). 
 
@@ -113,6 +114,8 @@ Code:
 * [07_stimulated_CAFs/00_Data/Fetch%26Preporcessing.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/07_stimulated_CAFs/00_Data/Fetch%26Preporcessing.R)
 
 * [07_stimulated_CAFs/02_17AC_NTvsCondition/anota2seq_17AC_NTvsCond.R](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/07_stimulated_CAFs/02_17AC_NTvsCondition/anota2seq_17AC_NTvsCond.R)
+
+* HLA-HD -> [07_stimulated_CAFs/270824_HLAHD](https://github.com/VeraPancaldiLab/TRANSDUCER/blob/main/07_stimulated_CAFs/270824_HLAHD/)
 
 
 ################################################################################
