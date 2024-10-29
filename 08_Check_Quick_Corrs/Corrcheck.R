@@ -1,6 +1,11 @@
 setwd("/home/jacobo/Documents/02_TRANSDUCER/08_Check_Quick_Corrs/")
+library(tidyverse)
+library(Hmisc)
 
 # In this script you can compare any of the components obtained from Tumour translatome/with transcription of tumour/stroma
+# REMEMBER RUNNING the following command in the directory to make text editable in InkScape:
+## for i in ./*.svg; do ./fixsvgs.sh "$i"; done
+
 # Functions
 plot_gene_correlation <- function(data, x_col, y_col, plot_title = fraction_expression, output_path = "02_Output/") {
   
