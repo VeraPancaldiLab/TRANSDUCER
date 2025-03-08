@@ -437,7 +437,7 @@ stats_text <- paste0("t-test: pval = ", format(stats$p.value, scientific = T))
 ggplot(mutated_genes_filt, aes(x = get(signature_bin), y = mutated_genes)) +
   geom_dotplot(binaxis = "y", stackdir = "center") +
   stat_summary(
-    fun.y = median, geom = "point", shape = 18,
+    fun = median, geom = "point", shape = 18,
     size = 3, color = "red"
   ) +
   # scale_y_log10() +
