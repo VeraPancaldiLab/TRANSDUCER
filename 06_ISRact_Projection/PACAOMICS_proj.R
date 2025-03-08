@@ -49,11 +49,19 @@ top_samples <- arrange(sample_info, ICA3) %>%
 
 ################################################################################
 # PARAMETERS
-PACAOMICS_raw <- RN2017_raw # RN2017_raw | PACAOMICs_90_raw
+PACAOMICS_data <- "PDX90"  # "PDX30" is Remy Nicolle 2017 data "PDX90" is the PACAOMICS90 cohort
 norm_method <- "upperquartile" # TMM | upperquartile
 signature_ISRact <- "ISRactPCA" # ISRactPCA | ISRactICA
 signature_bin = paste0(signature_ISRact, "_bin")
 ################################################################################
+# load desired data
+if (PACAOMICS_data == "PDX90") {
+  PACAOMICS_raw <- PACAOMICs_90_raw
+} else if (PACAOMICS_data == "PDX30") {
+  PACAOMICS_raw <- RN2017_raw
+} else {
+  stop("Invalid value for PACAOMICS_data. Choose either 'PDX90' or 'PDX30'.")
+}
 
 # Translate EnsemblID to gene names
 ## Version 75 for PDX data
@@ -118,26 +126,31 @@ if (signature_ISRact == "ISRactPCA") {
     as_tibble() %>%
     mutate(sample = PACAOMICS_norm$sample, .before = 1) %>% # manual assignation due to loss of sampleID in predict
     left_join(top_samples[, c("sample", "ISRact_bin")]) %>%
+    
+    dplyr::rename(ISRactPCA = "PC1", other_comp = "PC2") %>% 
     mutate(
       ISRact_bin = replace(ISRact_bin, is.na(ISRact_bin) & sample %in% sample_info$sample, "intermediate_ISRact"),
       ISRact_bin = replace_na(ISRact_bin, "Unknown")
     )
 
-  PACAOMICS_ISRact_projection <- arrange(PACAOMICS_PCAspace, PC1) %>%
+  PACAOMICS_ISRact_projection <- arrange(PACAOMICS_PCAspace, ISRactPCA) %>%
     dplyr::filter(!sample == "!") %>%
-    mutate(ISRactPCA_bin = cut(.$PC1, breaks = c(quantile(.$PC1, c(0:3 / 3))), labels = c("low_ISRactPCA", "intermediate_ISRactPCA", "high_ISRactPCA"), include.lowest = TRUE)) %>%
-    dplyr::select(sample, PC1, ISRactPCA_bin, ISRact_bin) %>%
+    mutate(ISRactPCA_bin = cut(.$ISRactPCA, breaks = c(quantile(.$ISRactPCA, c(0:3 / 3))), labels = c("low_ISRactPCA", "intermediate_ISRactPCA", "high_ISRactPCA"), include.lowest = TRUE)) %>%
+    dplyr::select(sample, ISRactPCA, ISRactPCA_bin, ISRact_bin) %>%
     left_join(sample_info_PACAOMICS[, c("sample", "PAMG", "ICA3")], by = "sample") %>%
-    dplyr::rename(ISRact = "ICA3", ISRactPCA = "PC1")
-
+    dplyr::rename(ISRact = "ICA3")
 
   # Plot pca and projections
   ## Add ISR status to PCA df
   pca_training <- pca_pdx[["x"]] %>%
     as.data.frame() %>%
     rownames_to_column("sample") %>%
+    # dplyr::select(sample, PC1, PC2) %>%
+    dplyr::rename(ISRactPCA = "PC1", other_comp = "PC2") %>% 
     inner_join(top_samples[, c("sample", "ISRact", "ISRact_bin")])
-} else if (signature_ISRact == "ISRactICA") {
+  
+  
+} else if (signature_ISRact == "ISRactICA") { # careful if component of interest is IC.2!
   # Import the projection
   ## ISRactPCA
   ica_pdx <- read_rds("../06_Human_Cohort_Projection/01_PDXTranslation_to_PDXTrascription/ISRactICA_IC3.RDS")
@@ -245,20 +258,30 @@ if (signature_ISRact == "ISRactPCA") {
     metadata_id = "EnsemblID",
     vars = c("IC.3"),
     is.categorical = F
-  )
+  ) 
+  
+  if (PACAOMICS_data == "PDX90"){ # IC.8 from nc20
+    nc_choice = 20
+    IC_choice = "IC.8"
+    rotate = FALSE
+  }else if (PACAOMICS_data == "PDX30"){ #IC.10 from nc13 reversed
+    nc_choice = 13
+    IC_choice = "IC.10"
+    rotate = TRUE
+  }
 
-  ISRactICA <- Range_ICA(PACAOMICS_icaready, "EnsemblID", 13)
-  # IC.10 is the component
-
-  ISRactICA$A[, "IC.10"] <- ISRactICA$A[, "IC.10"] * (-1)
-  ISRactICA$S[, "IC.10"] <- ISRactICA$S[, "IC.10"] * (-1)
-
+  ISRactICA <- Range_ICA(PACAOMICS_icaready, "EnsemblID", nc_choice)
+  
+if (rotate){
+  ISRactICA$A[, IC_choice] <- ISRactICA$A[, IC_choice] * (-1)
+  ISRactICA$S[, IC_choice] <- ISRactICA$S[, IC_choice] * (-1)
+}
   # Create a PACAOMICS_PCA like object to explore the association in depth in the following analyses
 
   PACAOMICS_PCAspace <- as_tibble(ISRactICA$A, rownames = "sample") %>%
-    dplyr::arrange(IC.10) %>%
-    dplyr::select(sample, IC.10, IC.2) %>%
-    dplyr::rename(ISRactICA = "IC.10", other_comp = "IC.2") %>%
+    dplyr::arrange(get(IC_choice)) %>%
+    dplyr::select(sample, matches(IC_choice), IC.2) %>%
+    dplyr::rename(ISRactICA = IC_choice, other_comp = "IC.2") %>%
     left_join(top_samples[, c("sample", "ISRact_bin")]) %>%
     mutate(
       ISRact_bin = replace(ISRact_bin, is.na(ISRact_bin) & sample %in% sample_info$sample, "intermediate_ISRact"),
@@ -296,7 +319,7 @@ show_projection <- bind_rows(
 
 projection_scatter_pacaomics <- dplyr::mutate(show_projection, ISRact_bin = fct(ISRact_bin, levels = c("low_ISRact", "intermediate_ISRact", "high_ISRact", "Unknown"))) %>%
   dplyr::filter(
-    dataset %in% c("PaCaOmics PDX"), # "Shin et al. PDX","PACAOMICS PDX", "CPTAC", "CCLE"
+    dataset %in% c("PaCaOmics PDX", "Shin et al. PDX"), # "Shin et al. PDX","PACAOMICS PDX", "CPTAC", "CCLE"
     ISRact_bin %in% c("low_ISRact", "high_ISRact", "intermediate_ISRact", "Unknown")
   ) %>%
   ggplot(aes(x = get(signature_ISRact), y = other_comp, color = ISRact_bin, shape = dataset)) +
@@ -312,6 +335,10 @@ projection_scatter_pacaomics <- dplyr::mutate(show_projection, ISRact_bin = fct(
 #        filename = "results/Figures/projection_scatter_pacaomics.svg",
 #        width = 7,
 #        height = 3)
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Export a version of this for outer file usage
+write_tsv(PACAOMICS_ISRact_projection, paste0("data/PACAOMICs/", PACAOMICS_data,  signature_ISRact, "_metadata.tsv"))
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 # Check ISR marker genes associated with ISRActPCA extreme samples
