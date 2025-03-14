@@ -188,7 +188,7 @@ if (signature_ISRact == "ISRactPCA") {
       var = character(),
       IC = character(),
       R = numeric(),
-      needs_inversion = logical(),
+      needs_rotation = logical(),
       Pval = numeric()
     )
     
@@ -228,7 +228,7 @@ if (signature_ISRact == "ISRactPCA") {
           var = cv,
           IC = best_c,
           R = abs(correlations[[cv]]$Rs[[n.comp]][[best_c]]),
-          needs_inversion = correlations[[cv]]$Rs[[n.comp]][[best_c]] < 0, 
+          needs_rotation = correlations[[cv]]$Rs[[n.comp]][[best_c]] < 0, 
           Pval = correlations[[cv]]$Pvals[[n.comp]][[best_c]]
         ) -> to_plot
       }
@@ -242,7 +242,7 @@ if (signature_ISRact == "ISRactPCA") {
     to_plot$nc <- to_plot$nc %>%
       factor(order_bars$nc)
     
-    to_plot %>% ggplot(aes(x = nc, y = R, fill = needs_inversion)) +
+    to_plot %>% ggplot(aes(x = nc, y = R, fill = needs_rotation)) +
       geom_bar(stat = "identity", position = position_dodge()) +
       geom_text(aes(x = nc, y = 0.1, label = IC), angle = 90, position = position_dodge(width = 0.9)) +
       theme_minimal() +
@@ -265,7 +265,7 @@ if (signature_ISRact == "ISRactPCA") {
   if (PACAOMICS_data == "PDX90"){ # IC.8 from nc20
     nc_choice = 20
     IC_choice = "IC.8"
-    rotate = FALSE
+    rotate = TRUE
   }else if (PACAOMICS_data == "PDX30"){ #IC.10 from nc13 reversed
     nc_choice = 13
     IC_choice = "IC.10"
