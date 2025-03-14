@@ -51,7 +51,7 @@ top_samples <- arrange(sample_info, ICA3) %>%
 # PARAMETERS
 PACAOMICS_data <- "PDX90"  # "PDX30" is Remy Nicolle 2017 data "PDX90" is the PACAOMICS90 cohort
 norm_method <- "upperquartile" # TMM | upperquartile
-signature_ISRact <- "ISRactPCA" # ISRactPCA | ISRactICA
+signature_ISRact <- "ISRactICA" # ISRactPCA | ISRactICA
 signature_bin = paste0(signature_ISRact, "_bin")
 ################################################################################
 # load desired data
@@ -188,6 +188,7 @@ if (signature_ISRact == "ISRactPCA") {
       var = character(),
       IC = character(),
       R = numeric(),
+      needs_inversion = logical(),
       Pval = numeric()
     )
     
@@ -227,6 +228,7 @@ if (signature_ISRact == "ISRactPCA") {
           var = cv,
           IC = best_c,
           R = abs(correlations[[cv]]$Rs[[n.comp]][[best_c]]),
+          needs_inversion = correlations[[cv]]$Rs[[n.comp]][[best_c]] < 0, 
           Pval = correlations[[cv]]$Pvals[[n.comp]][[best_c]]
         ) -> to_plot
       }
@@ -240,7 +242,7 @@ if (signature_ISRact == "ISRactPCA") {
     to_plot$nc <- to_plot$nc %>%
       factor(order_bars$nc)
     
-    to_plot %>% ggplot(aes(x = nc, y = R, fill = var)) +
+    to_plot %>% ggplot(aes(x = nc, y = R, fill = needs_inversion)) +
       geom_bar(stat = "identity", position = position_dodge()) +
       geom_text(aes(x = nc, y = 0.1, label = IC), angle = 90, position = position_dodge(width = 0.9)) +
       theme_minimal() +
@@ -258,7 +260,7 @@ if (signature_ISRact == "ISRactPCA") {
     metadata_id = "EnsemblID",
     vars = c("IC.3"),
     is.categorical = F
-  ) 
+  )
   
   if (PACAOMICS_data == "PDX90"){ # IC.8 from nc20
     nc_choice = 20
